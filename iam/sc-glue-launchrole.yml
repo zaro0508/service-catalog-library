@@ -46,6 +46,9 @@ Resources:
 Outputs:
     LaunchRoleArn:
         Value: !GetAtt GlueLaunchRole.Arn
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleArn'
     LaunchRoleName:
         Value: !Ref GlueLaunchRole
-        
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleName'

@@ -59,6 +59,9 @@ Resources:
 Outputs:
     LaunchRoleArn:
         Value: !GetAtt SCEC2LaunchRole.Arn
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleArn'
     LaunchRoleName:
         Value: !Ref SCEC2LaunchRole
-        
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleName'

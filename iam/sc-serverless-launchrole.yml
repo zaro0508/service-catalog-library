@@ -122,6 +122,9 @@ Resources:
 Outputs:
     LaunchRoleArn:
         Value: !GetAtt SCServerlessLaunchRole.Arn
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleArn'
     LaunchRoleName:
         Value: !Ref SCServerlessLaunchRole
-        
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleName'

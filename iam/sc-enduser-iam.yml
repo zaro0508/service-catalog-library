@@ -25,11 +25,19 @@ Resources:
 Outputs:
     EndUserGroupArn:
         Value: !GetAtt SCEnduserGroup.Arn
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserGroupArn'
     EndUserGroupName:
         Value: !Ref SCEnduserGroup        
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserGroupName'
     EndUserRoleArn:
         Value: !GetAtt SCEnduserRole.Arn
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleArn'
     EndUserRoleName:
         Value: !Ref SCEnduserRole
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleName'
 
          

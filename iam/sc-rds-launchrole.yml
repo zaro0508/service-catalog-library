@@ -59,6 +59,9 @@ Resources:
 Outputs:
     LaunchRoleArn:
         Value: !GetAtt SCRDSLaunchRole.Arn
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleArn'
     LaunchRoleName:
         Value: !Ref SCRDSLaunchRole
-        
+        Export:
+          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleName'

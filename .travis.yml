@@ -23,7 +23,7 @@ jobs:
         - pre-commit run --all-files
     - stage: test
       script:
-        - taskcat -c ci/taskcat.yaml --tag owner=taskcat
+        - taskcat -c ci/taskcat-all.yml --tag owner=taskcat
     - stage: deploy
       script:
         - ./deploy-templates.sh || travis_terminate 1

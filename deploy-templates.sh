@@ -7,13 +7,9 @@ S3_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='us-east-1-b
 S3_BUCKET_PATH="$REPO_NAME/$TRAVIS_BRANCH"
 S3_BUCKET_URL="s3://$S3_BUCKET/$S3_BUCKET_PATH"
 
-# Upload local templates
-TEMPLATES=templates/*
-for template in $TEMPLATES
+# Upload local dirs to S3 bucket
+DIRS=$(ls -d */)
+for dir in $DIRS
 do
-  dir="${template%/*}"
-  file="${template##*/}"
-  extension="${file##*.}"
-  filename="${file%.*}"
-  aws s3 cp ${template} $S3_BUCKET_URL/${file}
+  aws s3 cp --recursive ${dir} $S3_BUCKET_URL/${dir}
 done

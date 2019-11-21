@@ -1,6 +1,5 @@
-*Issue #, if available:*
+PR Checklist:
+[ ] Describe and explain your intentions for this change
 
-*Description of changes:*
-
-
-By submitting this pull request, I confirm that my contribution is made under the terms of the Apache 2.0 license.
+[ ] Setup pre-commit and run the validators (info in README.md)
+    To validate files run: `pre-commit run --all-files`

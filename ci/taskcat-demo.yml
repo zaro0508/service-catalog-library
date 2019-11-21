@@ -1,7 +1,7 @@
 ---
 global:
   cleanup: true 
-  owner: owner@company.com
+  owner: it@sagebase.org
   qsname: SCPortfoliosRepo
   regions:
     - us-east-1

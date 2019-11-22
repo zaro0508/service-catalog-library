@@ -180,6 +180,11 @@
           "Condition":"CreateLaunchConstraint",
           "Value": { "Fn::GetAtt":["LaunchConstraintRole", "Outputs.LaunchRoleName"] } 
         },
-        "vpcproductId":{"Value": { "Fn::GetAtt":["vpcproduct","Outputs.ProductId"]} }
+        "vpcproductId" : {
+          "Value" : { "Fn::GetAtt":["vpcproduct","Outputs.ProductId"]},
+          "Export" : {
+            "Name" : { "Fn::Sub":["${AWS::Region}-${AWS::StackName}-vpcproductId"]}
+           }
+        }
     }
 }

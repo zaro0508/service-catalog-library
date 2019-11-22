@@ -210,6 +210,11 @@
         "ec2windowsproductId":{"Value":     { "Fn::GetAtt":["ec2windowsproduct","Outputs.ProductId"]} },
         "ec2webserverproductId":{"Value":     { "Fn::GetAtt":["ec2webserverproduct","Outputs.ProductId"]} },
         "ec2linuxproductId":{"Value":         { "Fn::GetAtt":["ec2linuxproduct","Outputs.ProductId"]} },
-        "vpcproductId":{"Value":         { "Fn::GetAtt":["vpcproduct","Outputs.ProductId"]} }
+        "vpcproductId" : {
+          "Value" : { "Fn::GetAtt":["vpcproduct","Outputs.ProductId"] },
+          "Export" : {
+            "Name" : { "Fn::Sub": "${AWS::Region}-${AWS::StackName}-vpcproductId"}
+           }
+        }
     }
 }

@@ -181,9 +181,9 @@
           "Value": { "Fn::GetAtt":["LaunchConstraintRole", "Outputs.LaunchRoleName"] } 
         },
         "vpcproductId" : {
-          "Value" : { "Fn::GetAtt":["vpcproduct","Outputs.ProductId"]},
+          "Value" : { "Fn::GetAtt":["vpcproduct","Outputs.ProductId"] },
           "Export" : {
-            "Name" : { "Fn::Sub":["${AWS::Region}-${AWS::StackName}-vpcproductId"]}
+            "Name" : { "Fn::Join":["-", [{"Ref": "AWS::Region"}, {"Ref": "AWS::StackName"}, "vpcproductId"]] }
            }
         }
     }

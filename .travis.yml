@@ -24,6 +24,15 @@ jobs:
     - stage: test
       script:
         - taskcat -c ci/taskcat-all.yml --tag owner=taskcat
+        - |
+          if $(grep -Fq "CREATE_FAILED" taskcat_outputs/index.html)
+          then
+            echo Validation FAILED!
+            exit 1
+          else
+            echo Validation Passed!
+            exit 0
+          fi
     - stage: deploy
       script:
         - ./deploy-templates.sh || travis_terminate 1

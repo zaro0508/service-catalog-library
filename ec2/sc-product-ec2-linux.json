@@ -36,7 +36,7 @@
                     {
                         "Description": "baseline version",
                         "Info": {
-                            "LoadTemplateFromURL": {"Fn::Sub": "${RepoRootURL}ec2/sc-ec2-linux-ra.json"}
+                            "LoadTemplateFromURL": {"Fn::Sub": "${RepoRootURL}ec2/sc-ec2-linux-ra.yaml"}
                         },
                         "Name": "v1.0"
                     }

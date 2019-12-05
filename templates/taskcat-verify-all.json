@@ -75,7 +75,7 @@
                 "LinkedRole2": {"Ref":"LinkedRole2"},
                 "RepoRootURL":{"Ref":"RepoRootURL"}
             },
-            "TemplateURL" : {"Fn::Sub": "${RepoRootURL}vpc/sc-portfolio-vpc.json"},
+            "TemplateURL" : {"Fn::Sub": "${RepoRootURL}vpc/sc-portfolio-vpc.yaml"},
             "TimeoutInMinutes" : 5
           }
         },

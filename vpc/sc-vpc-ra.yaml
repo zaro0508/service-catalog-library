@@ -450,22 +450,47 @@ Outputs:
     Value: !Ref 'RegionAZ2Name'
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-RegionAZ2Name'
+  VPCID:
+    Description: 'VPCID of the newly created VPC'
+    Value: !Ref 'VPC'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-VPCID'
   VPCCIDR:
     Value: !GetAtt 'VPC.CidrBlock'
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-VPCCIDR'
+  SubnetAPublicID:
+    Description: 'ID of the first public subnet'
+    Value: !Ref 'SubnetAPublic'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPublicID'
   SubnetAPublicCIDR:
     Value: !Ref 'SubnetAPublicCIDR'
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPublicCIDR'
+  SubnetBPublicID:
+    Description: 'ID of the second public subnet'
+    Value: !Ref 'SubnetBPublic'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPublicID'
   SubnetBPublicCIDR:
     Value: !Ref 'SubnetBPublicCIDR'
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPublicCIDR'
+  SubnetAPrivateID:
+    Description: 'ID of the first private subnet'
+    Value: !Ref 'SubnetAPrivate'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPrivateID'
   SubnetAPrivateCIDR:
     Value: !Ref 'SubnetAPrivateCIDR'
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPrivateCIDR'
+  SubnetBPrivateID:
+    Description: 'ID of the second private subnet'
+    Value: !Ref 'SubnetBPrivate'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPrivateID'
   SubnetBPrivateCIDR:
     Value: !Ref 'SubnetAPrivateCIDR'
     Export:

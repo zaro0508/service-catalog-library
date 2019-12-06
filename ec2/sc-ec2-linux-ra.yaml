@@ -27,7 +27,7 @@ Metadata:
         default: SSM key to the latest Amazon linux AMI
 Parameters:
   LinuxSubnetPrivacy:
-    Type: AWS::EC2::Subnet::Id
+    Type: String
     Description: Select a public or private subnet
     AllowedValues:
       - private

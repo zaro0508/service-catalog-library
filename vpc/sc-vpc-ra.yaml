@@ -440,66 +440,115 @@ Outputs:
     Value: service-catalog-reference-architectures/sc-vpc-ra
   AWSRegionName:
     Value: !Ref 'AWS::Region'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-AWSRegionName'
   RegionAZ1Name:
     Value: !Ref 'RegionAZ1Name'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-RegionAZ1Name'
   RegionAZ2Name:
     Value: !Ref 'RegionAZ2Name'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-RegionAZ2Name'
   VPCCIDR:
     Value: !GetAtt 'VPC.CidrBlock'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-VPCCIDR'
   SubnetAPublicCIDR:
     Value: !Ref 'SubnetAPublicCIDR'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPublicCIDR'
   SubnetBPublicCIDR:
     Value: !Ref 'SubnetBPublicCIDR'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPublicCIDR'
   SubnetAPrivateCIDR:
     Value: !Ref 'SubnetAPrivateCIDR'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPrivateCIDR'
   SubnetBPrivateCIDR:
     Value: !Ref 'SubnetAPrivateCIDR'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPrivateCIDR'
   InternetGatewayID:
     Value: !Ref 'InternetGateway'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-InternetGatewayID'
   NATGatewayAID:
     Value: !Ref 'NATGatewayA'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-NATGatewayAID'
   NATGatewayAEIP:
     Value: !Ref 'NATGatewayAEIP'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-NATGatewayAEIP'
   NATGatewayBID:
     Value: !Ref 'NATGatewayB'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-NATGatewayBID'
   NATGatewayBEIP:
     Value: !Ref 'NATGatewayBEIP'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-NATGatewayBEIP'
   RouteTableAPublic:
     Value: !Ref 'RouteTableAPublic'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-RouteTableAPublic'
   RouteTableBPublic:
     Value: !Ref 'RouteTableBPublic'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-RouteTableBPublic'
   RouteTableAPrivate:
     Value: !Ref 'RouteTableAPrivate'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-RouteTableAPrivate'
   RouteTableBPrivate:
     Value: !Ref 'RouteTableBPrivate'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-RouteTableBPrivate'
   NetworkAclPublic:
     Value: !Ref 'NetworkAclPublic'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-NetworkAclPublic'
   NetworkAclPrivate:
     Value: !Ref 'NetworkAclPrivate'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-NetworkAclPrivate'
   CreatedBastionInstance:
     Value: !Ref 'BastionInstance'
     Condition: CreateBastionResources
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-CreatedBastionInstance'
   BastionInstanceType:
     Value: !Ref 'BastionInstanceType'
     Condition: CreateBastionResources
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionInstanceType'
   BastionInstancePublicIP:
     Value: !GetAtt 'BastionInstance.PublicDnsName'
     Condition: CreateBastionResources
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionInstancePublicIP'
   BastionSecurityGroupID:
     Value: !Ref 'BastionSecurityGroup'
     Condition: CreateBastionResources
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionSecurityGroupID'
   EC2KeyPair:
     Value: !If
       - HasKeyName
       - !Ref 'EC2KeyPair'
       - !Ref 'AWS::NoValue'
     Condition: CreateBastionResources
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-EC2KeyPair'
   BastionSSHCIDR:
     Value: !Ref 'BastionSSHCIDR'
     Condition: CreateBastionResources
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionSSHCIDR'
   VPNSecurityGroupID:
     Description: 'VPN Security Group Id'
     Value: !Ref VPNSecurityGroup
     Export:
-      Name:
-        !Join ['-', [!Ref 'AWS::Region', !Sub '${AWS::StackName}', 'VPNSecurityGroupID']]
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-VPNSecurityGroupID'

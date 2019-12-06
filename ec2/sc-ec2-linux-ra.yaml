@@ -231,10 +231,6 @@ Outputs:
     Value: !Ref 'LinuxSSHPort'
   LinuxInstanceType:
     Value: !Ref 'LinuxInstanceType'
-  RemoteAccessCIDR:
-    Value: !Ref 'RemoteAccessCIDR'
-  VPC:
-    Value: !Ref 'VPC'
   IAMInstancePatchingRole:
     Value: !Ref 'InstancePatchingRole'
   IAMPatchingInstanceProfile:

@@ -4,16 +4,16 @@ Resources:
     Type: AWS::IAM::Group
     Properties:
       GroupName: ServiceCatalogEndusers
-      ManagedPolicyArns: 
+      ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
       Path: /
   SCEnduserRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: ServiceCatalogEndusers
-      ManagedPolicyArns: 
+      ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
-      Path: /      
+      Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -23,21 +23,19 @@ Resources:
             Action:
               - 'sts:AssumeRole'
 Outputs:
-    EndUserGroupArn:
-        Value: !GetAtt SCEnduserGroup.Arn
-        Export:
-          Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserGroupArn'
-    EndUserGroupName:
-        Value: !Ref SCEnduserGroup        
-        Export:
-          Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserGroupName'
-    EndUserRoleArn:
-        Value: !GetAtt SCEnduserRole.Arn
-        Export:
-          Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleArn'
-    EndUserRoleName:
-        Value: !Ref SCEnduserRole
-        Export:
-          Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleName'
-
-         
+  EndUserGroupArn:
+    Value: !GetAtt SCEnduserGroup.Arn
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserGroupArn'
+  EndUserGroupName:
+    Value: !Ref SCEnduserGroup
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserGroupName'
+  EndUserRoleArn:
+    Value: !GetAtt SCEnduserRole.Arn
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleArn'
+  EndUserRoleName:
+    Value: !Ref SCEnduserRole
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleName'

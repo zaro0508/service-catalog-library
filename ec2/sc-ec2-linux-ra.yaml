@@ -7,33 +7,34 @@ Metadata:
           default: General Configuration
         Parameters:
           - KeyPair
+          - Subnet
+          - SecurityGroups
       - Label:
           default: Linux Instance Configuration
         Parameters:
-          - LinuxInstanceType
-          - LinuxSubnetPrivacy
-          - LinuxSSHPort
+          - EC2InstanceType
           - LatestAmiId
     ParameterLabels:
       KeyPair:
         default: Key Pair
-      LinuxInstanceType:
-        default: Linux Instance Type
-      LinuxSubnetPrivacy:
-        default: Linux Subnet Privacy
-      LinuxSSHPort:
-        default: Linux SSH Port
+      Subnet:
+        default: Subnet
+      SecurityGroups:
+        default: Security Groups
+      EC2InstanceType:
+        default: EC2 Instance Type
       LatestAmiId:
         default: SSM key to the latest Amazon linux AMI
 Parameters:
-  LinuxSubnetPrivacy:
-    Type: String
-    Description: Select a public or private subnet
-    AllowedValues:
-      - private
-      - public
-    Default: private
-  LinuxInstanceType:
+  Subnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet for Linux Instance
+    ConstraintDescription: must be an existing subnet
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: The list of security groups to apply to the instance
+    ConstraintDescription: must be existing security groups
+  EC2InstanceType:
     AllowedValues:
       - t3.nano
       - t3.micro
@@ -48,11 +49,6 @@ Parameters:
     Default: t3.micro
     Description: Amazon EC2 Linux Instance Type
     Type: String
-  LinuxSSHPort:
-    Description: Linux SSH Port Number
-    Type: Number
-    Default: 22
-    ConstraintDescription: must be 22 or a number from 1024 to 65535
   KeyPair:
     Description: Name of existing EC2 key pair for Linux Instances
     Type: AWS::EC2::KeyPair::KeyName
@@ -60,10 +56,6 @@ Parameters:
   LatestAmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-Conditions:
-  HasPublicSubnet: !Equals
-    - !Ref LinuxSubnetPrivacy
-    - public
 Resources:
   InstancePatchingRole:
     Type: AWS::IAM::Role
@@ -91,15 +83,9 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref 'LatestAmiId'
-      InstanceType: !Ref 'LinuxInstanceType'
-      SubnetId:
-        !If
-        - HasPublicSubnet
-        - !Sub '${AWS::Region}-sc-vpc-ra-SubnetAPublicID'
-        - !Sub '${AWS::Region}-sc-vpc-ra-SubnetAPrivateID'
-      SecurityGroupIds:
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-sc-vpc-ra-VPNSecurityGroupID'
+      InstanceType: !Ref 'EC2InstanceType'
+      SubnetId: !Ref Subnet
+      SecurityGroupIds: !Ref SecurityGroups
       KeyName: !Ref 'KeyPair'
       IamInstanceProfile: !Ref 'PatchingInstanceProfile'
       Tags:
@@ -227,10 +213,14 @@ Outputs:
     Value: !GetAtt 'LinuxInstance.AvailabilityZone'
   KeyPair:
     Value: !Ref 'KeyPair'
-  LinuxSSHPort:
-    Value: !Ref 'LinuxSSHPort'
-  LinuxInstanceType:
-    Value: !Ref 'LinuxInstanceType'
+  Subnet:
+    Value: !Ref 'Subnet'
+  SecurityGroups:
+    Value: !Join
+      - ','
+      - !Ref 'SecurityGroups'
+  EC2InstanceType:
+    Value: !Ref 'EC2InstanceType'
   IAMInstancePatchingRole:
     Value: !Ref 'InstancePatchingRole'
   IAMPatchingInstanceProfile:

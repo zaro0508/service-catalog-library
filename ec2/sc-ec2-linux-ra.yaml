@@ -7,6 +7,7 @@ Metadata:
           default: General Configuration
         Parameters:
           - KeyPair
+          - VPC
           - Subnet
           - SecurityGroups
       - Label:
@@ -17,6 +18,8 @@ Metadata:
     ParameterLabels:
       KeyPair:
         default: Key Pair
+      VPC:
+        default: VPC
       Subnet:
         default: Subnet
       SecurityGroups:
@@ -26,13 +29,16 @@ Metadata:
       LatestAmiId:
         default: SSM key to the latest Amazon linux AMI
 Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: Virtual Private Cloud where the EC2 instance will be created (required)
   Subnet:
     Type: AWS::EC2::Subnet::Id
-    Description: Subnet for Linux Instance
+    Description: Subnet for the Instance (required)
     ConstraintDescription: must be an existing subnet
   SecurityGroups:
     Type: List<AWS::EC2::SecurityGroup::Id>
-    Description: The list of security groups to apply to the instance
+    Description: Security groups to apply to the instance (required)
     ConstraintDescription: must be existing security groups
   EC2InstanceType:
     AllowedValues:
@@ -47,14 +53,15 @@ Parameters:
       - t2.medium
       - t2.large
     Default: t3.micro
-    Description: Amazon EC2 Linux Instance Type
+    Description: Amazon EC2 Instance Type
     Type: String
   KeyPair:
-    Description: Name of existing EC2 key pair for Linux Instances
+    Description: Name of existing EC2 key pair for the instance (required)
     Type: AWS::EC2::KeyPair::KeyName
     Default: scipool
   LatestAmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Description: Amazon Linux Machine Image
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
 Resources:
   InstancePatchingRole:
@@ -213,6 +220,8 @@ Outputs:
     Value: !GetAtt 'LinuxInstance.AvailabilityZone'
   KeyPair:
     Value: !Ref 'KeyPair'
+  VPC:
+    Value: !Ref 'VPC'
   Subnet:
     Value: !Ref 'Subnet'
   SecurityGroups:

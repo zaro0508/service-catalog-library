@@ -17,7 +17,7 @@ phases:
             - echo "S3 Upload Complete, updating cloudformation now..."
             - /bin/bash codepipeline/run-pipelineupdate-multi.sh
             - aws cloudformation update-stack-set --stack-set-name ${ALIAS}-SC-IAC-automated-IAMroles  --parameters "[{\"ParameterKey\":\"RepoRootURL\",\"ParameterValue\":\"${S3Https}/\"}]" --template-url "${S3Https}/iam/sc-demosetup-iam.json" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --administration-role-arn ${AdminRoleArn}
-            - aws cloudformation update-stack-set --stack-set-name ${ALIAS}-SC-IAC-automated-portfolio --parameters "[{\"ParameterKey\":\"LinkedRole2\",\"UsePreviousValue\":true},{\"ParameterKey\":\"LinkedRole1\",\"UsePreviousValue\":true},{\"ParameterKey\":\"LaunchRoleName\",\"UsePreviousValue\":true},{\"ParameterKey\":\"RepoRootURL\",\"ParameterValue\":\"${S3Https}/\"}]" --template-url "${S3Https}/ec2/sc-portfolio-ec2VPC.json" --administration-role-arn ${AdminRoleArn}
+            - aws cloudformation update-stack-set --stack-set-name ${ALIAS}-SC-IAC-automated-portfolio --parameters "[{\"ParameterKey\":\"LinkedRole2\",\"UsePreviousValue\":true},{\"ParameterKey\":\"LinkedRole1\",\"UsePreviousValue\":true},{\"ParameterKey\":\"LaunchRoleName\",\"UsePreviousValue\":true},{\"ParameterKey\":\"RepoRootURL\",\"ParameterValue\":\"${S3Https}/\"}]" --template-url "${S3Https}/ec2/sc-portfolio-ec2VPC.yaml" --administration-role-arn ${AdminRoleArn}
 
     post_build:
         commands:

@@ -48,7 +48,7 @@ sleep 10
 done
 
 echo "creating the ServiceCatalog Portfolio StackSet"
-aws cloudformation create-stack-set --stack-set-name ${ALIAS}-SC-IAC-automated-portfolio --parameters "[{\"ParameterKey\":\"PorfolioName\",\"ParameterValue\":\"${ALIAS}-SC-RA\"},{\"ParameterKey\":\"LinkedRole1\",\"ParameterValue\":\"$LinkedRole1\"},{\"ParameterKey\":\"LinkedRole2\",\"ParameterValue\":\"\"},{\"ParameterKey\":\"LaunchRoleName\",\"ParameterValue\":\"SCEC2LaunchRole\"},{\"ParameterKey\":\"RepoRootURL\",\"ParameterValue\":\"$S3RootURL/\"}]" --template-url "$S3RootURL/ec2/sc-portfolio-ec2VPC.json" --administration-role-arn $CFTSSAdminRole --execution-role-name $CFTSSExecRole --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+aws cloudformation create-stack-set --stack-set-name ${ALIAS}-SC-IAC-automated-portfolio --parameters "[{\"ParameterKey\":\"PorfolioName\",\"ParameterValue\":\"${ALIAS}-SC-RA\"},{\"ParameterKey\":\"LinkedRole1\",\"ParameterValue\":\"$LinkedRole1\"},{\"ParameterKey\":\"LinkedRole2\",\"ParameterValue\":\"\"},{\"ParameterKey\":\"LaunchRoleName\",\"ParameterValue\":\"SCEC2LaunchRole\"},{\"ParameterKey\":\"RepoRootURL\",\"ParameterValue\":\"$S3RootURL/\"}]" --template-url "$S3RootURL/ec2/sc-portfolio-ec2VPC.yaml" --administration-role-arn $CFTSSAdminRole --execution-role-name $CFTSSExecRole --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
 aws cloudformation create-stack-instances --stack-set-name ${ALIAS}-SC-IAC-automated-portfolio --regions $allregions --accounts $allACC --operation-preferences FailureToleranceCount=0,MaxConcurrentCount=3
 
 date

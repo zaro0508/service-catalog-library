@@ -60,7 +60,7 @@
                 "LinkedRole2": {"Ref":"LinkedRole2"},
                 "RepoRootURL":{"Ref":"RepoRootURL"}
             },
-            "TemplateURL" : {"Fn::Sub": "${RepoRootURL}ec2/sc-portfolio-ec2.json"},
+            "TemplateURL" : {"Fn::Sub": "${RepoRootURL}ec2/sc-portfolio-ec2.yaml"},
             "TimeoutInMinutes" : 5
           }
         },

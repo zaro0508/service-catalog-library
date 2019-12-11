@@ -14,7 +14,7 @@ Resources:
         LinkedRole1: !Ref LinkedRole1
         LinkedRole2: ""
         RepoRootURL: "https://s3.amazonaws.com/aws-service-catalog-reference-architectures/"
-      TemplateURL: "https://s3.amazonaws.com/aws-service-catalog-reference-architectures/ec2/sc-portfolio-ec2demo.json"
+      TemplateURL: "https://s3.amazonaws.com/aws-service-catalog-reference-architectures/ec2/sc-portfolio-ec2demo.yaml"
       TimeoutInMinutes: 5
     
   SCSyncUser:

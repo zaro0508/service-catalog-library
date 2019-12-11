@@ -10,7 +10,7 @@ phases:
   pre_build:
     commands:
       - echo Entered the pre_build phase...
-      - cp ec2/*.json templates/
+      - cp ec2/*.yaml templates/
       - export dirname=${PWD##*/}
       - echo Directory name $dirname
       - cd ..

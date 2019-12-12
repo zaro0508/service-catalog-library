@@ -1,3 +1,3 @@
 #!/bin/bash
-cp ec2/*.json templates/
-cp iam/*.{json,yml} templates/
+cp ec2/*.yaml templates/
+cp iam/*.yaml templates/

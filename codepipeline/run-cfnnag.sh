@@ -1,10 +1,10 @@
 #!/bin/bash
 shopt -s nullglob
 mkdir templates/
-cp {ec2,vpc}/*.{json,yml} templates/
-cp codepipeline/*.json templates/
+cp {ec2,vpc}/*.yaml templates/
+cp codepipeline/*.yaml templates/
 for f in templates/*; do
-    if cfn_nag_scan --input-path "$f" --blacklist-path ./codepipeline/blacklist-cfnnag.yml; then
+    if cfn_nag_scan --input-path "$f" --blacklist-path ./codepipeline/blacklist-cfnnag.yaml; then
         echo "$f PASSED"
     else
         echo "$f FAILED"

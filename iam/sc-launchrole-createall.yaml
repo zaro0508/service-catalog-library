@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create all Roles for ServiceCatalog RA launch constraints. (fdp-1p5rtpgm8)
+Parameters:
+  RepoRootURL:
+    Type: String
+    Description: Root url for the repo containing the product templates.
+    Default: https://s3.amazonaws.com/aws-service-catalog-reference-architectures/
+Resources:
+  SCEndUSersIAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
+      TimeoutInMinutes: 5
+  ec2vpcCLaunchConstraintRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yaml'
+      TimeoutInMinutes: 5
+  emrLaunchConstraintRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-emr-launchrole.yaml'
+      TimeoutInMinutes: 5
+  rdsLaunchConstraintRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-rds-launchrole.yaml'
+      TimeoutInMinutes: 5
+  s3LaunchConstraintRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-s3-launchrole.yaml'
+      TimeoutInMinutes: 5
+Outputs:
+  SCEndUSersGroupARN:
+    Value: !GetAtt 'SCEndUSersIAM.Outputs.EndUserGroupName'
+    Export:
+      Name: sc-enduser-group
+  ec2vpcLaunchConstraintRoleARN:
+    Value: !GetAtt 'ec2vpcCLaunchConstraintRole.Outputs.LaunchRoleArn'
+    Export:
+      Name: sc-ec2vpc-launchconstraint-role
+  s3LaunchConstraintRoleARN:
+    Value: !GetAtt 's3LaunchConstraintRole.Outputs.LaunchRoleArn'
+    Export:
+      Name: sc-s3-launchconstraint-role
+  rdsLaunchConstraintRoleARN:
+    Value: !GetAtt 'rdsLaunchConstraintRole.Outputs.LaunchRoleArn'
+    Export:
+      Name: sc-rds-launchconstraint-role
+  emrLaunchConstraintRoleARN:
+    Value: !GetAtt 'emrLaunchConstraintRole.Outputs.LaunchRoleArn'
+    Export:
+      Name: sc-emr-launchconstraint-role

@@ -280,7 +280,7 @@ Resources:
             Type: PLAINTEXT
       Source:
         Type: CODEPIPELINE
-        BuildSpec: codepipeline/buildspec.yml
+        BuildSpec: codepipeline/buildspec.yaml
       TimeoutInMinutes: 10
   CodeBuildValidateTemplate:
     Type: AWS::CodeBuild::Project
@@ -303,7 +303,7 @@ Resources:
             Type: PLAINTEXT
       Source:
         Type: CODEPIPELINE
-        BuildSpec: ci/buildspec-validate.yml
+        BuildSpec: ci/buildspec-validate.yaml
       TimeoutInMinutes: 10
   CodeBuildCFNNAG:
     Type: AWS::CodeBuild::Project
@@ -319,7 +319,7 @@ Resources:
         Image: aws/codebuild/ruby:2.5.3
       Source:
         Type: CODEPIPELINE
-        BuildSpec: codepipeline/buildspec-cnfnag.yml
+        BuildSpec: codepipeline/buildspec-cnfnag.yaml
       TimeoutInMinutes: 10
   ProductPipeline:
     Type: AWS::CodePipeline::Pipeline

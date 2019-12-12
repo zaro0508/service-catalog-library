@@ -9,27 +9,27 @@ Resources:
   SCEndUSersIAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   ec2vpcCLaunchConstraintRole:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yaml'
       TimeoutInMinutes: 5
   emrLaunchConstraintRole:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-emr-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-emr-launchrole.yaml'
       TimeoutInMinutes: 5
   rdsLaunchConstraintRole:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-rds-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-rds-launchrole.yaml'
       TimeoutInMinutes: 5
   s3LaunchConstraintRole:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-s3-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-s3-launchrole.yaml'
       TimeoutInMinutes: 5
 Outputs:
   SCEndUSersGroupARN:

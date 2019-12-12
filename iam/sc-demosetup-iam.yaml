@@ -10,12 +10,12 @@ Resources:
   SCEndUSersIAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   ec2vpcCLaunchConstraintRole:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yaml'
       TimeoutInMinutes: 5
 Outputs:
   SCEndUSersGroupARN:

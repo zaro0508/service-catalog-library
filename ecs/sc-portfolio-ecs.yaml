@@ -98,13 +98,13 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateLaunchConstraint
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-ecs-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-ecs-launchrole.yaml'
       TimeoutInMinutes: 5
   stackServiceCatalogEndusers:
     Type: AWS::CloudFormation::Stack
     Condition: CondCreateEndUsers
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   LinkEndusersRole:
     Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
@@ -135,7 +135,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCECSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}ecs/sc-product-container-pipeline.json'
+      TemplateURL: !Sub '${RepoRootURL}ecs/sc-product-container-pipeline.yaml'
       TimeoutInMinutes: 5
   fargateclusterproduct:
     Type: AWS::CloudFormation::Stack
@@ -148,7 +148,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCECSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}ecs/sc-product-fargatecluster.json'
+      TemplateURL: !Sub '${RepoRootURL}ecs/sc-product-fargatecluster.yaml'
       TimeoutInMinutes: 5
   ecstaskproduct:
     Type: AWS::CloudFormation::Stack
@@ -161,7 +161,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCECSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}ecs/sc-product-fargatetask.json'
+      TemplateURL: !Sub '${RepoRootURL}ecs/sc-product-fargatetask.yaml'
       TimeoutInMinutes: 5
 Outputs:
   EndUserRoleArn:

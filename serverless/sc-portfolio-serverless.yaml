@@ -130,14 +130,14 @@ Resources:
     Condition: CreateLaunchConstraint
     Properties:
       TemplateURL:
-        Fn::Sub: "${RepoRootURL}iam/sc-serverless-launchrole.yml"
+        Fn::Sub: "${RepoRootURL}iam/sc-serverless-launchrole.yaml"
       TimeoutInMinutes: 5
   stackServiceCatalogEndUsers:
     Type: AWS::CloudFormation::Stack
     Condition: CondCreateEndUsersGroup
     Properties:
       TemplateURL:
-        Fn::Sub: "${RepoRootURL}iam/sc-enduser-iam.yml"
+        Fn::Sub: "${RepoRootURL}iam/sc-enduser-iam.yaml"
       TimeoutInMinutes: 5
   LinkEndusers:
     Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
@@ -181,7 +181,7 @@ Resources:
         RepoRootURL:
           Ref: RepoRootURL
       TemplateURL:
-        Fn::Sub: "${RepoRootURL}serverless/sc-product-serverless-lambda.yml"
+        Fn::Sub: "${RepoRootURL}serverless/sc-product-serverless-lambda.yaml"
       TimeoutInMinutes: 5
 Outputs:
   PortfolioId:

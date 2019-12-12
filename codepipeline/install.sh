@@ -27,10 +27,10 @@ aws cloudformation wait stack-create-complete --stack-name IAM-StackSetAdministr
 aws cloudformation wait stack-create-complete --stack-name IAM-StackSetExecution
 
 echo "creating the automation pipeline stack"
-aws cloudformation create-stack --region $AWS_DEFAULT_REGION --stack-name SC-RA-IACPipeline --parameters "[{\"ParameterKey\":\"ChildAccountAccess\",\"ParameterValue\":\"$childAccComma\"}]" --template-url "$S3RootURL/codepipeline/sc-codepipeline-ra.json" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+aws cloudformation create-stack --region $AWS_DEFAULT_REGION --stack-name SC-RA-IACPipeline --parameters "[{\"ParameterKey\":\"ChildAccountAccess\",\"ParameterValue\":\"$childAccComma\"}]" --template-url "$S3RootURL/codepipeline/sc-codepipeline-ra.yaml" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
 
 echo "creating the ServiceCatalog IAM roles StackSet"
-aws cloudformation create-stack-set --stack-set-name SC-IAC-automated-IAMroles --template-url "$S3RootURL/iam/sc-demosetup-iam.json" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+aws cloudformation create-stack-set --stack-set-name SC-IAC-automated-IAMroles --template-url "$S3RootURL/iam/sc-demosetup-iam.yaml" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
 SSROLEOPID=$(aws cloudformation create-stack-instances --stack-set-name SC-IAC-automated-IAMroles --regions $AWS_DEFAULT_REGION --accounts $allACC --operation-preferences FailureToleranceCount=0,MaxConcurrentCount=1 | jq '.OperationId' | tr -d '"')
 STATUS=""
 until [ "$STATUS" = "SUCCEEDED" ]; do 

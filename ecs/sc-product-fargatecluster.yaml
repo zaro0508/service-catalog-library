@@ -28,7 +28,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: Fargate Cluster
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}ecs/fargate-private-vpc.yml'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ecs/fargate-private-vpc.yaml'
           Name: v1.0
   Associatenginxcf:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation

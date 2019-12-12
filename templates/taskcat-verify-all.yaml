@@ -45,7 +45,7 @@ Resources:
   IAMenduser:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   STACKec2portfolio:
     Type: AWS::CloudFormation::Stack
@@ -83,7 +83,7 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}rds/sc-portfolio-rds.json'
+      TemplateURL: !Sub '${RepoRootURL}rds/sc-portfolio-rds.yaml'
       TimeoutInMinutes: 5
   STACKemrportfolio:
     Type: AWS::CloudFormation::Stack
@@ -96,7 +96,7 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}emr/sc-portfolio-emr.json'
+      TemplateURL: !Sub '${RepoRootURL}emr/sc-portfolio-emr.yaml'
       TimeoutInMinutes: 5
   STACKs3portfolio:
     Type: AWS::CloudFormation::Stack
@@ -109,5 +109,5 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-portfolio-s3.json'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-portfolio-s3.yaml'
       TimeoutInMinutes: 5

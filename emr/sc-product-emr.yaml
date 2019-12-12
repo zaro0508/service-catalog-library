@@ -29,7 +29,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}emr/sc-emr-ra.json'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}emr/sc-emr-ra.yaml'
           Name: v1.1
   Associateemr:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation

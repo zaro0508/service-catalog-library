@@ -98,13 +98,13 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateLaunchConstraint
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yaml'
       TimeoutInMinutes: 5
   stackServiceCatalogEndusers:
     Type: AWS::CloudFormation::Stack
     Condition: CondCreateEndUsers
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   LinkEndusersRole:
     Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation

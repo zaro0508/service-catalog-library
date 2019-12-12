@@ -98,7 +98,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CondCreateEndUsers
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   LinkEndusersRole:
     Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
@@ -122,7 +122,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateLaunchConstraint
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-rds-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-rds-launchrole.yaml'
       TimeoutInMinutes: 5
   rdsmariaproduct:
     Type: AWS::CloudFormation::Stack
@@ -135,7 +135,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCRDSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mariadb.json'
+      TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mariadb.yaml'
       TimeoutInMinutes: 5
   rdsmysqlproduct:
     Type: AWS::CloudFormation::Stack
@@ -148,7 +148,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCRDSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mysql.json'
+      TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mysql.yaml'
       TimeoutInMinutes: 5
   rdsmssqlproduct:
     Type: AWS::CloudFormation::Stack
@@ -161,7 +161,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCRDSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mssql.json'
+      TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mssql.yaml'
       TimeoutInMinutes: 5
   rdspostgresproduct:
     Type: AWS::CloudFormation::Stack
@@ -174,5 +174,5 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCRDSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-postgresql.json'
+      TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-postgresql.yaml'
       TimeoutInMinutes: 5

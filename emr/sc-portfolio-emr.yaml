@@ -98,7 +98,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CondCreateEndUsers
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   LinkEndusersRole:
     Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
@@ -122,7 +122,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateLaunchConstraint
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-emr-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-emr-launchrole.yaml'
       TimeoutInMinutes: 5
   emrproduct:
     Type: AWS::CloudFormation::Stack
@@ -135,7 +135,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEMRportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}emr/sc-product-emr.json'
+      TemplateURL: !Sub '${RepoRootURL}emr/sc-product-emr.yaml'
       TimeoutInMinutes: 5
   emrsparkhbaseproduct:
     Type: AWS::CloudFormation::Stack
@@ -148,5 +148,5 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEMRportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}emr/sc-product-emrsparkhbase.json'
+      TemplateURL: !Sub '${RepoRootURL}emr/sc-product-emrsparkhbase.yaml'
       TimeoutInMinutes: 5

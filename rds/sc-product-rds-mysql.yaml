@@ -29,7 +29,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}rds/sc-rds-mysql-ra.json'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}rds/sc-rds-mysql-ra.yaml'
           Name: v1.0
   Associaterds:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation

@@ -28,7 +28,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: CodePipeline project
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}ecs/container-codepipeline-ra.json'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ecs/container-codepipeline-ra.yaml'
           Name: v1.0
   Associatenginxcf:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation

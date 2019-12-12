@@ -28,7 +28,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}glue/sc-glue-ra.yml'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}glue/sc-glue-ra.yaml'
           Name: v1.1
   Associateglue:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation

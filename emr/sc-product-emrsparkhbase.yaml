@@ -29,7 +29,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}emr/sc-emr-SparkHbase.json'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}emr/sc-emr-SparkHbase.yaml'
           Name: v1.1
   Associateemr:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation

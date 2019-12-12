@@ -77,7 +77,7 @@ Parameters:
   VPCStackCFN:
     Description:    Please specify the VPC CloudFormation artifact location.
     Type:           String
-    Default:        "CFN/DeployVPC.yml"
+    Default:        "CFN/DeployVPC.yaml"
 
   EC2StackName:
     Description:    Please specify the EC2 VPC stack name.
@@ -87,7 +87,7 @@ Parameters:
   EC2StackCFN:
     Description:    Please specify the EC2 CloudFormation artifact location.
     Type:           String
-    Default:        "CFN/DeployEC2.yml"
+    Default:        "CFN/DeployEC2.yaml"
 
 Resources:
   AcceptedPortfolioShare:

@@ -86,12 +86,12 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateLaunchConstraint
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-ec2vpc-launchrole.yaml'
       TimeoutInMinutes: 5
   IAMenduser:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   LinkEndusers:
     Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
@@ -110,7 +110,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux.json'
+      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux.yaml'
       TimeoutInMinutes: 5
   ec2webserverproduct:
     Type: AWS::CloudFormation::Stack
@@ -123,7 +123,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-webserver.json'
+      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-webserver.yaml'
       TimeoutInMinutes: 5
   ec2windowsproduct:
     Type: AWS::CloudFormation::Stack
@@ -136,7 +136,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows.json'
+      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows.yaml'
       TimeoutInMinutes: 5
   vpcproduct:
     Type: AWS::CloudFormation::Stack
@@ -149,7 +149,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}vpc/sc-product-vpc.json'
+      TemplateURL: !Sub '${RepoRootURL}vpc/sc-product-vpc.yaml'
       TimeoutInMinutes: 5
 Outputs:
   LaunchConstraintRoleARN:

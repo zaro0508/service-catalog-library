@@ -98,7 +98,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CondCreateEndUsers
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
       TimeoutInMinutes: 5
   LinkEndusersRole:
     Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
@@ -122,7 +122,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateLaunchConstraint
     Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-s3-launchrole.yml'
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-s3-launchrole.yaml'
       TimeoutInMinutes: 5
   s3publicproduct:
     Type: AWS::CloudFormation::Stack
@@ -135,7 +135,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-public.json'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-public.yaml'
       TimeoutInMinutes: 5
   s3privateproduct:
     Type: AWS::CloudFormation::Stack
@@ -148,7 +148,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private.json'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private.yaml'
       TimeoutInMinutes: 5
   s3privateEncproduct:
     Type: AWS::CloudFormation::Stack
@@ -161,7 +161,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-enc.json'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-enc.yaml'
       TimeoutInMinutes: 5
   s3privateMFAproduct:
     Type: AWS::CloudFormation::Stack
@@ -174,7 +174,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-mfa.json'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-mfa.yaml'
       TimeoutInMinutes: 5
   s3privatetransproduct:
     Type: AWS::CloudFormation::Stack
@@ -187,5 +187,5 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-trans.json'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-trans.yaml'
       TimeoutInMinutes: 5

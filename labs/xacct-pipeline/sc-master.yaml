@@ -110,7 +110,7 @@ Parameters:
   ProductArtifactName:
     Description:    Please specify ServiceCatalog Product Artifact Name.
     Type:           String
-    Default:        "VPC.yml"
+    Default:        "VPC.yaml"
 
 # ServiceCatalog Product Artifact Location
   ProductArtifactLocation:

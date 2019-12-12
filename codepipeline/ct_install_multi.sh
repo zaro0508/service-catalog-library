@@ -27,7 +27,7 @@ export AWS_DEFAULT_REGION=us-east-1
 echo "Using Account:$ACC  Region:$AWS_DEFAULT_REGION Child Accounts:$childAcc All Regions:$allregions"
 
 echo "creating the automation pipeline stack"
-aws cloudformation create-stack --region us-east-1 --stack-name ${ALIAS}-SC-RA-IACPipeline --parameters "[{\"ParameterKey\":\"ChildAccountAccess\",\"ParameterValue\":\"$childAccComma\"},{\"ParameterKey\":\"CodeCommitRepoName\",\"ParameterValue\":\"${ALIAS}-SCPortfoliosRepo\"},{\"ParameterKey\":\"RandomString\",\"ParameterValue\":\"$ALIAS\"}]" --template-url "$S3RootURL/codepipeline/sc-codepipeline-ra-ct-multi.json" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+aws cloudformation create-stack --region us-east-1 --stack-name ${ALIAS}-SC-RA-IACPipeline --parameters "[{\"ParameterKey\":\"ChildAccountAccess\",\"ParameterValue\":\"$childAccComma\"},{\"ParameterKey\":\"CodeCommitRepoName\",\"ParameterValue\":\"${ALIAS}-SCPortfoliosRepo\"},{\"ParameterKey\":\"RandomString\",\"ParameterValue\":\"$ALIAS\"}]" --template-url "$S3RootURL/codepipeline/sc-codepipeline-ra-ct-multi.yaml" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
 
 echo "creating the ServiceCatalog IAM roles StackSet"
 if [[ $CreateEndUsers == 'YES' || $CreateEndUsers == 'Y' ]]
@@ -38,7 +38,7 @@ listACC=$childAcc
 fi
 
 echo "Create IAM Roles on ${listACC}"
-aws cloudformation create-stack-set --stack-set-name ${ALIAS}-SC-IAC-automated-IAMroles --parameters "[{\"ParameterKey\":\"RepoRootURL\",\"ParameterValue\":\"$S3RootURL/\"}]" --template-url "$S3RootURL/iam/sc-demosetup-iam.json" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --administration-role-arn $CFTSSAdminRole --execution-role-name $CFTSSExecRole
+aws cloudformation create-stack-set --stack-set-name ${ALIAS}-SC-IAC-automated-IAMroles --parameters "[{\"ParameterKey\":\"RepoRootURL\",\"ParameterValue\":\"$S3RootURL/\"}]" --template-url "$S3RootURL/iam/sc-demosetup-iam.yaml" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --administration-role-arn $CFTSSAdminRole --execution-role-name $CFTSSExecRole
 SSROLEOPID=$(aws cloudformation create-stack-instances --stack-set-name ${ALIAS}-SC-IAC-automated-IAMroles --regions $AWS_DEFAULT_REGION --accounts $listACC --operation-preferences FailureToleranceCount=0,MaxConcurrentCount=1 | jq '.OperationId' | tr -d '"')
 STATUS=""
 until [ "$STATUS" = "SUCCEEDED" ]; do 

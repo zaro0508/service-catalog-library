@@ -1,6 +1,6 @@
 ---
 global:
-  cleanup: true 
+  cleanup: true
   owner: it@sagebase.org
   qsname: SCPortfoliosRepo
   regions:
@@ -9,5 +9,3 @@ tests:
   taskcat-master-allportfolios:
     template_file: taskcat-verify-all.yaml
     parameter_input: taskcat-params-verify-all.yaml
-
-  

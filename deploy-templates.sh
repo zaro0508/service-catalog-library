@@ -7,7 +7,10 @@ S3_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='us-east-1-b
 S3_BUCKET_PATH="$REPO_NAME/$TRAVIS_BRANCH"
 S3_BUCKET_URL="s3://$S3_BUCKET/$S3_BUCKET_PATH"
 
-# Upload local dirs to S3 bucket
+# Clean existing files on S3 bucket
+aws s3 rm --recursive $S3_BUCKET_URL/
+
+# Upload dirs and files to S3 bucket
 DIRS=$(ls -d */)
 for dir in $DIRS
 do

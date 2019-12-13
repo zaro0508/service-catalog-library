@@ -181,7 +181,7 @@ Outputs:
     Value: !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleName'
   ec2windowsproductId:
     Value: !GetAtt 'ec2windowsproduct.Outputs.ProductId'
-  ec2webserverproductId:
-    Value: !GetAtt 'ec2webserverproduct.Outputs.ProductId'
+  # ec2webserverproductId:
+  #   Value: !GetAtt 'ec2webserverproduct.Outputs.ProductId'
   ec2linuxproductId:
     Value: !GetAtt 'ec2linuxproduct.Outputs.ProductId'

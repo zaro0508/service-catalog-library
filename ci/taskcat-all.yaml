@@ -8,4 +8,4 @@ global:
 tests:
   taskcat-master-allportfolios:
     template_file: taskcat-verify-all.yaml
-    parameter_input: taskcat-params-verify-all.yaml
+    parameter_input: taskcat-params-verify-all.json

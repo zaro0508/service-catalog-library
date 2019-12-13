@@ -1,8 +1,6 @@
-sudo: false
 language: python
 python: 3.6
 cache: pip
-fast_finish: true
 install:
   - pip install taskcat==0.8.50
   - wget https://github.com/Sage-Bionetworks/infra-utils/archive/master.zip -O /tmp/infra-utils.zip
@@ -16,6 +14,7 @@ stages:
   - name: deploy
     if: (tag =~ ^v) OR (branch = master AND type = push)
 jobs:
+  fast_finish: true
   include:
     - stage: validate
       script:
@@ -23,7 +22,7 @@ jobs:
         - pre-commit run --all-files
     - stage: test
       script:
-        - taskcat -c ci/taskcat-all.yml --tag owner=taskcat
+        - taskcat -c ci/taskcat-all.yaml --tag owner=taskcat
         - |
           if $(grep -Fq "CREATE_FAILED" taskcat_outputs/index.html)
           then

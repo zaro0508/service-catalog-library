@@ -22,7 +22,7 @@ jobs:
         - pre-commit run --all-files
     - stage: test
       script:
-        - taskcat -c ci/taskcat-all.yaml --tag owner=taskcat
+        - taskcat -c ci/taskcat-all.yaml --tag owner=taskcat || travis_terminate 1
         - |
           if $(grep -Fq "CREATE_FAILED" taskcat_outputs/index.html)
           then

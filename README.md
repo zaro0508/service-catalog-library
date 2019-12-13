@@ -1,6 +1,9 @@
 # AWS Service Catalog Reference Architecture
 
-[AWS Service Catalog](https://docs.aws.amazon.com/servicecatalog/latest/adminguide/introduction.html) allows you to centrally manage commonly deployed AWS services, and helps you achieve consistent governance which meets your compliance requirements, while enabling users to quickly deploy only the approved AWS services they need. 
+[AWS Service Catalog](https://docs.aws.amazon.com/servicecatalog/latest/adminguide/introduction.html) 
+allows you to centrally manage commonly deployed AWS services, and helps you achieve consistent
+governance which meets your compliance requirements, while enabling users to quickly deploy only
+the approved AWS services they need. 
 
 This guide will help you deploy and manage your AWS ServiceCatalog using Infrastructure as Code (IaC).
  Read the [documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-reference-servicecatalog.html)

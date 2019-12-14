@@ -333,23 +333,6 @@ Resources:
       RuleAction: allow
       Egress: true
       CidrBlock: '0.0.0.0/0'
-  VPNSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
-    Properties:
-      GroupDescription: Security Group for VPN
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-        - CidrIp: !Ref VPCCIDR
-          FromPort: -1
-          ToPort: -1
-          IpProtocol: '-1'
-          Description: 'Allow all VPN traffic'
-      # CF does not support removing all rules, workaround is to add a pointless rule
-      SecurityGroupEgress:
-        - CidrIp: '0.0.0.0/0'
-          FromPort: -1
-          ToPort: -1
-          IpProtocol: '-1'
   BastionSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Condition: CreateBastionResources
@@ -572,8 +555,3 @@ Outputs:
     Condition: CreateBastionResources
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionSSHCIDR'
-  VPNSecurityGroupID:
-    Description: 'VPN Security Group Id'
-    Value: !Ref VPNSecurityGroup
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-VPNSecurityGroupID'

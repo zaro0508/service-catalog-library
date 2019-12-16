@@ -20,6 +20,7 @@ Metadata:
           default: Product Settings
         Parameters:
           - RepoRootURL
+          - DefaultVPCID
 Parameters:
   PortfolioProvider:
     Type: String
@@ -58,6 +59,10 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'Yes'
+  DefaultVPCID:
+    Type: AWS::EC2::VPC::Id
+    Description: Default VPC to be used in this portfolio
+    Default: ''
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
@@ -135,6 +140,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        DefaultVPCID: !Ref 'DefaultVPCID'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux.yaml'
       TimeoutInMinutes: 5
   # ec2webserverproduct:

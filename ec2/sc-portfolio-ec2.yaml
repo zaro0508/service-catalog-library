@@ -62,7 +62,6 @@ Parameters:
   DefaultVPCID:
     Type: AWS::EC2::VPC::Id
     Description: Default VPC to be used in this portfolio
-    Default: ''
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'

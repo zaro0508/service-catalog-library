@@ -29,6 +29,9 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
+  DefaultVPCID:
+    Type: AWS::EC2::VPC::Id
+    Description: Default VPC to be used in this portfolio
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
@@ -57,6 +60,7 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
+        DefaultVPCID: !Ref 'DefaultVPCID'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-portfolio-ec2.yaml'
       TimeoutInMinutes: 5
   STACKvpcportfolio:

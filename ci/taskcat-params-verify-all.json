@@ -26,5 +26,9 @@
     {
         "ParameterKey": "RepoRootURL",
         "ParameterValue": "https://s3.amazonaws.com/$[taskcat_autobucket]/SCPortfoliosRepo/"
+    },
+    {
+        "ParameterKey": "DefaultVPCID",
+        "ParameterValue": "vpc-5326f028"
     }
 ]

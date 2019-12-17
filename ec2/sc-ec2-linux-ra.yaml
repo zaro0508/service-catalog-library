@@ -32,6 +32,7 @@ Parameters:
   VPC:
     Type: AWS::EC2::VPC::Id
     Description: Virtual Private Cloud where the EC2 instance will be created (required)
+    Default: vpc-0d92dc681a4078458
   Subnet:
     Type: AWS::EC2::Subnet::Id
     Description: Subnet for the Instance (required)

@@ -36,6 +36,7 @@ Parameters:
     Type: AWS::EC2::VPC::Id
     Description: Select the VPC where the EC2 instances will be created
     ConstraintDescription: must be an existing VPC
+    Default: vpc-0d92dc681a4078458
   WindowsSubnet:
     Type: AWS::EC2::Subnet::Id
     Description: Select subnet for Windows Instance

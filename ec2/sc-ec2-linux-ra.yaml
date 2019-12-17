@@ -8,7 +8,7 @@ Metadata:
         Parameters:
           - KeyPair
           - VPC
-          - Subnet
+          - PrivateNetwork
           - SecurityGroups
       - Label:
           default: Linux Instance Configuration
@@ -20,8 +20,8 @@ Metadata:
         default: Key Pair
       VPC:
         default: VPC
-      Subnet:
-        default: Subnet
+      PrivateNetwork:
+        default: Use private network?
       SecurityGroups:
         default: Security Groups
       EC2InstanceType:
@@ -33,10 +33,13 @@ Parameters:
     Type: AWS::EC2::VPC::Id
     Description: Virtual Private Cloud where the EC2 instance will be created (required)
     Default: vpc-0d92dc681a4078458
-  Subnet:
-    Type: AWS::EC2::Subnet::Id
-    Description: Subnet for the Instance (required)
-    ConstraintDescription: must be an existing subnet
+  PrivateNetwork:
+    Type: String
+    Description: In the private subnet (recommended) as opposed to a public subnet
+    Default: 'true'
+    AllowedValues:
+      - 'true'
+      - 'false'
   SecurityGroups:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: Security groups to apply to the instance (required)
@@ -64,6 +67,8 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Description: Amazon Linux Machine Image
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+Conditions:
+  UsePrivateSubnet: !Equals [!Ref PrivateNetwork, 'true']
 Resources:
   InstancePatchingRole:
     Type: AWS::IAM::Role
@@ -92,7 +97,12 @@ Resources:
     Properties:
       ImageId: !Ref 'LatestAmiId'
       InstanceType: !Ref 'EC2InstanceType'
-      SubnetId: !Ref Subnet
+      SubnetId: !If
+        - UsePrivateSubnet
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-sc-vpc-ra-SubnetAPrivateID'
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-sc-vpc-ra-SubnetAPublicID'
       SecurityGroupIds: !Ref SecurityGroups
       KeyName: !Ref 'KeyPair'
       IamInstanceProfile: !Ref 'PatchingInstanceProfile'
@@ -223,8 +233,6 @@ Outputs:
     Value: !Ref 'KeyPair'
   VPC:
     Value: !Ref 'VPC'
-  Subnet:
-    Value: !Ref 'Subnet'
   SecurityGroups:
     Value: !Join
       - ','

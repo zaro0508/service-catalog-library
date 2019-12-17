@@ -13,9 +13,6 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
-  DefaultVPCID:
-    Type: AWS::EC2::VPC::Id
-    Description: Default VPC to be used by this product
 Resources:
   scec2linuxproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -33,7 +30,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-ra.yaml?param_VPC=${DefaultVPCID}'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-ra.yaml'
           Name: v1.0
   Associateec2linux:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation

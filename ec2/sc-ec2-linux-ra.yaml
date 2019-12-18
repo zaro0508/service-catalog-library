@@ -7,7 +7,6 @@ Metadata:
           default: General Configuration
         Parameters:
           - KeyPair
-          - VPC
           - PrivateNetwork
       - Label:
           default: Linux Instance Configuration
@@ -17,8 +16,6 @@ Metadata:
     ParameterLabels:
       KeyPair:
         default: Key Pair
-      VPC:
-        default: VPC
       PrivateNetwork:
         default: Use private network?
       EC2InstanceType:
@@ -26,10 +23,6 @@ Metadata:
       LatestAmiId:
         default: SSM key to the latest Amazon linux AMI
 Parameters:
-  VPC:
-    Type: AWS::EC2::VPC::Id
-    Description: Virtual Private Cloud where the EC2 instance will be created (required)
-    Default: vpc-0d92dc681a4078458
   PrivateNetwork:
     Type: String
     Description: In the private subnet (recommended) as opposed to a public subnet
@@ -271,8 +264,6 @@ Outputs:
     Value: !GetAtt 'LinuxInstance.AvailabilityZone'
   KeyPair:
     Value: !Ref 'KeyPair'
-  VPC:
-    Value: !Ref 'VPC'
   EC2InstanceType:
     Value: !Ref 'EC2InstanceType'
   IAMInstancePatchingRole:

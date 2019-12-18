@@ -9,7 +9,6 @@ Metadata:
           - KeyPair
           - VPC
           - PrivateNetwork
-          - SecurityGroups
       - Label:
           default: Linux Instance Configuration
         Parameters:
@@ -22,8 +21,6 @@ Metadata:
         default: VPC
       PrivateNetwork:
         default: Use private network?
-      SecurityGroups:
-        default: Security Groups
       EC2InstanceType:
         default: EC2 Instance Type
       LatestAmiId:
@@ -40,10 +37,6 @@ Parameters:
     AllowedValues:
       - 'true'
       - 'false'
-  SecurityGroups:
-    Type: List<AWS::EC2::SecurityGroup::Id>
-    Description: Security groups to apply to the instance (required)
-    ConstraintDescription: must be existing security groups
   EC2InstanceType:
     AllowedValues:
       - t3.nano
@@ -69,6 +62,7 @@ Parameters:
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
 Conditions:
   UsePrivateSubnet: !Equals [!Ref PrivateNetwork, 'true']
+  UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
 Resources:
   InstancePatchingRole:
     Type: AWS::IAM::Role
@@ -92,6 +86,49 @@ Resources:
       Path: /
       Roles:
         - !Ref 'InstancePatchingRole'
+  PrivateSubnetSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Condition: UsePrivateSubnet
+    Properties:
+      GroupDescription: >-
+        Allow all traffic to an instance originating from the VPN
+      VpcId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-vpc-ra-VPCID'
+      SecurityGroupIngress:
+        - CidrIp: !ImportValue
+            'Fn::Sub': '${AWS::Region}-sc-vpc-ra-VPCCIDR'
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: '-1'
+          Description: 'Allow all VPN traffic'
+      SecurityGroupEgress:
+        - CidrIp: !ImportValue
+            'Fn::Sub': '${AWS::Region}-sc-vpc-ra-VPCCIDR'
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: '-1'
+  PublicSubnetSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Condition: UsePublicSubnet
+    Properties:
+      GroupDescription: Allow SSH to port 22
+      VpcId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-vpc-ra-VPCID'
+      SecurityGroupIngress:
+        - Description: allow SSH
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: '0.0.0.0/0'
+        - Description: allow icmp
+          IpProtocol: icmp
+          FromPort: '-1'
+          ToPort: '-1'
+          CidrIp: '0.0.0.0/0'
+      SecurityGroupEgress:
+        - Description: allow all outgoing
+          IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
   LinuxInstance:
     Type: AWS::EC2::Instance
     Properties:
@@ -103,7 +140,10 @@ Resources:
           'Fn::Sub': '${AWS::Region}-sc-vpc-ra-SubnetAPrivateID'
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-sc-vpc-ra-SubnetAPublicID'
-      SecurityGroupIds: !Ref SecurityGroups
+      SecurityGroupIds: !If
+        - UsePrivateSubnet
+        - [!Ref PrivateSubnetSecurityGroup]
+        - [!Ref PublicSubnetSecurityGroup]
       KeyName: !Ref 'KeyPair'
       IamInstanceProfile: !Ref 'PatchingInstanceProfile'
       Tags:
@@ -233,10 +273,6 @@ Outputs:
     Value: !Ref 'KeyPair'
   VPC:
     Value: !Ref 'VPC'
-  SecurityGroups:
-    Value: !Join
-      - ','
-      - !Ref 'SecurityGroups'
   EC2InstanceType:
     Value: !Ref 'EC2InstanceType'
   IAMInstancePatchingRole:

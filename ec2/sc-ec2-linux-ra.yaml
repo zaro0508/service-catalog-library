@@ -22,6 +22,12 @@ Metadata:
         default: EC2 Instance Type
       LinuxDistribution:
         default: Linux Distribution
+Mappings:
+  LinuxDistributions:
+    Ubuntu:
+      AMIID: ami-04b9e92b5572fa0d1
+    AmazonLinux:
+      AMIID: ami-00068cd7555f543d5
 Parameters:
   PrivateNetwork:
     Type: String
@@ -52,10 +58,10 @@ Parameters:
   LinuxDistribution:
     Type: String
     Description: Linux distribution to use for instance operation system
-    Default: amazon-linux
+    Default: AmazonLinux
     AllowedValues:
-      - amazon-linux
-      - ubuntu
+      - AmazonLinux
+      - Ubuntu
 Conditions:
   UsePrivateSubnet: !Equals [!Ref PrivateNetwork, 'true']
   UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
@@ -128,7 +134,7 @@ Resources:
   LinuxInstance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref 'LatestAmiId'
+      ImageId: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !If
         - UsePrivateSubnet

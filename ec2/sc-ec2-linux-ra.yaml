@@ -32,11 +32,6 @@ Parameters:
       - 'false'
   EC2InstanceType:
     AllowedValues:
-      - a1.medium
-      - a1.large
-      - a1.xlarge
-      - a1.2xlarge
-      - a1.4xlarge
       - c4.large
       - c4.xlarge
       - c4.2xlarge

@@ -11,6 +11,7 @@ Metadata:
       - Label:
           default: VPC Configuration
         Parameters:
+          - VPCName
           - VPCCIDR
       - Label:
           default: Public Subnet Configuration

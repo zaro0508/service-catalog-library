@@ -37,6 +37,11 @@ Parameters:
   RegionAZ2Name:
     Description: Availability Zone 2 Name in Region
     Type: AWS::EC2::AvailabilityZone::Name
+  VPCName:
+    Description: Human-friendly name for the VPC
+    Type: String
+    AllowedPattern: '[a-zA-Z0-9]*'
+    MinLength: 3
   VPCCIDR:
     Description: CIDR block for the VPC
     Type: String
@@ -119,7 +124,7 @@ Resources:
       InstanceTenancy: default
       Tags:
         - Key: Name
-          Value: !Sub 'SC-VPC-RA-${VPCCIDR}'
+          Value: !Ref VPCName
         - Key: Description
           Value: Service-Catalog-VPC-Reference-Architecture
   InternetGateway:
@@ -424,124 +429,124 @@ Outputs:
   AWSRegionName:
     Value: !Ref 'AWS::Region'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-AWSRegionName'
+      Name: !Sub '${AWS::Region}-${VPCName}-AWSRegionName'
   RegionAZ1Name:
     Value: !Ref 'RegionAZ1Name'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-RegionAZ1Name'
+      Name: !Sub '${AWS::Region}-${VPCName}-RegionAZ1Name'
   RegionAZ2Name:
     Value: !Ref 'RegionAZ2Name'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-RegionAZ2Name'
+      Name: !Sub '${AWS::Region}-${VPCName}-RegionAZ2Name'
   VPCID:
     Description: 'VPCID of the newly created VPC'
     Value: !Ref 'VPC'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-VPCID'
+      Name: !Sub '${AWS::Region}-${VPCName}-VPCID'
   VPCCIDR:
     Value: !GetAtt 'VPC.CidrBlock'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-VPCCIDR'
+      Name: !Sub '${AWS::Region}-${VPCName}-VPCCIDR'
   SubnetAPublicID:
     Description: 'ID of the first public subnet'
     Value: !Ref 'SubnetAPublic'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPublicID'
+      Name: !Sub '${AWS::Region}-${VPCName}-SubnetAPublicID'
   SubnetAPublicCIDR:
     Value: !Ref 'SubnetAPublicCIDR'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPublicCIDR'
+      Name: !Sub '${AWS::Region}-${VPCName}-SubnetAPublicCIDR'
   SubnetBPublicID:
     Description: 'ID of the second public subnet'
     Value: !Ref 'SubnetBPublic'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPublicID'
+      Name: !Sub '${AWS::Region}-${VPCName}-SubnetBPublicID'
   SubnetBPublicCIDR:
     Value: !Ref 'SubnetBPublicCIDR'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPublicCIDR'
+      Name: !Sub '${AWS::Region}-${VPCName}-SubnetBPublicCIDR'
   SubnetAPrivateID:
     Description: 'ID of the first private subnet'
     Value: !Ref 'SubnetAPrivate'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPrivateID'
+      Name: !Sub '${AWS::Region}-${VPCName}-SubnetAPrivateID'
   SubnetAPrivateCIDR:
     Value: !Ref 'SubnetAPrivateCIDR'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetAPrivateCIDR'
+      Name: !Sub '${AWS::Region}-${VPCName}-SubnetAPrivateCIDR'
   SubnetBPrivateID:
     Description: 'ID of the second private subnet'
     Value: !Ref 'SubnetBPrivate'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPrivateID'
+      Name: !Sub '${AWS::Region}-${VPCName}-SubnetBPrivateID'
   SubnetBPrivateCIDR:
     Value: !Ref 'SubnetAPrivateCIDR'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SubnetBPrivateCIDR'
+      Name: !Sub '${AWS::Region}-${VPCName}-SubnetBPrivateCIDR'
   InternetGatewayID:
     Value: !Ref 'InternetGateway'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-InternetGatewayID'
+      Name: !Sub '${AWS::Region}-${VPCName}-InternetGatewayID'
   NATGatewayAID:
     Value: !Ref 'NATGatewayA'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-NATGatewayAID'
+      Name: !Sub '${AWS::Region}-${VPCName}-NATGatewayAID'
   NATGatewayAEIP:
     Value: !Ref 'NATGatewayAEIP'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-NATGatewayAEIP'
+      Name: !Sub '${AWS::Region}-${VPCName}-NATGatewayAEIP'
   NATGatewayBID:
     Value: !Ref 'NATGatewayB'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-NATGatewayBID'
+      Name: !Sub '${AWS::Region}-${VPCName}-NATGatewayBID'
   NATGatewayBEIP:
     Value: !Ref 'NATGatewayBEIP'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-NATGatewayBEIP'
+      Name: !Sub '${AWS::Region}-${VPCName}-NATGatewayBEIP'
   RouteTableAPublic:
     Value: !Ref 'RouteTableAPublic'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-RouteTableAPublic'
+      Name: !Sub '${AWS::Region}-${VPCName}-RouteTableAPublic'
   RouteTableBPublic:
     Value: !Ref 'RouteTableBPublic'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-RouteTableBPublic'
+      Name: !Sub '${AWS::Region}-${VPCName}-RouteTableBPublic'
   RouteTableAPrivate:
     Value: !Ref 'RouteTableAPrivate'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-RouteTableAPrivate'
+      Name: !Sub '${AWS::Region}-${VPCName}-RouteTableAPrivate'
   RouteTableBPrivate:
     Value: !Ref 'RouteTableBPrivate'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-RouteTableBPrivate'
+      Name: !Sub '${AWS::Region}-${VPCName}-RouteTableBPrivate'
   NetworkAclPublic:
     Value: !Ref 'NetworkAclPublic'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-NetworkAclPublic'
+      Name: !Sub '${AWS::Region}-${VPCName}-NetworkAclPublic'
   NetworkAclPrivate:
     Value: !Ref 'NetworkAclPrivate'
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-NetworkAclPrivate'
+      Name: !Sub '${AWS::Region}-${VPCName}-NetworkAclPrivate'
   CreatedBastionInstance:
     Value: !Ref 'BastionInstance'
     Condition: CreateBastionResources
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-CreatedBastionInstance'
+      Name: !Sub '${AWS::Region}-${VPCName}-CreatedBastionInstance'
   BastionInstanceType:
     Value: !Ref 'BastionInstanceType'
     Condition: CreateBastionResources
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionInstanceType'
+      Name: !Sub '${AWS::Region}-${VPCName}-BastionInstanceType'
   BastionInstancePublicIP:
     Value: !GetAtt 'BastionInstance.PublicDnsName'
     Condition: CreateBastionResources
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionInstancePublicIP'
+      Name: !Sub '${AWS::Region}-${VPCName}-BastionInstancePublicIP'
   BastionSecurityGroupID:
     Value: !Ref 'BastionSecurityGroup'
     Condition: CreateBastionResources
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionSecurityGroupID'
+      Name: !Sub '${AWS::Region}-${VPCName}-BastionSecurityGroupID'
   EC2KeyPair:
     Value: !If
       - HasKeyName
@@ -549,9 +554,9 @@ Outputs:
       - !Ref 'AWS::NoValue'
     Condition: CreateBastionResources
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-EC2KeyPair'
+      Name: !Sub '${AWS::Region}-${VPCName}-EC2KeyPair'
   BastionSSHCIDR:
     Value: !Ref 'BastionSSHCIDR'
     Condition: CreateBastionResources
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-BastionSSHCIDR'
+      Name: !Sub '${AWS::Region}-${VPCName}-BastionSSHCIDR'

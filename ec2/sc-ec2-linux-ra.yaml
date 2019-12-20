@@ -12,7 +12,7 @@ Metadata:
           default: Linux Instance Configuration
         Parameters:
           - EC2InstanceType
-          - LatestAmiId
+          - LinuxDistribution
     ParameterLabels:
       KeyPair:
         default: Key Pair
@@ -20,8 +20,14 @@ Metadata:
         default: Use private network?
       EC2InstanceType:
         default: EC2 Instance Type
-      LatestAmiId:
-        default: SSM key to the latest Amazon linux AMI
+      LinuxDistribution:
+        default: Linux Distribution
+Mappings:
+  LinuxDistributions:
+    Ubuntu:
+      AMIID: ami-04b9e92b5572fa0d1
+    AmazonLinux:
+      AMIID: ami-00068cd7555f543d5
 Parameters:
   PrivateNetwork:
     Type: String
@@ -49,10 +55,13 @@ Parameters:
     Description: Name of existing EC2 key pair for the instance (required)
     Type: AWS::EC2::KeyPair::KeyName
     Default: scipool
-  LatestAmiId:
-    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Description: Amazon Linux Machine Image
-    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  LinuxDistribution:
+    Type: String
+    Description: Linux distribution to use for instance operation system
+    Default: AmazonLinux
+    AllowedValues:
+      - AmazonLinux
+      - Ubuntu
 Conditions:
   UsePrivateSubnet: !Equals [!Ref PrivateNetwork, 'true']
   UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
@@ -125,7 +134,7 @@ Resources:
   LinuxInstance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref 'LatestAmiId'
+      ImageId: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !If
         - UsePrivateSubnet

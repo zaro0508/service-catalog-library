@@ -23,10 +23,10 @@ Resources:
         bastion instance.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
-      SupportDescription: Operations Team
-      SupportEmail: support@yourcompany.com
+      SupportDescription: Sage IT
+      SupportEmail: it@sagebase.org
       AcceptLanguage: en
-      SupportUrl: http://helpdesk.yourcompany.com
+      SupportUrl: https://app.slack.com/client/T092YT0LV/CEFQD0KU1
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:

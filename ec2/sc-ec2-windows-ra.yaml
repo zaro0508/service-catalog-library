@@ -65,20 +65,20 @@ Resources:
     Properties:
       GroupDescription: Enables SSH Access to Windows EC2 Instance
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-vpc-ra-VPCID'
+        'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-VPCID'
       SecurityGroupIngress:
         - Description: allow RDP
           IpProtocol: tcp
           FromPort: 3389
           ToPort: 3389
           CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-sc-vpc-ra-VPCCIDR'
+            'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-VPCCIDR'
         - Description: allow icmp
           IpProtocol: icmp
           FromPort: '-1'
           ToPort: '-1'
           CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-sc-vpc-ra-VPCCIDR'
+            'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-VPCCIDR'
       SecurityGroupEgress:
         - Description: allow all outgoing
           IpProtocol: '-1'
@@ -89,7 +89,7 @@ Resources:
       ImageId: !Ref 'LatestAmiId'
       InstanceType: !Ref 'WindowsInstanceType'
       SubnetId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-vpc-ra-SubnetBPrivateID'
+        'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-SubnetBPrivateID'
       SecurityGroupIds:
         - !Ref 'WindowsSecurityGroup'
       KeyName: !Ref 'KeyPair'

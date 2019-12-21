@@ -42,7 +42,7 @@ Parameters:
     Description: Human-friendly name for the VPC
     Type: String
     AllowedPattern: '[a-zA-Z0-9]*'
-    MinLength: 3
+    MinLength: 6
   VPCCIDR:
     Description: CIDR block for the VPC
     Type: String

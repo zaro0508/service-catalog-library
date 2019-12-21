@@ -427,6 +427,8 @@ Resources:
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-vpc-ra
+    Export:
+      Name: !Sub '${AWS::Region}-${VPCName}-TemplateID'
   AWSRegionName:
     Value: !Ref 'AWS::Region'
     Export:

@@ -230,17 +230,17 @@ Resources:
       GroupDescription: >-
         Allow all traffic to an instance originating from the VPN
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-VPCID'
+        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
       SecurityGroupIngress:
         - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-VPCCIDR'
+            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpcCidr'
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
           Description: 'Allow all VPN traffic'
       SecurityGroupEgress:
         - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-VPCCIDR'
+            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpcCidr'
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
@@ -250,7 +250,7 @@ Resources:
     Properties:
       GroupDescription: Allow SSH to port 22
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-VPCID'
+        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
       SecurityGroupIngress:
         - Description: allow SSH
           IpProtocol: tcp
@@ -274,9 +274,9 @@ Resources:
       SubnetId: !If
         - UsePrivateSubnet
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-SubnetAPrivateID'
+          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet'
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-ScipoolInternalVPC-SubnetAPublicID'
+          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PublicSubnet'
       SecurityGroupIds: !If
         - UsePrivateSubnet
         - [!Ref PrivateSubnetSecurityGroup]

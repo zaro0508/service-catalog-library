@@ -7,12 +7,15 @@ Metadata:
       - Label:
           default: S3 Bucket Policy Configuration
         Parameters:
-          - S3UserARN
+          - S3UserARNs
 Parameters:
-  S3UserARN:
-    Description: User ARN allowed to access S3 Bucket
-    Type: String
-    Default: Input user ARN
+  S3UserARNs:
+    Type: CommaDelimitedList
+    Default: "[]"
+    Description: User ARNs allowed to access S3 Bucket
+    ConstraintDescription: List of ARNs (i.e. ["arn:aws:iam::011223344556:user/jsmith", "arn:aws:iam::544332211006:user/rjones"]
+Conditions:
+  AllowUserAccess: !Not [!Equals [!Join ['', !Ref S3UserARNs], "[]"]]
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -28,6 +31,7 @@ Resources:
           Value: SC-S3-RA-S3-Bucket
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
+    Condition: AllowUserAccess
     Properties:
       Bucket: !Ref 'S3Bucket'
       PolicyDocument:
@@ -36,7 +40,7 @@ Resources:
             Effect: Deny
             Principal:
               AWS:
-                - !Ref 'S3UserARN'
+                - !Ref 'S3UserARNs'
             Action: s3:PutObject
             Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
             Condition:
@@ -46,7 +50,7 @@ Resources:
             Effect: Deny
             Principal:
               AWS:
-                - !Ref 'S3UserARN'
+                - !Ref 'S3UserARNs'
             Action: s3:PutObject
             Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
             Condition:
@@ -57,5 +61,3 @@ Outputs:
     Value: !Ref 'S3Bucket'
   BucketARN:
     Value: !GetAtt 'S3Bucket.Arn'
-  S3UserARN:
-    Value: !Ref 'S3UserARN'

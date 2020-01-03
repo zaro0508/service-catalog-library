@@ -70,7 +70,7 @@ Resources:
             Action:
               - "s3:*Object*"
               - "s3:*MultipartUpload*"
-            Resource: !Sub "${SynapseBucket.Arn}/*"
+            Resource: !Sub "${S3Bucket.Arn}/*"
 Outputs:
   BucketName:
     Value: !Ref 'S3Bucket'

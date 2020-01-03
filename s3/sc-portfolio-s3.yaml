@@ -197,3 +197,16 @@ Resources:
         ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-trans.yaml'
       TimeoutInMinutes: 5
+  s3synapseroduct:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        PortfolioProvider: !Ref 'PortfolioProvider'
+        LaunchConstraintARN: !If
+          - CreateLaunchConstraint
+          - !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleArn'
+          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
+        PortfolioId: !Ref 'SCS3portfolio'
+        RepoRootURL: !Ref 'RepoRootURL'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-synapse.yaml'
+      TimeoutInMinutes: 5

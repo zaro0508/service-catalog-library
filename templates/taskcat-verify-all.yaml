@@ -29,6 +29,9 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
@@ -57,6 +60,7 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-portfolio-ec2.yaml'
       TimeoutInMinutes: 5
   STACKvpcportfolio:
@@ -70,6 +74,7 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}vpc/sc-portfolio-vpc.yaml'
       TimeoutInMinutes: 5
   STACKrdsportfolio:
@@ -83,6 +88,7 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}rds/sc-portfolio-rds.yaml'
       TimeoutInMinutes: 5
   STACKemrportfolio:
@@ -96,6 +102,7 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}emr/sc-portfolio-emr.yaml'
       TimeoutInMinutes: 5
   STACKs3portfolio:
@@ -109,5 +116,6 @@ Resources:
         LinkedRole1: !Ref 'LinkedRole1'
         LinkedRole2: !Ref 'LinkedRole2'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-portfolio-s3.yaml'
       TimeoutInMinutes: 5

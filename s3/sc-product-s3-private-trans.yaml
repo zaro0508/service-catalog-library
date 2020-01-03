@@ -13,6 +13,9 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Resources:
   scs3product:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -30,7 +33,7 @@ Resources:
         - Description: baseline version
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-transition-ra.yaml'
-          Name: v1.0
+          Name: !Ref 'ProductVersionName'
   Associates3:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

@@ -58,6 +58,9 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'Yes'
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
@@ -135,6 +138,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCVPCportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}vpc/sc-product-vpc.yaml'
       TimeoutInMinutes: 5
 Outputs:

@@ -13,6 +13,9 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Resources:
   WebserverProduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -29,7 +32,7 @@ Resources:
         - Description: CodePipeline project
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ecs/container-codepipeline-ra.yaml'
-          Name: v1.0
+          Name: !Ref 'ProductVersionName'
   Associatenginxcf:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

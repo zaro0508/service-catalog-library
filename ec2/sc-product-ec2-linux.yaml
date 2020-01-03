@@ -13,6 +13,9 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Resources:
   scec2linuxproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -31,7 +34,7 @@ Resources:
         - Description: baseline version
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-ra.yaml'
-          Name: v1.0
+          Name: !Ref 'ProductVersionName'
   Associateec2linux:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

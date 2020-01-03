@@ -58,6 +58,9 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'Yes'
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
@@ -135,6 +138,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux.yaml'
       TimeoutInMinutes: 5
   # ec2webserverproduct:
@@ -148,6 +152,7 @@ Resources:
   #         - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
   #       PortfolioId: !Ref 'SCEC2portfolio'
   #       RepoRootURL: !Ref 'RepoRootURL'
+  #       ProductVersionName: !Ref 'ProductVersionName'
   #     TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-webserver.yaml'
   #     TimeoutInMinutes: 5
   ec2windowsproduct:
@@ -161,6 +166,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows.yaml'
       TimeoutInMinutes: 5
 Outputs:

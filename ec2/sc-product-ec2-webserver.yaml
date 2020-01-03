@@ -13,6 +13,9 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Resources:
   WebserverProduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -34,7 +37,7 @@ Resources:
         - Description: Apache webserver
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-apache.yaml'
-          Name: Apache v2.0
+          Name: !Ref 'ProductVersionName'
   Associatenginxcf:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

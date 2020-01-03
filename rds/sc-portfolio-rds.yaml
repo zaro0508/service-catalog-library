@@ -58,6 +58,9 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'Yes'
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
@@ -135,6 +138,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCRDSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mariadb.yaml'
       TimeoutInMinutes: 5
   rdsmysqlproduct:
@@ -148,6 +152,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCRDSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mysql.yaml'
       TimeoutInMinutes: 5
   rdsmssqlproduct:
@@ -161,6 +166,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCRDSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-mssql.yaml'
       TimeoutInMinutes: 5
   rdspostgresproduct:
@@ -174,5 +180,6 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCRDSportfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}rds/sc-product-rds-postgresql.yaml'
       TimeoutInMinutes: 5

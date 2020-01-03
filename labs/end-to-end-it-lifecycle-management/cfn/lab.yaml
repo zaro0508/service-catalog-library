@@ -5,6 +5,9 @@ Parameters:
     Description: Password for internal SNOW users
     Type: String
     Default: NevaChang3
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Mappings:
   AMI:
     us-east-1:
@@ -119,7 +122,7 @@ Resources:
         - Description: Base Version
           Info:
             LoadTemplateFromURL: https://s3.amazonaws.com/marketplace-sa-resources/ec2CFT.json
-          Name: v1.0
+          Name: !Ref 'ProductVersionName'
   ProdAssEC2:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     DependsOn:

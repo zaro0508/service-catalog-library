@@ -58,6 +58,9 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'Yes'
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
@@ -135,6 +138,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-public.yaml'
       TimeoutInMinutes: 5
   s3privateproduct:
@@ -148,6 +152,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private.yaml'
       TimeoutInMinutes: 5
   s3privateEncproduct:
@@ -161,6 +166,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-enc.yaml'
       TimeoutInMinutes: 5
   s3privateMFAproduct:
@@ -174,6 +180,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-mfa.yaml'
       TimeoutInMinutes: 5
   s3privatetransproduct:
@@ -187,5 +194,6 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
+        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-trans.yaml'
       TimeoutInMinutes: 5

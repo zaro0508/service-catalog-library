@@ -119,17 +119,3 @@ Resources:
         ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-portfolio-s3.yaml'
       TimeoutInMinutes: 5
-  STACKs3Basicportfolio:
-    Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - IAMenduser
-    Properties:
-      Parameters:
-        LaunchRoleName: ''
-        CreateEndUsers: 'No'
-        LinkedRole1: !Ref 'LinkedRole1'
-        LinkedRole2: !Ref 'LinkedRole2'
-        RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-portfolio-s3-basic.yaml'
-      TimeoutInMinutes: 5

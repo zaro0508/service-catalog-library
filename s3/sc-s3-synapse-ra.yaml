@@ -16,9 +16,9 @@ Parameters:
     Default: ""
   S3UserARNs:
     Type: CommaDelimitedList
-    Default: "[]"
+    Default: ""
     Description: User ARNs allowed to access S3 Bucket
-    ConstraintDescription: List of ARNs (i.e. ["arn:aws:iam::011223344556:user/jsmith", "arn:aws:iam::544332211006:user/rjones"]
+    ConstraintDescription: List of ARNs separated by commas (i.e. arn:aws:iam::011223344556:user/jsmith,arn:aws:iam::544332211006:user/rjones)
   BucketName:
     Type: String
     Description: (Optional) Name of the created bucket.

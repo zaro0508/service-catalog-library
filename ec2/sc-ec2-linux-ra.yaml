@@ -8,6 +8,7 @@ Metadata:
         Parameters:
           - KeyPair
           - PrivateNetwork
+          - OpenPort
       - Label:
           default: Linux Instance Configuration
         Parameters:
@@ -18,6 +19,8 @@ Metadata:
         default: Key Pair
       PrivateNetwork:
         default: Use private network?
+      OpenPort:
+        default: Open Port
       EC2InstanceType:
         default: EC2 Instance Type
       LinuxDistribution:
@@ -187,9 +190,13 @@ Parameters:
     Description: Amazon EC2 Instance Type
     Type: String
   KeyPair:
-    Description: Name of existing EC2 key pair for the instance (required)
+    Description: Name of existing EC2 key pair for the instance
     Type: AWS::EC2::KeyPair::KeyName
     Default: scipool
+  OpenPort:
+    Description: (Optional) Port to open if on public network
+    Type: String
+    Default: 22
   LinuxDistribution:
     Type: String
     Description: Linux distribution to use for instance operation system
@@ -254,8 +261,8 @@ Resources:
       SecurityGroupIngress:
         - Description: allow SSH
           IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
+          FromPort: !Ref OpenPort
+          ToPort: !Ref OpenPort
           CidrIp: '0.0.0.0/0'
         - Description: allow icmp
           IpProtocol: icmp
@@ -410,6 +417,8 @@ Outputs:
     Value: !Ref 'KeyPair'
   EC2InstanceType:
     Value: !Ref 'EC2InstanceType'
+  OpenPort:
+    Value: !Ref OpenPort
   IAMInstancePatchingRole:
     Value: !Ref 'InstancePatchingRole'
   IAMPatchingInstanceProfile:

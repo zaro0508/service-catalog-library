@@ -55,6 +55,24 @@ Resources:
               - "s3:*Object*"
               - "s3:*MultipartUpload*"
             Resource: !Sub "${S3Bucket.Arn}/*"
+          - Sid: DenyIncorrectEncryptionHeader
+            Effect: Deny
+            Principal:
+              AWS: !Ref 'S3UserARNs'
+            Action: s3:PutObject
+            Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
+            Condition:
+              StringNotEquals:
+                s3:x-amz-server-side-encryption: AES256
+          - Sid: DenyUnEncryptedObjectUploads
+            Effect: Deny
+            Principal:
+              AWS: !Ref 'S3UserARNs'
+            Action: s3:PutObject
+            Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
+            Condition:
+              'Null':
+                s3:x-amz-server-side-encryption: 'true'
 Outputs:
   BucketName:
     Value: !Ref 'S3Bucket'

@@ -11,6 +11,7 @@ Resources:
         - arn:aws:iam::aws:policy/IAMReadOnlyAccess
         - arn:aws:iam::aws:policy/AWSCloudTrailReadOnlyAccess
         - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
+        - !Ref CFNDenyGetTemplateSummaryPolicy
       Path: /
   SCEnduserRole:
     Type: AWS::IAM::Role
@@ -18,6 +19,7 @@ Resources:
       RoleName: ServiceCatalogEndusers
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
+        - !Ref CFNDenyGetTemplateSummaryPolicy
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -27,6 +29,18 @@ Resources:
               AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
             Action:
               - 'sts:AssumeRole'
+  CFNDenyGetTemplateSummaryPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          -
+            Effect: Deny
+            Action:
+              # Deny this action to hide secrets
+              - cloudformation:GetTemplateSummary
+            Resource: "*"
 Outputs:
   EndUserGroupArn:
     Value: !GetAtt SCEnduserGroup.Arn

@@ -1,11 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Service Catalog: EC2 Reference Architecture(fdp-1oc5f3ula).'
 Metadata:
-  cfn-lint:
-    config:
-      ignore_checks:
-        - E1022
-        - E3012
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -259,6 +254,11 @@ Resources:
           ToPort: -1
           IpProtocol: '-1'
   PublicSubnetSecurityGroup:
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3012
     Type: 'AWS::EC2::SecurityGroup'
     Condition: UsePublicSubnet
     Properties:
@@ -283,6 +283,10 @@ Resources:
   LinuxInstance:
     Type: AWS::EC2::Instance
     Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E1022
       'AWS::CloudFormation::Init':
         configSets:
           SetupCfn:
@@ -468,6 +472,11 @@ Resources:
             - !Ref 'LinuxInstance'
       Name: sc-ec2-ra-linux-patch-targets
   LinuxMaintenanceWindowTaskScan:
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3012
     Type: AWS::SSM::MaintenanceWindowTask
     Properties:
       MaxErrors: 1
@@ -489,6 +498,11 @@ Resources:
             - Scan
       TaskType: RUN_COMMAND
   LinuxMaintenanceWindowTaskInstall:
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3012
     Type: AWS::SSM::MaintenanceWindowTask
     Properties:
       MaxErrors: 1

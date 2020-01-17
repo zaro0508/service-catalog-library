@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Transform: S3Objects
 Description: 'Synapse S3 Custom Storage (https://docs.synapse.org/articles/custom_storage_location.html)'
 Metadata:
   AWS::CloudFormation::Interface:
@@ -71,6 +72,21 @@ Resources:
               - "s3:*Object*"
               - "s3:*MultipartUpload*"
             Resource: !Sub "${S3Bucket.Arn}/*"
+  # Add owner file to the synapse bucket, requires the cloudformation S3 objects macro
+  # https://github.com/Sage-Bionetworks/aws-infra/tree/master/lambdas/cfn-s3objects-macro
+  SynapseOwnerFile:
+    Type: AWS::S3::Object
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3001
+    Properties:
+      Target:
+        Bucket: !Ref S3Bucket
+        Key: owner.txt
+        ContentType: text
+      Body: !Ref SynapseUserName
 Outputs:
   BucketName:
     Value: !Ref 'S3Bucket'

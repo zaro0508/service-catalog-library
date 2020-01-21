@@ -36,7 +36,7 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
   LatestAmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
+    Default: ami-074545a6fb2313e2c
 Resources:
   InstancePatchingRole:
     Type: AWS::IAM::Role

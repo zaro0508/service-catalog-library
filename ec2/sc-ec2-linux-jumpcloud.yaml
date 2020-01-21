@@ -28,9 +28,9 @@ Metadata:
 Mappings:
   LinuxDistributions:
     Ubuntu:
-      AMIID: ami-04b9e92b5572fa0d1
+      AMIID: ami-0acb259f7a7b035f6
     AmazonLinux:
-      AMIID: ami-00068cd7555f543d5
+      AMIID: ami-0ca7208f904dc1874
 Parameters:
   PrivateNetwork:
     Type: String

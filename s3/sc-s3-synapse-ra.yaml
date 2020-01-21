@@ -86,7 +86,7 @@ Resources:
         Bucket: !Ref S3Bucket
         Key: owner.txt
         ContentType: text
-        ACL: public-read
+        ACL: authenticated-read
       Body: !Ref SynapseUserName
 Outputs:
   BucketName:

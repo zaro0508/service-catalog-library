@@ -410,7 +410,7 @@ Resources:
         PatchRules:
           - ApproveAfterDays: 0
             ComplianceLevel: CRITICAL
-            EnableNonSecurity: true
+            EnableNonSecurity: false
             PatchFilterGroup:
               PatchFilters:
                 - Key: PRODUCT

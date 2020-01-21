@@ -241,15 +241,13 @@ Resources:
       VpcId: !ImportValue
         'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
       SecurityGroupIngress:
-        - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpcCidr'
+        - CidrIp: 10.1.0.0/16
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
           Description: 'Allow all VPN traffic'
       SecurityGroupEgress:
-        - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpcCidr'
+        - CidrIp: 0.0.0.0/0
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
@@ -310,8 +308,8 @@ Resources:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
-                path=Resources.Ec2Instance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource Ec2Instance --configsets SetupCfn,SetupJumpcloud,SetupVolume --region ${AWS::Region}
+                path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetupJumpcloud --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -399,8 +397,8 @@ Resources:
           else
             /bin/yum update -y aws-cfn-bootstrap
           fi
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource Ec2Instance --configsets SetupCfn,SetupJumpcloud --region ${AWS::Region}
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource Ec2Instance --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetupJumpcloud --region ${AWS::Region}
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Description
           Value: Service-Catalog-EC2-Reference-Architecture

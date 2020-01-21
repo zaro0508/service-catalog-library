@@ -243,7 +243,8 @@ Resources:
       VpcId: !ImportValue
         'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
       SecurityGroupIngress:
-        - CidrIp: 10.1.0.0/16
+        - CidrIp: !ImportValue
+            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpnCidr'
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'

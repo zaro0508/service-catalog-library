@@ -29,8 +29,10 @@ Mappings:
   LinuxDistributions:
     Ubuntu:
       AMIID: ami-0acb259f7a7b035f6
+      PatchBaselineOperatingSystem: UBUNTU
     AmazonLinux:
       AMIID: ami-0ca7208f904dc1874
+      PatchBaselineOperatingSystem: AMAZON_LINUX
 Parameters:
   PrivateNetwork:
     Type: String
@@ -400,7 +402,7 @@ Resources:
   LinuxPatchBaseline:
     Type: AWS::SSM::PatchBaseline
     Properties:
-      OperatingSystem: AMAZON_LINUX
+      OperatingSystem: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, PatchBaselineOperatingSystem]
       ApprovalRules:
         PatchRules:
           - ApproveAfterDays: 0

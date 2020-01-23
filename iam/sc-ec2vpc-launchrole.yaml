@@ -5,7 +5,7 @@ Resources:
     Properties:
       RoleName: SCEC2LaunchRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonEC2FullAccess      
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -24,7 +24,7 @@ Resources:
             Statement:
               - Sid: SCLaunchPolicySID
                 Effect: Allow
-                Action:                  
+                Action:
                   - "servicecatalog:ListServiceActionsForProvisioningArtifact"
                   - "servicecatalog:ExecuteprovisionedProductServiceAction"
                   - "iam:AddRoleToInstanceProfile"
@@ -39,7 +39,7 @@ Resources:
                   - "iam:RemoveRoleFromInstanceProfile"
                   - "iam:CreateRole"
                   - "iam:DetachRolePolicy"
-                  - "iam:AttachRolePolicy"                                 
+                  - "iam:AttachRolePolicy"
                   - "cloudformation:DescribeStackResource"
                   - "cloudformation:DescribeStackResources"
                   - "cloudformation:GetTemplate"
@@ -53,15 +53,16 @@ Resources:
                   - "cloudformation:GetTemplateSummary"
                   - "cloudformation:SetStackPolicy"
                   - "cloudformation:ValidateTemplate"
-                  - "cloudformation:UpdateStack"               
+                  - "cloudformation:UpdateStack"
+                  - "cloudformation:CreateChangeSet"
                   - "s3:GetObject"
                 Resource: '*'
 Outputs:
-    LaunchRoleArn:
-        Value: !GetAtt SCEC2LaunchRole.Arn
-        Export:
-          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleArn'
-    LaunchRoleName:
-        Value: !Ref SCEC2LaunchRole
-        Export:
-          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleName'
+  LaunchRoleArn:
+    Value: !GetAtt SCEC2LaunchRole.Arn
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleArn'
+  LaunchRoleName:
+    Value: !Ref SCEC2LaunchRole
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleName'

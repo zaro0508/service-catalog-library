@@ -29,8 +29,10 @@ Mappings:
   LinuxDistributions:
     Ubuntu:
       AMIID: ami-0acb259f7a7b035f6
+      PatchBaselineOperatingSystem: UBUNTU
     AmazonLinux:
       AMIID: ami-0ca7208f904dc1874
+      PatchBaselineOperatingSystem: AMAZON_LINUX
 Parameters:
   PrivateNetwork:
     Type: String
@@ -240,14 +242,13 @@ Resources:
         'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
       SecurityGroupIngress:
         - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpcCidr'
+            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpnCidr'
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
           Description: 'Allow all VPN traffic'
       SecurityGroupEgress:
-        - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpcCidr'
+        - CidrIp: '0.0.0.0/0'
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
@@ -263,11 +264,6 @@ Resources:
           IpProtocol: tcp
           FromPort: !Ref OpenPort
           ToPort: !Ref OpenPort
-          CidrIp: '0.0.0.0/0'
-        - Description: allow icmp
-          IpProtocol: icmp
-          FromPort: '-1'
-          ToPort: '-1'
           CidrIp: '0.0.0.0/0'
       SecurityGroupEgress:
         - Description: allow all outgoing
@@ -296,12 +292,12 @@ Resources:
   LinuxPatchBaseline:
     Type: AWS::SSM::PatchBaseline
     Properties:
-      OperatingSystem: AMAZON_LINUX
+      OperatingSystem: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, PatchBaselineOperatingSystem]
       ApprovalRules:
         PatchRules:
           - ApproveAfterDays: 0
             ComplianceLevel: CRITICAL
-            EnableNonSecurity: true
+            EnableNonSecurity: false
             PatchFilterGroup:
               PatchFilters:
                 - Key: PRODUCT

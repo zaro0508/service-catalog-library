@@ -205,7 +205,7 @@ Resources:
               PatchFilters:
                 - Key: PRODUCT
                   Values:
-                    - WindowsServer2016
+                    - WindowsServer2019
                 - Key: CLASSIFICATION
                   Values:
                     - SecurityUpdates

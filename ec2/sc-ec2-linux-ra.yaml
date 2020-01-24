@@ -14,6 +14,7 @@ Metadata:
         Parameters:
           - EC2InstanceType
           - LinuxDistribution
+          - VolumeSize
     ParameterLabels:
       KeyPair:
         default: Key Pair
@@ -25,6 +26,8 @@ Metadata:
         default: EC2 Instance Type
       LinuxDistribution:
         default: Linux Distribution
+      VolumeSize:
+        default: Disk Size
 Mappings:
   LinuxDistributions:
     Ubuntu:
@@ -206,6 +209,12 @@ Parameters:
     AllowedValues:
       - AmazonLinux
       - Ubuntu
+  VolumeSize:
+    Description: The EC2 volume size (in GB)
+    Type: Number
+    Default: 8
+    MinValue: 8
+    MaxValue: 2000
 Conditions:
   UsePrivateSubnet: !Equals [!Ref PrivateNetwork, 'true']
   UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
@@ -284,6 +293,13 @@ Resources:
         - UsePrivateSubnet
         - [!Ref PrivateSubnetSecurityGroup]
         - [!Ref PublicSubnetSecurityGroup]
+      BlockDeviceMappings:
+        -
+          DeviceName: "/dev/sda1"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: !Ref VolumeSize
+            Encrypted: true
       KeyName: !Ref 'KeyPair'
       IamInstanceProfile: !Ref 'PatchingInstanceProfile'
       Tags:

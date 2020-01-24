@@ -1,0 +1,324 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Service Catalog: EC2 Reference Architecture(fdp-1oc5f3ula).'
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: General Configuration
+        Parameters:
+          - KeyPair
+      - Label:
+          default: Windows Instance Configuration
+        Parameters:
+          - WindowsInstanceType
+          - AmiId
+    ParameterLabels:
+      KeyPair:
+        default: Key Pair
+      WindowsInstanceType:
+        default: Windows Instance Type
+      AmiId:
+        default: SSM path for Windows AMI ImageId
+Parameters:
+  WindowsInstanceType:
+    AllowedValues:
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+    Default: t3.micro
+    Description: Amazon EC2 Windows Instance Type
+    Type: String
+  KeyPair:
+    Description: Name of existing EC2 key pair for Windows Instances
+    Type: AWS::EC2::KeyPair::KeyName
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: ami-074545a6fb2313e2c
+Resources:
+  InstancePatchingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  PatchingInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'InstancePatchingRole'
+  WindowsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enables SSH Access to Windows EC2 Instance
+      VpcId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+      SecurityGroupIngress:
+        - Description: allow RDP
+          IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: !ImportValue
+            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpnCidr'
+      SecurityGroupEgress:
+        - Description: allow all outgoing
+          IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
+  WindowsInstance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      'AWS::CloudFormation::Init':
+        configSets:
+          SetupCfn:
+            - cfn_hup_service
+          SetupApps:
+            - install_apps
+          SetupJumpcloud:
+            - install_jc
+            - config_jc
+        # Cfn-hup setting, it is to monitor the change of metadata.
+        # When there is change in the contents of json file in the metadata section, cfn-hup will call cfn-init.
+        cfn_hup_service:
+          files:
+             "c:\\cfn\\cfn-hup.conf":
+               content: !Sub |
+                 [main]
+                 stack=${AWS::StackId}
+                 region=${AWS::Region}
+                 interval=1
+             "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf":
+               content: !Sub |
+                 [cfn-auto-reloader-hook]
+                 triggers=post.update
+                 path=Resources.WindowsInstance.Metadata.AWS::CloudFormation::Init
+                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetupJumpcloud
+          services:
+            windows:
+              cfn-hup:
+                enabled: 'true'
+                ensureRunning: 'true'
+                files:
+                  - "c:\\cfn\\cfn-hup.conf"
+                  - "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf"
+        install_apps:
+          files:
+            'c:\\scripts\\install-chocolatey.ps1':
+              source: "https://chocolatey.org/install.ps1"
+              mode: "0664"
+          commands:
+            01_install_nuget:
+              command: 'Powershell.exe Install-PackageProvider -Name NuGet -Force'
+            02_install_chocolatey:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - 'Powershell.exe C:\scripts\install-chocolatey.ps1 > C:\scripts\install-chocolatey.log'
+            03_install_jq:
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install jq --yes'
+            04_install_awscli:
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install awscli --yes'
+            05_install_googlechrome:
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install googlechrome  --yes --ignore-checksums'
+        install_jc:
+          files:
+            'c:\scripts\install-ms-vc.ps1':
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/install-ms-vc.ps1"
+              mode: "0664"
+            'c:\\scripts\\install-jc-agent.ps1':
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/install-jc-agent.ps1"
+              mode: "0664"
+          commands:
+            01_install_ms_vc:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - 'Powershell.exe C:\scripts\install-ms-vc.ps1 > C:\scripts\install-ms-vc.log'
+            02_install_jc_agent:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - 'Powershell.exe C:\scripts\install-jc-agent.ps1 '
+                  - ' -JcConnectKey '
+                  - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcConnectKey"}}
+                  - ' > C:\scripts\install-jc-agent.log'
+        config_jc:
+          files:
+            'c:\\scripts\\associate-jc-system.ps1':
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/associate-jc-system.ps1"
+              mode: "0664"
+          commands:
+            01_associate_jc_systems:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - 'Powershell.exe C:\scripts\associate-jc-system.ps1 '
+                  - ' -JcServiceApiKey '
+                  - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
+                  - ' -JcSystemsGroupId '
+                  - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcSystemsGroupId"}}
+                  - ' -OwnerEmail '
+                  - !Ref OwnerEmail
+                  - ' > C:\scripts\associate-jc-system.log'
+    Properties:
+      ImageId: !Ref 'AmiId'
+      InstanceType: !Ref 'WindowsInstanceType'
+      SubnetId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet1'
+      SecurityGroupIds:
+        - !Ref 'WindowsSecurityGroup'
+      KeyName: !Ref 'KeyPair'
+      IamInstanceProfile: !Ref 'PatchingInstanceProfile'
+      UserData:
+        Fn::Base64: !Sub |
+          <script>
+          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetupJumpcloud
+          cfn-signal.exe -e %errorlevel% --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region}
+          </script>
+      Tags:
+        - Key: Name
+          Value: SC-EC2-RA-Windows-Instance
+        - Key: Description
+          Value: Service-Catalog-EC2-Reference-Architecture
+  WindowsPatchBaseline:
+    Type: AWS::SSM::PatchBaseline
+    Properties:
+      OperatingSystem: WINDOWS
+      ApprovalRules:
+        PatchRules:
+          - ApproveAfterDays: 0
+            ComplianceLevel: CRITICAL
+            EnableNonSecurity: false
+            PatchFilterGroup:
+              PatchFilters:
+                - Key: PRODUCT
+                  Values:
+                    - WindowsServer2019
+                - Key: CLASSIFICATION
+                  Values:
+                    - SecurityUpdates
+                - Key: MSRC_SEVERITY
+                  Values:
+                    - Critical
+                    - Important
+                    - Moderate
+                    - Low
+                    - Unspecified
+      Description: Service Catalog EC2 Reference Architecture Patch Baseline for Microsoft
+        Windows instace
+      Name: sc-ec2-ra-windows-patch-baseline
+  MaintenanceWindowRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonSSMMaintenanceWindowRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - ssm.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  MaintenanceWindow:
+    Type: AWS::SSM::MaintenanceWindow
+    Properties:
+      Description: Maintenance window to allow for patching windows instances
+      AllowUnassociatedTargets: false
+      Cutoff: 2
+      Schedule: cron(* 17 * * ? *)
+      Duration: 6
+      Name: sc-ec2-ra-windows-maintenance-window
+  WindowsMainteanceWindowTarget:
+    Type: AWS::SSM::MaintenanceWindowTarget
+    Properties:
+      OwnerInformation: Service Catalog EC2 Reference Architecture
+      Description: Service Catalog EC2 Reference Architecture Maintenance Window for
+        Microsoft Windows Instances
+      WindowId: !Ref 'MaintenanceWindow'
+      ResourceType: INSTANCE
+      Targets:
+        - Key: InstanceIds
+          Values:
+            - !Ref 'WindowsInstance'
+      Name: sc-ec2-ra-windows-patch-targets
+  WindowsMaintenanceWindowTaskScan:
+    Type: AWS::SSM::MaintenanceWindowTask
+    Properties:
+      MaxErrors: 1
+      Description: 'Service Catalog EC2 Reference Architecture Maintenance Window
+        Task: Scan for update for Microsoft Windows Instance'
+      ServiceRoleArn: !GetAtt 'MaintenanceWindowRole.Arn'
+      Priority: 1
+      MaxConcurrency: 1
+      Targets:
+        - Key: InstanceIds
+          Values:
+            - !Ref 'WindowsInstance'
+      Name: patch-sc-ec2-ra-windows-instances
+      TaskArn: AWS-RunPatchBaseline
+      WindowId: !Ref 'MaintenanceWindow'
+      TaskParameters:
+        Operation:
+          Values:
+            - Scan
+      TaskType: RUN_COMMAND
+  WindowsMaintenanceWindowTask:
+    Type: AWS::SSM::MaintenanceWindowTask
+    Properties:
+      MaxErrors: 1
+      Description: 'Service Catalog EC2 Reference Architecture Maintenance Window
+        Task: Install update for Microsoft Windows Instance'
+      ServiceRoleArn: !GetAtt 'MaintenanceWindowRole.Arn'
+      Priority: 2
+      MaxConcurrency: 1
+      Targets:
+        - Key: InstanceIds
+          Values:
+            - !Ref 'WindowsInstance'
+      Name: patch-sc-ec2-ra-windows-instances
+      TaskArn: AWS-RunPatchBaseline
+      WindowId: !Ref 'MaintenanceWindow'
+      TaskParameters:
+        Operation:
+          Values:
+            - Install
+      TaskType: RUN_COMMAND
+Outputs:
+  TemplateID:
+    Value: service-catalog-reference-architectures/sc-ec2-ra
+  AWSRegionName:
+    Value: !Ref 'AWS::Region'
+  WindowsInstancePrivateIpAddress:
+    Value: !GetAtt 'WindowsInstance.PrivateIp'
+  WindosInstanceAvailabilityZone:
+    Value: !GetAtt 'WindowsInstance.AvailabilityZone'
+  WindowsInstanceId:
+    Value: !Ref 'WindowsInstance'
+  KeyPair:
+    Value: !Ref 'KeyPair'
+  WindowsInstanceType:
+    Value: !Ref 'WindowsInstanceType'
+  IAMInstancePatchingRole:
+    Value: !Ref 'InstancePatchingRole'
+  IAMPatchingInstanceProfile:
+    Value: !Ref 'PatchingInstanceProfile'
+  SSMMaintenaceWindowRole:
+    Value: !Ref 'MaintenanceWindowRole'
+  SSMWindowsPatchBaseline:
+    Value: !Ref 'WindowsPatchBaseline'

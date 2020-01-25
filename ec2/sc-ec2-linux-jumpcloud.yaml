@@ -221,13 +221,15 @@ Conditions:
   UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
   IsUbuntu: !Equals [!Ref LinuxDistribution, 'Ubuntu']
 Resources:
-  InstancePatchingRole:
+  InstanceRole:
     Type: AWS::IAM::Role
     Properties:
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -237,12 +239,12 @@ Resources:
                 - ec2.amazonaws.com
             Action:
               - sts:AssumeRole
-  PatchingInstanceProfile:
+  InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
       Roles:
-        - !Ref 'InstancePatchingRole'
+        - !Ref 'InstanceRole'
   PrivateSubnetSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Condition: UsePrivateSubnet
@@ -299,6 +301,8 @@ Resources:
           SetupJumpcloud:
             - install_jc
             - config_jc
+          SetupVolume:
+            - TagRootVolume
         cfn_hup_service:
           files:
             /etc/cfn/cfn-hup.conf:
@@ -316,7 +320,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetupJumpcloud --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetupJumpcloud,SetupVolume --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -377,6 +381,25 @@ Resources:
                   - "-H 'Accept: application/json' -H 'Content-Type: application/json' -H 'x-api-key: "
                   - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
                   - "' -d '{\"attributes\":{\"sudo\":{\"enabled\":true,\"withoutPassword\":false}},\"op\":\"add\",\"type\":\"system\",\"id\":\"'$JC_SYSTEM_ID'\"}'"
+        TagRootVolume:
+          commands:
+            01_tag_root_disk:
+              command: !Join
+                - ''
+                - - "EC2_INSTANCE_ID=$(/usr/bin/curl -s http://169.254.169.254/latest/meta-data/instance-id) "
+                  - "ROOT_DISK_ID=$(/usr/bin/aws ec2 describe-volumes --region $AWS_REGION "
+                  - "--filters Name=attachment.instance-id,Values=$EC2_INSTANCE_ID "
+                  - "--query Volumes[].VolumeId --out text); "
+                  - "EC2_INSTANCE_TAGS=$(aws --region $AWS_REGION ec2 describe-tags --filters 'Name=resource-id,Values=$EC2_INSTANCE_ID') "
+                  - "PROJECT=$(echo $EC2_INSTANCE_TAGS | jq '.Tags[] | select(.Key == \"Project\").Value ') "
+                  - "DEPARTMENT=$(echo $EC2_INSTANCE_TAGS | jq '.Tags[] | select(.Key == \"Department\").Value ') "
+                  - "OWNER_EMAIL=$(echo $EC2_INSTANCE_TAGS | jq '.Tags[] | select(.Key == \"OwnerEmail\").Value ') "
+                  - "/usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID "
+                  - "--tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME "
+                  - "Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL"
+              env:
+                AWS_REGION: !Ref AWS::Region
+                STACK_NAME: !Ref AWS::StackName
     Properties:
       ImageId: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
@@ -397,7 +420,7 @@ Resources:
             DeleteOnTermination: true
             VolumeSize: !Ref VolumeSize
             Encrypted: true
-      IamInstanceProfile: !Ref 'PatchingInstanceProfile'
+      IamInstanceProfile: !Ref 'InstanceProfile'
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -411,7 +434,7 @@ Resources:
           else
             /bin/yum update -y aws-cfn-bootstrap
           fi
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetupJumpcloud --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetupJumpcloud,SetupVolume --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Description
@@ -550,10 +573,10 @@ Outputs:
     Value: !Ref 'EC2InstanceType'
   OpenPort:
     Value: !Ref OpenPort
-  IAMInstancePatchingRole:
-    Value: !Ref 'InstancePatchingRole'
-  IAMPatchingInstanceProfile:
-    Value: !Ref 'PatchingInstanceProfile'
+  IAMInstanceRole:
+    Value: !Ref 'InstanceRole'
+  IAMInstanceProfile:
+    Value: !Ref 'InstanceProfile'
   SSMMaintenaceWindowRole:
     Value: !Ref 'MaintenanceWindowRole'
   SSMLinuxPatchBaseline:

@@ -127,20 +127,6 @@ Resources:
         - !Sub 'arn:aws:iam::${AWS::AccountId}:group/ServiceCatalogEndusers'
       PortfolioId: !Ref 'SCEC2portfolio'
       PrincipalType: IAM
-  ec2linuxproduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !If
-          - CreateLaunchConstraint
-          - !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleArn'
-          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
-        PortfolioId: !Ref 'SCEC2portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux.yaml'
-      TimeoutInMinutes: 5
   ec2linuxjumpcloudproduct:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -155,7 +141,7 @@ Resources:
         ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud.yaml'
       TimeoutInMinutes: 5
-  ec2windowsproduct:
+  ec2windowsjumpcloudproduct:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
@@ -167,7 +153,7 @@ Resources:
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
         ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows.yaml'
+      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows-jumpcloud.yaml'
       TimeoutInMinutes: 5
 Outputs:
   EndUserRoleArn:
@@ -185,9 +171,7 @@ Outputs:
   LaunchConstraintRoleName:
     Condition: CreateLaunchConstraint
     Value: !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleName'
-  ec2windowsproductId:
-    Value: !GetAtt 'ec2windowsproduct.Outputs.ProductId'
-  ec2linuxproductId:
-    Value: !GetAtt 'ec2linuxproduct.Outputs.ProductId'
+  ec2windowsjumpcloudproductId:
+    Value: !GetAtt 'ec2windowsjumpcloudproduct.Outputs.ProductId'
   ec2linuxjumpcloudproductId:
     Value: !GetAtt 'ec2linuxjumpcloudproduct.Outputs.ProductId'

@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Windows EC2 ServiceCatalog product with Jumpcloud integration.
+Parameters:
+  PortfolioProvider:
+    Type: String
+    Description: Owner and Distributor Name
+  LaunchConstraintARN:
+    Type: String
+    Description: ARN of the launch constraint role for EC2 products.
+  PortfolioId:
+    Type: String
+    Description: The ServiceCatalog portfolio this product will be attached to.
+  RepoRootURL:
+    Type: String
+    Description: Root url for the repo containing the product templates.
+  ProductVersionName:
+    Type: String
+    Description: The product version name in the service catalog
+Resources:
+  scec2windowsproduct:
+    Type: AWS::ServiceCatalog::CloudFormationProduct
+    Properties:
+      Name: EC2 Windows with Jumpcloud Integration
+      Description: This product builds one Microsoft Windows EC2 instance with
+        Jumpcloud integration. It also creates a SSM patch baseline, maintenance
+        window, and patch task to scan for and install operating system updates
+        on the EC2 instance.
+      Owner: !Ref 'PortfolioProvider'
+      Distributor: !Ref 'PortfolioProvider'
+      SupportDescription: Sage IT
+      SupportEmail: it@sagebase.org
+      AcceptLanguage: en
+      SupportUrl: https://app.slack.com/client/T092YT0LV/CEFQD0KU1
+      ProvisioningArtifactParameters:
+        - Description: baseline version
+          Info:
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-windows-jumpcloud.yaml'
+          Name: !Ref 'ProductVersionName'
+  Associateec2windows:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      PortfolioId: !Ref 'PortfolioId'
+      ProductId: !Ref 'scec2windowsproduct'
+  constraintec2linux:
+    Type: AWS::ServiceCatalog::LaunchRoleConstraint
+    DependsOn: Associateec2windows
+    Properties:
+      PortfolioId: !Ref 'PortfolioId'
+      ProductId: !Ref 'scec2windowsproduct'
+      RoleArn: !Ref 'LaunchConstraintARN'
+      Description: !Ref 'LaunchConstraintARN'
+Outputs:
+  ProductId:
+    Value: !Ref 'scec2windowsproduct'

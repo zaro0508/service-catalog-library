@@ -3,9 +3,9 @@ Resources:
   SCS3LaunchRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: SCS3LaunchRole 
+      RoleName: SCS3LaunchRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess      
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -23,9 +23,9 @@ Resources:
             Statement:
               - Sid: SCLaunchPolicySID
                 Effect: Allow
-                Action:                  
+                Action:
                   - "servicecatalog:ListServiceActionsForProvisioningArtifact"
-                  - "servicecatalog:ExecuteprovisionedProductServiceAction"                  
+                  - "servicecatalog:ExecuteprovisionedProductServiceAction"
                   - "iam:ListRolePolicies"
                   - "iam:ListPolicies"
                   - "iam:DeleteRole"
@@ -34,7 +34,7 @@ Resources:
                   - "iam:ListRoles"
                   - "iam:CreateRole"
                   - "iam:DetachRolePolicy"
-                  - "iam:AttachRolePolicy"                                 
+                  - "iam:AttachRolePolicy"
                   - "cloudformation:DescribeStackResource"
                   - "cloudformation:DescribeStackResources"
                   - "cloudformation:GetTemplate"
@@ -48,14 +48,15 @@ Resources:
                   - "cloudformation:GetTemplateSummary"
                   - "cloudformation:SetStackPolicy"
                   - "cloudformation:ValidateTemplate"
-                  - "cloudformation:UpdateStack"               
+                  - "cloudformation:UpdateStack"
+                  - "cloudformation:CreateChangeSet"
                 Resource: '*'
 Outputs:
-    LaunchRoleArn:
-        Value: !GetAtt SCS3LaunchRole.Arn
-        Export:
-          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleArn'
-    LaunchRoleName:
-        Value: !Ref SCS3LaunchRole
-        Export:
-          Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleName'
+  LaunchRoleArn:
+    Value: !GetAtt SCS3LaunchRole.Arn
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleArn'
+  LaunchRoleName:
+    Value: !Ref SCS3LaunchRole
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-LaunchRoleName'

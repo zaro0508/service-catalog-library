@@ -27,18 +27,6 @@ Resources:
               AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
             Action:
               - 'sts:AssumeRole'
-  CFNDenyGetTemplateSummaryPolicy:
-    Type: 'AWS::IAM::ManagedPolicy'
-    Properties:
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          -
-            Effect: Deny
-            Action:
-              # Deny this action to hide secrets
-              - cloudformation:GetTemplateSummary
-            Resource: "*"
 Outputs:
   EndUserGroupArn:
     Value: !GetAtt SCEnduserGroup.Arn

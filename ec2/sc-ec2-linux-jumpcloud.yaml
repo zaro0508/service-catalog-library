@@ -391,7 +391,7 @@ Resources:
                   - "ROOT_DISK_ID=$(/usr/bin/aws ec2 describe-volumes --region $AWS_REGION "
                   - "--filters Name=attachment.instance-id,Values=$EC2_INSTANCE_ID "
                   - "--query Volumes[].VolumeId --out text) && "
-                  - "EC2_INSTANCE_TAGS=$(aws --region $AWS_REGION ec2 describe-tags --filters Name=resource-id,Values=$EC2_INSTANCE_ID) & &"
+                  - "EC2_INSTANCE_TAGS=$(aws --region $AWS_REGION ec2 describe-tags --filters Name=resource-id,Values=$EC2_INSTANCE_ID) && "
                   - "PROJECT=$(echo $EC2_INSTANCE_TAGS | jq -j '.Tags[] | select(.Key == \"Project\").Value ') && "
                   - "DEPARTMENT=$(echo $EC2_INSTANCE_TAGS | jq -j '.Tags[] | select(.Key == \"Department\").Value ') && "
                   - "OWNER_EMAIL=$(echo $EC2_INSTANCE_TAGS | jq -j '.Tags[] | select(.Key == \"OwnerEmail\").Value ') && "

@@ -369,7 +369,7 @@ Resources:
                 PROJECT=$(extract_tag_value Project)
                 OWNER_EMAIL=$(extract_tag_value OwnerEmail)
 
-                echo "export AWS_REGION=$AWS_REGION" >> /opt/sage/bin/instance_env_vars.sh
+                echo "export AWS_REGION=$AWS_REGION" > /opt/sage/bin/instance_env_vars.sh
                 echo "export STACK_NAME=$STACK_NAME" >> /opt/sage/bin/instance_env_vars.sh
                 echo "export EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> /opt/sage/bin/instance_env_vars.sh
                 echo "export ROOT_DISK_ID='$ROOT_DISK_ID'" >> /opt/sage/bin/instance_env_vars.sh

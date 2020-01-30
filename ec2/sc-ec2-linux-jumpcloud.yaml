@@ -369,14 +369,14 @@ Resources:
                 PROJECT=$(extract_tag_value Project)
                 OWNER_EMAIL=$(extract_tag_value OwnerEmail)
 
-                echo "export AWS_REGION=$AWS_REGION" >> /opt/sage/bin/export_env_vars.sh
-                echo "export STACK_NAME=$STACK_NAME" >> /opt/sage/bin/export_env_vars.sh
-                echo "export EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> /opt/sage/bin/export_env_vars.sh
-                echo "export ROOT_DISK_ID='$ROOT_DISK_ID'" >> /opt/sage/bin/export_env_vars.sh
-                echo "export DEPARTMENT=$DEPARTMENT" >> /opt/sage/bin/export_env_vars.sh
-                echo "export PROJECT=$PROJECT" >> /opt/sage/bin/export_env_vars.sh
-                echo "export OWNER_EMAIL=$OWNER_EMAIL" >> /opt/sage/bin/export_env_vars.sh
-                chmod +x /opt/sage/bin/export_env_vars.sh
+                echo "export AWS_REGION=$AWS_REGION" >> /opt/sage/bin/instance_env_vars.sh
+                echo "export STACK_NAME=$STACK_NAME" >> /opt/sage/bin/instance_env_vars.sh
+                echo "export EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> /opt/sage/bin/instance_env_vars.sh
+                echo "export ROOT_DISK_ID='$ROOT_DISK_ID'" >> /opt/sage/bin/instance_env_vars.sh
+                echo "export DEPARTMENT=$DEPARTMENT" >> /opt/sage/bin/instance_env_vars.sh
+                echo "export PROJECT=$PROJECT" >> /opt/sage/bin/instance_env_vars.sh
+                echo "export OWNER_EMAIL=$OWNER_EMAIL" >> /opt/sage/bin/instance_env_vars.sh
+                chmod +x /opt/sage/bin/instance_env_vars.sh
 
               mode: "00744"
               owner: "root"
@@ -422,7 +422,7 @@ Resources:
             01_wait_registration:
               command: "sleep 10"
             02_associate_jc_systems:
-              command: ". /opt/sage/bin/export_env_vars.sh && . /opt/sage/bin/associate_jc_systems.sh"
+              command: ". /opt/sage/bin/instance_env_vars.sh && . /opt/sage/bin/associate_jc_systems.sh"
               env:
                 JC_SERVICE_API_KEY:
                   Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
@@ -431,7 +431,7 @@ Resources:
             01_tag_root_disk:
               command: !Join
                 - ''
-                - - ". /opt/sage/bin/export_env_vars.sh;"
+                - - ". /opt/sage/bin/instance_env_vars.sh;"
                   - "/usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID "
                   - "--tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME "
                   - "Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL"

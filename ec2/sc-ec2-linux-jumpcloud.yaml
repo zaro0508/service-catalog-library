@@ -378,7 +378,7 @@ Resources:
                 echo "export OWNER_EMAIL=$OWNER_EMAIL" >> /opt/sage/bin/export_env_vars.sh
                 chmod +x /opt/sage/bin/export_env_vars.sh
 
-              mode: "00644"
+              mode: "00744"
               owner: "root"
               group: "root"
           commands:

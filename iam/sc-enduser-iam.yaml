@@ -11,6 +11,7 @@ Resources:
         - arn:aws:iam::aws:policy/IAMReadOnlyAccess
         - arn:aws:iam::aws:policy/AWSCloudTrailReadOnlyAccess
         - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
+        - !Ref SCEnduserExpandedPolicy
       Path: /
   SCEnduserRole:
     Type: AWS::IAM::Role
@@ -18,6 +19,7 @@ Resources:
       RoleName: ServiceCatalogEndusers
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
+        - !Ref SCEnduserExpandedPolicy
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -27,6 +29,19 @@ Resources:
               AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
             Action:
               - 'sts:AssumeRole'
+  SCEnduserExpandedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Expand permissions SC users.
+      Path: "/"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - organizations:DescribeOrganization
+              - servicecatalog:DescribeProvisionedProduct
+            Resource: "*"
 Outputs:
   EndUserGroupArn:
     Value: !GetAtt SCEnduserGroup.Arn
@@ -44,3 +59,7 @@ Outputs:
     Value: !Ref SCEnduserRole
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleName'
+  EndUserExpandPolicy:
+    Value: !Ref SCEnduserExpandedPolicy
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SCEnduserExpandedPolicy'

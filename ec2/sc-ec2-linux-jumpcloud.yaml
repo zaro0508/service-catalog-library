@@ -28,11 +28,9 @@ Metadata:
 Mappings:
   LinuxDistributions:
     Ubuntu:
-      AMIID: ami-0acb259f7a7b035f6
-      PatchBaselineOperatingSystem: UBUNTU
+      AMIID: ami-0d576d466a205f6db
     AmazonLinux:
       AMIID: ami-0ca7208f904dc1874
-      PatchBaselineOperatingSystem: AMAZON_LINUX
 Parameters:
   PrivateNetwork:
     Type: String
@@ -218,8 +216,6 @@ Resources:
     Properties:
       Path: /
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
       AssumeRolePolicyDocument:
@@ -401,6 +397,7 @@ Resources:
               content: !Sub |
                 #! /bin/bash
 
+                source /opt/sage/bin/instance_env_vars.sh
                 JC_SYSTEM_ID=$(sudo cat /opt/jc/jcagent.conf|jq -r '.systemKey')
                 JC_SYSTEM_USERS=$(/usr/bin/curl --silent --show-error -X GET \
                   https://console.jumpcloud.com/api/systemusers \
@@ -414,7 +411,7 @@ Resources:
                   -H x-api-key:$JC_SERVICE_API_KEY \
                   -d '{"attributes":{"sudo":{"enabled":true,"withoutPassword":false}},"op":"add","type":"system","id":"'$JC_SYSTEM_ID'"}'
 
-              mode: "00644"
+              mode: "00744"
               owner: "root"
               group: "root"
           commands:
@@ -422,7 +419,7 @@ Resources:
             01_wait_registration:
               command: "sleep 10"
             02_associate_jc_systems:
-              command: ". /opt/sage/bin/instance_env_vars.sh && . /opt/sage/bin/associate_jc_systems.sh"
+              command: "/opt/sage/bin/associate_jc_systems.sh"
               env:
                 JC_SERVICE_API_KEY:
                   Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
@@ -474,125 +471,7 @@ Resources:
       Tags:
         - Key: Description
           Value: Service-Catalog-EC2-Reference-Architecture
-  LinuxPatchBaseline:
-    Type: AWS::SSM::PatchBaseline
-    Properties:
-      OperatingSystem: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, PatchBaselineOperatingSystem]
-      ApprovalRules:
-        PatchRules:
-          - ApproveAfterDays: 0
-            ComplianceLevel: CRITICAL
-            EnableNonSecurity: false
-            PatchFilterGroup:
-              PatchFilters:
-                - Key: PRODUCT
-                  Values:
-                    - '*'
-                - Key: CLASSIFICATION
-                  Values:
-                    - Security
-                    - Bugfix
-                    - Enhancement
-                    - Recommended
-                - Key: SEVERITY
-                  Values:
-                    - Critical
-                    - Important
-                    - Medium
-                    - Low
-      Description: Service Catalog EC2 Reference Architecture Patch Baseline for Amazon
-        Linux instace
-      Name: sc-ec2-ra-linux-patch-baseline
-  MaintenanceWindowRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonSSMMaintenanceWindowRole
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - ec2.amazonaws.com
-                - ssm.amazonaws.com
-            Action:
-              - sts:AssumeRole
-  MaintenanceWindow:
-    Type: AWS::SSM::MaintenanceWindow
-    Properties:
-      Description: Maintenance window to allow for patching Amazon Linux instances
-      AllowUnassociatedTargets: false
-      Cutoff: 2
-      Schedule: cron(* 17 * * ? *)
-      Duration: 6
-      Name: sc-ec2-ra-linux-maintenance-window
-  LinuxMainteanceWindowTarget:
-    Type: AWS::SSM::MaintenanceWindowTarget
-    Properties:
-      OwnerInformation: Service Catalog EC2 Reference Architecture
-      Description: Service Catalog EC2 Reference Architecture - Patch Maintenance
-        for Amazon Linux Instances
-      WindowId: !Ref 'MaintenanceWindow'
-      ResourceType: INSTANCE
-      Targets:
-        - Key: InstanceIds
-          Values:
-            - !Ref 'LinuxInstance'
-      Name: sc-ec2-ra-linux-patch-targets
-  LinuxMaintenanceWindowTaskScan:
-    Metadata:
-      cfn-lint:
-        config:
-          ignore_checks:
-            - E3012
-    Type: AWS::SSM::MaintenanceWindowTask
-    Properties:
-      MaxErrors: 1
-      Description: 'Service Catalog EC2 Reference Architecture Maintenance Window
-        Task: Scan for update for Amazon Linux Instance'
-      ServiceRoleArn: !GetAtt 'MaintenanceWindowRole.Arn'
-      Priority: 1
-      MaxConcurrency: 1
-      Targets:
-        - Key: InstanceIds
-          Values:
-            - !Ref 'LinuxInstance'
-      Name: patch-sc-ec2-ra-linux-instances
-      TaskArn: AWS-RunPatchBaseline
-      WindowId: !Ref 'MaintenanceWindow'
-      TaskParameters:
-        Operation:
-          Values:
-            - Scan
-      TaskType: RUN_COMMAND
-  LinuxMaintenanceWindowTaskInstall:
-    Metadata:
-      cfn-lint:
-        config:
-          ignore_checks:
-            - E3012
-    Type: AWS::SSM::MaintenanceWindowTask
-    Properties:
-      MaxErrors: 1
-      Description: 'Service Catalog EC2 Reference Architecture Maintenance Window
-        Task: Install update for Amazon Linux Instance'
-      ServiceRoleArn: !GetAtt 'MaintenanceWindowRole.Arn'
-      Priority: 2
-      MaxConcurrency: 1
-      Targets:
-        - Key: InstanceIds
-          Values:
-            - !Ref 'LinuxInstance'
-      Name: patch-sc-ec2-ra-linux-instances
-      TaskArn: AWS-RunPatchBaseline
-      WindowId: !Ref 'MaintenanceWindow'
-      TaskParameters:
-        Operation:
-          Values:
-            - Install
-      TaskType: RUN_COMMAND
+
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra
@@ -612,7 +491,3 @@ Outputs:
     Value: !Ref 'InstanceRole'
   IAMInstanceProfile:
     Value: !Ref 'InstanceProfile'
-  SSMMaintenaceWindowRole:
-    Value: !Ref 'MaintenanceWindowRole'
-  SSMLinuxPatchBaseline:
-    Value: !Ref 'LinuxPatchBaseline'

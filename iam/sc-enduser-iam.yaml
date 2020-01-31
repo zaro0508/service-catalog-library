@@ -1,9 +1,14 @@
 Description: "ServiceCatalog End User policy and group (fdp-1p4dlgcp7)"
+Parameters:
+  RoleAndGroupName:
+    Description: 'Name that will be used for the IAM Group and IAM Role'
+    Type: String
+    Default: ServiceCatalogEndusers
 Resources:
   SCEnduserGroup:
     Type: AWS::IAM::Group
     Properties:
-      GroupName: ServiceCatalogEndusers
+      GroupName: !Ref RoleAndGroupName
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
@@ -16,7 +21,7 @@ Resources:
   SCEnduserRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ServiceCatalogEndusers
+      RoleName: !Ref RoleAndGroupName
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
         - !Ref SCEnduserExpandedPolicy
@@ -48,19 +53,19 @@ Outputs:
   EndUserGroupArn:
     Value: !GetAtt SCEnduserGroup.Arn
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserGroupArn'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-GroupArn'
   EndUserGroupName:
     Value: !Ref SCEnduserGroup
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserGroupName'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-GroupName'
   EndUserRoleArn:
     Value: !GetAtt SCEnduserRole.Arn
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleArn'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-RoleArn'
   EndUserRoleName:
     Value: !Ref SCEnduserRole
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-EndUserRoleName'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-RoleName'
   EndUserExpandPolicy:
     Value: !Ref SCEnduserExpandedPolicy
     Export:

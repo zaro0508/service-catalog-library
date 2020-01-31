@@ -41,6 +41,8 @@ Resources:
             Action:
               - organizations:DescribeOrganization
               - servicecatalog:DescribeProvisionedProduct
+              - servicecatalog:ListOrganizationPortfolioAccess
+              - servicecatalog:GetAWSOrganizationsAccessStatus
             Resource: "*"
 Outputs:
   EndUserGroupArn:

@@ -13,9 +13,10 @@ Metadata:
           default: IAM Settings
         Parameters:
           - LaunchRoleName
-          - LinkedRole1
-          - LinkedRole2
-          - CreateEndUsers
+          - PrincipalRoleName1
+          - PrincipalGroupName1
+          - PrincipalRoleName2
+          - PrincipalGroupName2
       - Label:
           default: Product Settings
         Parameters:
@@ -38,26 +39,30 @@ Parameters:
     Type: String
     Description: Name of the launch constraint role for VPC products. leave this blank
       to create the role.
-  LinkedRole1:
+  PrincipalRoleName1:
     Type: String
-    Description: (Optional) The name of a role which can execute products in this
-      portfolio.
-  LinkedRole2:
+    Description: (Optional) Name of an IAM role which can execute products
+      in this portfolio.
+    Default: ''
+  PrincipalGroupName1:
     Type: String
-    Description: (Optional) The name of a second role which can execute products in
-      this portfolio.
+    Description: (Optional) Name of an IAM  group which can execute products
+      in this portfolio.
+    Default: ''
+  PrincipalRoleName2:
+    Type: String
+    Description: (Optional) Name of an IAM role which can execute products
+      in this portfolio.
+    Default: ''
+  PrincipalGroupName2:
+    Type: String
+    Description: (Optional) Name of an IAM  group which can execute products
+      in this portfolio.
+    Default: ''
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
     Default: https://s3.amazonaws.com/aws-service-catalog-reference-architectures/
-  CreateEndUsers:
-    Type: String
-    Description: Select Yes to Create the ServiceCatalogEndusers IAM group. No if
-      you have already created the group
-    AllowedValues:
-      - 'Yes'
-      - 'No'
-    Default: 'Yes'
   ProductVersionName:
     Type: String
     Description: The product version name in the service catalog
@@ -65,16 +70,21 @@ Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
     - ''
-  CondCreateEndUsers: !Equals
-    - !Ref 'CreateEndUsers'
-    - 'Yes'
-  CondLinkRole1: !Not
+  CondPrincipalRoleName1: !Not
     - !Equals
-      - !Ref 'LinkedRole1'
+      - !Ref 'PrincipalRoleName1'
       - ''
-  CondLinkRole2: !Not
+  CondPrincipalGroupName1: !Not
     - !Equals
-      - !Ref 'LinkedRole2'
+      - !Ref 'PrincipalGroupName1'
+      - ''
+  CondPrincipalRoleName2: !Not
+    - !Equals
+      - !Ref 'PrincipalRoleName2'
+      - ''
+  CondPrincipalGroupName2: !Not
+    - !Equals
+      - !Ref 'PrincipalGroupName2'
       - ''
 Resources:
   SCS3portfolio:
@@ -83,64 +93,40 @@ Resources:
       ProviderName: !Ref 'PortfolioProvider'
       Description: !Ref 'PorfolioDescription'
       DisplayName: !Ref 'PorfolioName'
-  addrole1:
-    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
-    Condition: CondLinkRole1
-    Properties:
-      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LinkedRole1}'
-      PortfolioId: !Ref 'SCS3portfolio'
-      PrincipalType: IAM
-  addrole2:
-    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
-    Condition: CondLinkRole2
-    Properties:
-      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LinkedRole2}'
-      PortfolioId: !Ref 'SCS3portfolio'
-      PrincipalType: IAM
-  stackServiceCatalogEndusers:
-    Type: AWS::CloudFormation::Stack
-    Condition: CondCreateEndUsers
-    Properties:
-      TemplateURL: !Sub '${RepoRootURL}iam/sc-enduser-iam.yaml'
-      TimeoutInMinutes: 5
-  LinkEndusersRole:
-    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
-    Properties:
-      PrincipalARN: !If
-        - CondCreateEndUsers
-        - !GetAtt 'stackServiceCatalogEndusers.Outputs.EndUserRoleArn'
-        - !Sub 'arn:aws:iam::${AWS::AccountId}:role/ServiceCatalogEndusers'
-      PortfolioId: !Ref 'SCS3portfolio'
-      PrincipalType: IAM
-  LinkEndusersGroup:
-    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
-    Properties:
-      PrincipalARN: !If
-        - CondCreateEndUsers
-        - !GetAtt 'stackServiceCatalogEndusers.Outputs.EndUserGroupArn'
-        - !Sub 'arn:aws:iam::${AWS::AccountId}:group/ServiceCatalogEndusers'
-      PortfolioId: !Ref 'SCS3portfolio'
-      PrincipalType: IAM
   LaunchConstraintRole:
     Type: AWS::CloudFormation::Stack
     Condition: CreateLaunchConstraint
     Properties:
       TemplateURL: !Sub '${RepoRootURL}iam/sc-s3-launchrole.yaml'
       TimeoutInMinutes: 5
-  s3privateEncproduct:
-    Type: AWS::CloudFormation::Stack
+  LinkEndusersRole:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Condition: CondPrincipalRoleName1
     Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !If
-          - CreateLaunchConstraint
-          - !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleArn'
-          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
-        PortfolioId: !Ref 'SCS3portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-enc.yaml'
-      TimeoutInMinutes: 5
+      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${PrincipalRoleName1}'
+      PortfolioId: !Ref 'SCS3portfolio'
+      PrincipalType: IAM
+  LinkEndusersGroup:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Condition: CondPrincipalGroupName1
+    Properties:
+      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName1}'
+      PortfolioId: !Ref 'SCS3portfolio'
+      PrincipalType: IAM
+  LinkEndusersAltRole:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Condition: CondPrincipalRoleName2
+    Properties:
+      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${PrincipalRoleName2}'
+      PortfolioId: !Ref 'SCS3portfolio'
+      PrincipalType: IAM
+  LinkEndusersAltGroup:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Condition: CondPrincipalGroupName2
+    Properties:
+      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName2}'
+      PortfolioId: !Ref 'SCS3portfolio'
+      PrincipalType: IAM
   s3synapseroduct:
     Type: AWS::CloudFormation::Stack
     Properties:

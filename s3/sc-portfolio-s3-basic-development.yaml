@@ -41,9 +41,8 @@ Parameters:
       to create the role.
   PrincipalRoleName1:
     Type: String
-    Description: (Optional) Name of an IAM role which can execute products
+    Description: Name of an IAM role which can execute products
       in this portfolio.
-    Default: ''
   PrincipalGroupName1:
     Type: String
     Description: (Optional) Name of an IAM  group which can execute products

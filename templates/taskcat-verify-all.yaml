@@ -18,14 +18,19 @@ Parameters:
     Type: String
     Description: Name of the launch constraint role for EC2 products. leave this blank
       to create the role.
+  PrincipalRoleName1:
+    Type: String
+    Description: Name of the role that can execute products in this portfolio.
   LinkedRole1:
     Type: String
     Description: (Optional) The name of a role which can execute products in this
       portfolio.
+    Default: ''
   LinkedRole2:
     Type: String
     Description: (Optional) The name of a second role which can execute products in
       this portfolio.
+    Default: ''
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
@@ -56,26 +61,10 @@ Resources:
     Properties:
       Parameters:
         LaunchRoleName: ''
-        CreateEndUsers: 'No'
-        LinkedRole1: !Ref 'LinkedRole1'
-        LinkedRole2: !Ref 'LinkedRole2'
+        PrincipalRoleName1: ''
         RepoRootURL: !Ref 'RepoRootURL'
         ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-portfolio-ec2.yaml'
-      TimeoutInMinutes: 5
-  STACKvpcportfolio:
-    Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - IAMenduser
-    Properties:
-      Parameters:
-        LaunchRoleName: !GetAtt 'STACKec2portfolio.Outputs.LaunchConstraintRoleName'
-        CreateEndUsers: 'No'
-        LinkedRole1: !Ref 'LinkedRole1'
-        LinkedRole2: !Ref 'LinkedRole2'
-        RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}vpc/sc-portfolio-vpc.yaml'
       TimeoutInMinutes: 5
   STACKrdsportfolio:
     Type: AWS::CloudFormation::Stack
@@ -112,10 +101,8 @@ Resources:
     Properties:
       Parameters:
         LaunchRoleName: ''
-        CreateEndUsers: 'No'
-        LinkedRole1: !Ref 'LinkedRole1'
-        LinkedRole2: !Ref 'LinkedRole2'
+        PrincipalRoleName1: ''
         RepoRootURL: !Ref 'RepoRootURL'
         ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-portfolio-s3.yaml'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-portfolio-s3-basic.yaml'
       TimeoutInMinutes: 5

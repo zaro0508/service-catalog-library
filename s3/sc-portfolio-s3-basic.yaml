@@ -126,7 +126,7 @@ Resources:
       PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName2}'
       PortfolioId: !Ref 'SCS3portfolio'
       PrincipalType: IAM
-  s3synapseroduct:
+  s3privateEncproduct:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
@@ -138,5 +138,5 @@ Resources:
         PortfolioId: !Ref 'SCS3portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
         ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-synapse.yaml'
+      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-enc.yaml'
       TimeoutInMinutes: 5

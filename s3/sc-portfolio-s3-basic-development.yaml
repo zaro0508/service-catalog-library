@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: S3 Portfolio for Service Catalog. (fdp-1p5rtpgl6)
+Description: '[DEVELOPMENT] S3 Portfolio for Service Catalog.'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -29,7 +29,7 @@ Parameters:
   PorfolioName:
     Type: String
     Description: Portfolio Name
-    Default: Service Catalog S3 Reference Architecture
+    Default: '[DEVELOPMENT] Service Catalog S3 Reference Architecture'
   PorfolioDescription:
     Type: String
     Description: Portfolio Description

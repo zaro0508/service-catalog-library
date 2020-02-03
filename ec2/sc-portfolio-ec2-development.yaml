@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: EC2 Portfolio for Service Catalog. (fdp-1p4da46nc)
+Description: '[DEVELOPMENT] EC2 Portfolio for Service Catalog.'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -29,16 +29,16 @@ Parameters:
   PorfolioName:
     Type: String
     Description: Portfolio Name
-    Default: Service Catalog EC2 Reference Architecture
+    Default: '[DEVELOPMENT] Service Catalog EC2 Reference Architecture'
   PorfolioDescription:
     Type: String
     Description: Portfolio Description
-    Default: Service Catalog Portfolio that contains reference architecture products
-      for Amazon Elastic Compute Cloud (EC2).
+    Default: Service Catalog Portfolio that contains reference architecture
+      products for Amazon Elastic Compute Cloud (EC2).
   LaunchRoleName:
     Type: String
-    Description: Name of the launch constraint role for EC2 products. leave this blank
-      to create the role.
+    Description: Name of the launch constraint role for EC2 products. leave this
+      blank to create the role.
   PrincipalRoleName1:
     Type: String
     Description: Name of an IAM role which can execute products
@@ -126,7 +126,7 @@ Resources:
       PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName2}'
       PortfolioId: !Ref 'SCEC2portfolio'
       PrincipalType: IAM
-  ec2linuxjumpcloudproduct:
+  ec2windowsjumpcloudproduct:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
@@ -138,7 +138,7 @@ Resources:
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
         ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud.yaml'
+      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows-jumpcloud.yaml'
       TimeoutInMinutes: 5
 Outputs:
   LaunchConstraintRoleARN:
@@ -147,5 +147,5 @@ Outputs:
   LaunchConstraintRoleName:
     Condition: CreateLaunchConstraint
     Value: !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleName'
-  ec2linuxjumpcloudproductId:
-    Value: !GetAtt 'ec2linuxjumpcloudproduct.Outputs.ProductId'
+  ec2windowsjumpcloudproductId:
+    Value: !GetAtt 'ec2windowsjumpcloudproduct.Outputs.ProductId'

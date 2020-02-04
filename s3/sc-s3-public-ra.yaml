@@ -18,3 +18,5 @@ Outputs:
     Description: Name of the Amazon S3 bucket.
   BucketARN:
     Value: !GetAtt 'S3Bucket.Arn'
+  BucketUrl:
+    Value: !Sub 'https://console.aws.amazon.com/s3/home?region=${AWS::Region}&bucket=${S3Bucket}'

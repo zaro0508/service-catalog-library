@@ -48,6 +48,7 @@ Resources:
             Action:
               - organizations:DescribeOrganization
               - servicecatalog:DescribeProvisionedProduct
+            Resource: "*"
   CFNDenyGetTemplateSummaryPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:

@@ -6,7 +6,7 @@ Resources:
       RoleName: SCS3LaunchRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
-        - arn:aws:iam::aws:policy/AWSLambdaRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:

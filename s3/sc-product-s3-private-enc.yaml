@@ -20,8 +20,8 @@ Resources:
   scs3product:
     Type: AWS::ServiceCatalog::CloudFormationProduct
     Properties:
-      Name: Amazon S3 Private Encrypted Bucket
-      Description: This product builds an Amazon AWS S3 bucket encrypted with private
+      Name: S3 Private Encrypted Bucket
+      Description: This product builds an AWS S3 bucket encrypted with private
         access accessible from any source.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'

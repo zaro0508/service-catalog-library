@@ -126,17 +126,3 @@ Resources:
       PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName2}'
       PortfolioId: !Ref 'SCS3portfolio'
       PrincipalType: IAM
-  s3synapseroduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !If
-          - CreateLaunchConstraint
-          - !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleArn'
-          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
-        PortfolioId: !Ref 'SCS3portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-synapse.yaml'
-      TimeoutInMinutes: 5

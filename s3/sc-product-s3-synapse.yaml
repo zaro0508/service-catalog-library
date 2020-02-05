@@ -20,8 +20,9 @@ Resources:
   scs3product:
     Type: AWS::ServiceCatalog::CloudFormationProduct
     Properties:
-      Name: Amazon S3 Synapse Bucket
-      Description: This product builds an Amazon AWS S3 bucket with private access for Synapse
+      Name: S3 Synapse Bucket
+      Description: This product builds an AWS S3 bucket with private access
+        for Synapse.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
       SupportDescription: Operations Team

@@ -49,6 +49,28 @@ Resources:
               - organizations:DescribeOrganization
               - servicecatalog:DescribeProvisionedProduct
             Resource: "*"
+  # Give SC end users permission to start/stop/reboot instances
+  SCEnduserServiceActionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Expand permissions SC users.
+      Path: "/"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - "servicecatalog:ListServiceActionsForProvisioningArtifact"
+              - "servicecatalog:ExecuteprovisionedProductServiceAction"
+              - "ssm:DescribeDocument"
+              - "ssm:GetAutomationExecution"
+              - "ssm:StartAutomationExecution"
+              - "ssm:StopAutomationExecution"
+              - "cloudformation:ListStackResources"
+              - "ec2:DescribeInstanceStatus"
+              - "ec2:StartInstances"
+              - "ec2:StopInstances"
+            Resource: "*"
   CFNDenyGetTemplateSummaryPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:

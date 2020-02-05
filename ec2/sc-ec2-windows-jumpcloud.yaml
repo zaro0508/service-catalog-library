@@ -7,7 +7,6 @@ Metadata:
           default: General Configuration
         Parameters:
           - KeyPair
-          - OwnerEmail
       - Label:
           default: Windows Instance Configuration
         Parameters:
@@ -17,8 +16,6 @@ Metadata:
     ParameterLabels:
       KeyPair:
         default: Key Pair
-      OwnerEmail:
-        default: Your Sage Email
       WindowsInstanceType:
         default: Instance Type
       AmiId:
@@ -40,6 +37,7 @@ Parameters:
   KeyPair:
     Description: Name of existing EC2 key pair
     Type: AWS::EC2::KeyPair::KeyName
+    Default: 'scipool'
   AmiId:
     Type: AWS::EC2::Image::Id
     Default: ami-074545a6fb2313e2c
@@ -49,11 +47,6 @@ Parameters:
     Default: 30
     MinValue: 10
     MaxValue: 2000
-  OwnerEmail:
-    Description: 'Email address of the owner of this resource'
-    Type: String
-    AllowedPattern: '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
-    ConstraintDescription: 'Must be an acceptable email address syntax(i.e. joe.smith@sagebase.org)'
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -103,9 +96,13 @@ Resources:
             - cfn_hup_service
           SetupApps:
             - install_apps
+          SetEnv:
+            - set_env_vars
           SetupJumpcloud:
             - install_jc
             - config_jc
+          SetupVolume:
+            - tag_volume
         # Cfn-hup setting, it is to monitor the change of metadata.
         # When there is change in the contents of json file in the metadata section, cfn-hup will call cfn-init.
         cfn_hup_service:
@@ -121,7 +118,7 @@ Resources:
                  [cfn-auto-reloader-hook]
                  triggers=post.update
                  path=Resources.WindowsInstance.Metadata.AWS::CloudFormation::Init
-                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetupJumpcloud
+                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud,SetupVolume
           services:
             windows:
               cfn-hup:
@@ -149,6 +146,56 @@ Resources:
               command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install awscli --yes'
             05_install_googlechrome:
               command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install googlechrome  --yes --ignore-checksums'
+        set_env_vars:
+          files:
+            'c:\\scripts\\set_env_vars_file.ps1':
+              content: |
+                Param(
+                    [String]$AWS_REGION = $env:AWS_REGION
+                )
+
+                Function SetEnvVars() {
+                  $EC2_METADATA_URI = "http://169.254.169.254/latest/meta-data"
+                  $EC2_INSTANCE_ID = (Invoke-WebRequest -Uri $EC2_METADATA_URI/instance-id -UseBasicParsing).Content
+                  $ROOT_DISK_ID = & aws.exe ec2 describe-volumes `
+                    --region $AWS_REGION `
+                    --filters Name=attachment.instance-id,Values=$EC2_INSTANCE_ID `
+                    --query Volumes[].VolumeId --out text
+                  $EC2_INSTANCE_TAGS = & aws.exe --region $AWS_REGION `
+                    ec2 describe-tags `
+                    --filters Name=resource-id,Values=$EC2_INSTANCE_ID
+
+                  Function ExtractTagValue([String] $KeyName) {
+                    $EC2_INSTANCE_TAGS | jq -j --arg KEYNAME "$KeyName" '.Tags[] | select(.Key == $KEYNAME).Value '
+                  }
+
+                  $DEPARTMENT = ExtractTagValue -KeyName Department
+                  $PROJECT = ExtractTagValue -KeyName Project
+                  $OWNER_EMAIL = ExtractTagValue -KeyName OwnerEmail
+
+                  $FileString = @"
+                    `$env:EC2_INSTANCE_ID` = "$EC2_INSTANCE_ID"
+                    `$env:ROOT_DISK_ID` = "$ROOT_DISK_ID"
+                    `$env:DEPARTMENT` = "$DEPARTMENT"
+                    `$env:PROJECT` = "$PROJECT"
+                    `$env:OWNER_EMAIL` = "$OWNER_EMAIL"
+                "@
+                  Set-Content -Path C:\scripts\instance_env_vars.ps1 -Value $FileString
+
+                }
+
+                $env:Path += ";$env:ProgramFiles\Amazon\AWSCLI\bin"
+                $env:Path += ";C:\ProgramData\chocolatey\lib\jq\tools"
+
+                SetEnvVars
+
+              mode: "0664"
+          commands:
+            01_set_env_vars:
+              command: !Join
+                - ''
+                - - 'Powershell.exe C:\scripts\set_env_vars_file.ps1 -AWS_REGION '
+                  - !Ref 'AWS::Region'
         install_jc:
           files:
             'c:\scripts\install-ms-vc.ps1':
@@ -181,14 +228,34 @@ Resources:
               command: !Join
                 - ''
                 - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - '. C:\scripts\instance_env_vars.ps1;'
                   - 'Powershell.exe C:\scripts\associate-jc-system.ps1 '
                   - ' -JcServiceApiKey '
                   - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
                   - ' -JcSystemsGroupId '
                   - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcSystemsGroupId"}}
-                  - ' -OwnerEmail '
-                  - !Ref OwnerEmail
+                  - ' -OwnerEmail $env:OWNER_EMAIL'
                   - ' > C:\scripts\associate-jc-system.log'
+        tag_volume:
+          files:
+            "c:\\scripts\\tag-instance-volume.ps1":
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/tag-instance-volume.ps1"
+              mode: "0664"
+          commands:
+            01_tag_instance_volume:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - '. C:\scripts\instance_env_vars.ps1;'
+                  - 'Powershell.exe C:\scripts\tag-instance-volume.ps1 '
+                  - ' -AwsRegion '
+                  - !Ref AWS::Region
+                  - ' -StackName '
+                  - !Ref AWS::StackName
+                  - ' -Department $env:DEPARTMENT'
+                  - ' -Project $env:PROJECT'
+                  - ' -OwnerEmail $env:OWNER_EMAIL'
+                  - ' > C:\scripts\tag-instance-volume.log'
     Properties:
       ImageId: !Ref 'AmiId'
       InstanceType: !Ref 'WindowsInstanceType'
@@ -208,7 +275,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           <script>
-          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetupJumpcloud
+          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud,SetupVolume
           cfn-signal.exe -e %errorlevel% --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region}
           </script>
       Tags:

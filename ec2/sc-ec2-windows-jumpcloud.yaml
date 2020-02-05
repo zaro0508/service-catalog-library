@@ -7,7 +7,6 @@ Metadata:
           default: Windows Instance Configuration
         Parameters:
           - WindowsInstanceType
-          - AmiId
           - VolumeSize
     ParameterLabels:
       WindowsInstanceType:
@@ -135,11 +134,9 @@ Resources:
           files:
             'c:\\scripts\\set_env_vars_file.ps1':
               content: |
-                Param(
-                    [String]$AWS_REGION = $env:AWS_REGION
-                )
-
                 Function SetEnvVars() {
+                  $EC2_INSTANCE_IDENTITY_DOC_URI = "http://169.254.169.254/latest/dynamic/instance-identity/document"
+                  $AWS_REGION = (Invoke-WebRequest -Uri $EC2_INSTANCE_IDENTITY_DOC_URI -UseBasicParsing).Content | jq .region -r
                   $EC2_METADATA_URI = "http://169.254.169.254/latest/meta-data"
                   $EC2_INSTANCE_ID = (Invoke-WebRequest -Uri $EC2_METADATA_URI/instance-id -UseBasicParsing).Content
                   $ROOT_DISK_ID = & aws.exe ec2 describe-volumes `
@@ -177,10 +174,7 @@ Resources:
               mode: "0664"
           commands:
             01_set_env_vars:
-              command: !Join
-                - ''
-                - - 'Powershell.exe C:\scripts\set_env_vars_file.ps1 -AWS_REGION '
-                  - !Ref 'AWS::Region'
+              command: 'Powershell.exe C:\scripts\set_env_vars_file.ps1'
         install_jc:
           files:
             'c:\scripts\install-ms-vc.ps1':

@@ -445,6 +445,7 @@ Resources:
         - UsePrivateSubnet
         - [!Ref PrivateSubnetSecurityGroup]
         - [!Ref PublicSubnetSecurityGroup]
+      KeyName: 'scipool'
       BlockDeviceMappings:
         -
           DeviceName: "/dev/sda1"

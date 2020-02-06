@@ -235,7 +235,6 @@ Resources:
         - !Ref 'InstanceRole'
   PrivateSubnetSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
-    Condition: UsePrivateSubnet
     Properties:
       GroupDescription: >-
         Allow all traffic to an instance originating from the VPN
@@ -436,15 +435,15 @@ Resources:
       ImageId: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !If
-        - UsePrivateSubnet
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet'
+        - UsePublicSubnet
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-internalpoolvpc-PublicSubnet'
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet'
       SecurityGroupIds: !If
-        - UsePrivateSubnet
+        - UsePublicSubnet
+        - [!Ref PrivateSubnetSecurityGroup, !Ref PublicSubnetSecurityGroup]
         - [!Ref PrivateSubnetSecurityGroup]
-        - [!Ref PublicSubnetSecurityGroup]
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

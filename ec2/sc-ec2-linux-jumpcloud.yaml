@@ -191,7 +191,7 @@ Parameters:
     Type: String
   OpenPort:
     Description: (Optional) Port to open if on public network
-    Type: String
+    Type: Number
     Default: 22
   LinuxDistribution:
     Type: String
@@ -253,11 +253,6 @@ Resources:
           ToPort: -1
           IpProtocol: '-1'
   PublicSubnetSecurityGroup:
-    Metadata:
-      cfn-lint:
-        config:
-          ignore_checks:
-            - E3012
     Type: 'AWS::EC2::SecurityGroup'
     Condition: UsePublicSubnet
     Properties:

@@ -126,20 +126,6 @@ Resources:
       PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName2}'
       PortfolioId: !Ref 'SCEC2portfolio'
       PrincipalType: IAM
-  ec2windowsjumpcloudproduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !If
-          - CreateLaunchConstraint
-          - !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleArn'
-          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
-        PortfolioId: !Ref 'SCEC2portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows-jumpcloud.yaml'
-      TimeoutInMinutes: 5
 Outputs:
   LaunchConstraintRoleARN:
     Condition: CreateLaunchConstraint
@@ -147,5 +133,3 @@ Outputs:
   LaunchConstraintRoleName:
     Condition: CreateLaunchConstraint
     Value: !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleName'
-  ec2windowsjumpcloudproductId:
-    Value: !GetAtt 'ec2windowsjumpcloudproduct.Outputs.ProductId'

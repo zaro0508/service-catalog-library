@@ -18,7 +18,6 @@ Resources:
         - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
         - !Ref SCEnduserExpandedPolicy
         - !Ref CFNDenyGetTemplateSummaryPolicy
-        - !Ref SCEnduserServiceActionPolicy
       Path: /
   SCEnduserRole:
     Type: AWS::IAM::Role
@@ -28,7 +27,6 @@ Resources:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
         - !Ref SCEnduserExpandedPolicy
         - !Ref CFNDenyGetTemplateSummaryPolicy
-        - !Ref SCEnduserServiceActionPolicy
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17

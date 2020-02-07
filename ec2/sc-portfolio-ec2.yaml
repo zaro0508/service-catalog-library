@@ -163,3 +163,5 @@ Outputs:
     Value: !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleName'
   ec2linuxjumpcloudproductId:
     Value: !GetAtt 'ec2linuxjumpcloudproduct.Outputs.ProductId'
+  ec2windowsjumpcloudproductId:
+    Value: !GetAtt 'ec2windowsjumpcloudproduct.Outputs.ProductId'

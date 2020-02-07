@@ -133,5 +133,3 @@ Outputs:
   LaunchConstraintRoleName:
     Condition: CreateLaunchConstraint
     Value: !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleName'
-  ec2windowsjumpcloudproductId:
-    Value: !GetAtt 'ec2windowsjumpcloudproduct.Outputs.ProductId'

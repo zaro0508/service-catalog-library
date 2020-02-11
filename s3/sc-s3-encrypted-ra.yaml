@@ -41,7 +41,13 @@ Resources:
             Sid: "ReadAccess"
             Effect: "Allow"
             Principal:
-              - !Sub "AWS: [ ${S3UserARNs}, arn:aws:iam::325565585839:root ]"]
+              !Join
+                - ""
+                  - "AWS "
+                  - !Join
+                    - ","
+                      - !Ref ${S3UserARNs}
+                      - "arn:aws:iam::325565585839:root"
             Action:
               - "s3:ListBucket*"
               - "s3:GetBucketLocation"

@@ -26,7 +26,7 @@ Parameters:
     Default: ""
 Conditions:
   HasBucketName: !Not [!Equals [!Ref BucketName, ""]]
-  AllowUserAccess: !Not [!Equals [!Join ['', !Ref S3UserARNs], "[]"]] #TODO investigate doesn't this not allow access to the principal?
+  AllowUserAccess: !Not [!Equals [!Join ['', !Ref S3UserARNs], "[]"]] 
 Resources:
   S3Bucket:
     Type: "AWS::S3::Bucket"
@@ -45,7 +45,7 @@ Resources:
             MaxAge: 3000
       Tags:
         - Key: Name
-          Value: SC-S3-RA-S3-Bucket #TODO should this be tagged with the Synapse userid at least
+          Value: SC-S3-RA-S3-Bucket 
   BucketPolicy:
     Type: "AWS::S3::BucketPolicy"
     Condition: AllowUserAccess
@@ -58,8 +58,13 @@ Resources:
             Sid: "ReadAccess"
             Effect: "Allow"
             Principal:
-              AWS: 
-              - !Sub "AWS: [ ${S3UserARNs}, arn:aws:iam::325565585839:root ]"] #Synapse-prod and requestor account read access
+              !Join
+                - ""
+                  - "AWS "
+                  - !Join
+                    - ","
+                      - !Ref ${S3UserARNs}
+                      - "arn:aws:iam::325565585839:root"
             Action:
               - "s3:ListBucket*"
               - "s3:GetBucketLocation"

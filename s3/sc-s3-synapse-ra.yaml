@@ -34,6 +34,7 @@ Resources:
     Properties:
       BucketName: !If [HasBucketName, !Ref BucketName, !Ref 'AWS::NoValue']
       BucketEncryption:
+        ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       CorsConfiguration:
@@ -58,15 +59,11 @@ Resources:
             Sid: "ReadAccess"
             Effect: "Allow"
             Principal:
-              AWS:  
-                - Fn::Split:
-                    - ","
-                    - - Fn::Join:
-                          - ","
-                          - - Fn::Join:
-                                - ","
-                                - - !Ref S3UserARNs
-                      - "arn:aws:iam::325565585839:root" 
+              AWS: !Split
+                - ","
+                - !Sub
+                  - "${list},arn:aws:iam::325565585839:root" 
+                  - list: !Join [",",!Ref "S3UserARNs"]
             Action:
               - "s3:ListBucket*"
               - "s3:GetBucketLocation"

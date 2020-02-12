@@ -25,15 +25,15 @@ Parameters:
     Description: (Optional) Name of the created bucket.
     Default: ""
 Conditions:
-  HasBucketName: !Not [!Equals [!Ref BucketName, ""]]
+  HasSynapseUserName: !Not [!Equals [!Ref SynapseUserName, ""]]
   AllowUserAccess: !Not [!Equals [!Join ['', !Ref S3UserARNs], "[]"]]
+  HasBucketName: !Not [!Equals [!Ref BucketName, ""]]
 Resources:
   S3Bucket:
     Type: "AWS::S3::Bucket"
     Properties:
       BucketName: !If [HasBucketName, !Ref BucketName, !Ref 'AWS::NoValue']
       BucketEncryption:
-        ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       CorsConfiguration:
@@ -58,7 +58,15 @@ Resources:
             Sid: "ReadAccess"
             Effect: "Allow"
             Principal:
-              AWS: !Join [ ",", !Ref 'S3UserARNs', 'arn:aws:iam::325565585839:root' ]
+              AWS:  
+                - Fn::Split:
+                    - ","
+                    - - Fn::Join:
+                          - ","
+                          - - Fn::Join:
+                                - ","
+                                - - !Ref S3UserARNs
+                      - "arn:aws:iam::325565585839:root" 
             Action:
               - "s3:ListBucket*"
               - "s3:GetBucketLocation"
@@ -67,7 +75,7 @@ Resources:
             Sid: "WriteAccess"
             Effect: "Allow"
             Principal:
-              AWS: !Ref 'S3UserARNs' #sc-requestor write access
+              AWS: !Ref 'S3UserARNs'
             Action:
               - "s3:*Object*"
               - "s3:*MultipartUpload*"

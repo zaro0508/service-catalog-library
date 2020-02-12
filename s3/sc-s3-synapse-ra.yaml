@@ -72,7 +72,11 @@ Resources:
             Sid: "WriteAccess"
             Effect: "Allow"
             Principal:
-              AWS: !Ref 'S3UserARNs'
+              AWS: !Split
+                - ","
+                - !Sub
+                  - "${list},arn:aws:iam::325565585839:root" 
+                  - list: !Join [",",!Ref "S3UserARNs"]
             Action:
               - "s3:*Object*"
               - "s3:*MultipartUpload*"

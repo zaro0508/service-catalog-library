@@ -85,6 +85,7 @@ Resources:
   # https://github.com/Sage-Bionetworks/aws-infra/tree/master/lambdas/cfn-s3objects-macro
   SynapseOwnerFile:
     Type: AWS::S3::Object
+    Condition: HasSynapseUserName
     Metadata:
       cfn-lint:
         config:

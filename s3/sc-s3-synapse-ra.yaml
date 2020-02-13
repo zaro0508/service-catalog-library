@@ -20,12 +20,15 @@ Parameters:
     Default: ""
     Description: User ARNs allowed to access S3 Bucket
     ConstraintDescription: List of ARNs separated by commas (i.e. arn:aws:iam::011223344556:user/jsmith,arn:aws:iam::544332211006:user/rjones)
+  SynapseProdARN:
+    Type: String
+    Description: Root ARN for the Synapse production AWS account
+    Default: "arn:aws:iam::325565585839:root"
   BucketName:
     Type: String
     Description: (Optional) Name of the created bucket.
     Default: ""
 Conditions:
-  HasSynapseUserName: !Not [!Equals [!Ref SynapseUserName, ""]]
   AllowUserAccess: !Not [!Equals [!Join ['', !Ref S3UserARNs], "[]"]]
   HasBucketName: !Not [!Equals [!Ref BucketName, ""]]
 Resources:
@@ -62,7 +65,7 @@ Resources:
               AWS: !Split
                 - ","
                 - !Sub
-                  - "${list},arn:aws:iam::325565585839:root" 
+                  - "${list},${SynapseProdARN}"
                   - list: !Join [",",!Ref "S3UserARNs"]
             Action:
               - "s3:ListBucket*"
@@ -75,7 +78,7 @@ Resources:
               AWS: !Split
                 - ","
                 - !Sub
-                  - "${list},arn:aws:iam::325565585839:root" 
+                  - "${list},${SynapseProdARN}" 
                   - list: !Join [",",!Ref "S3UserARNs"]
             Action:
               - "s3:*Object*"
@@ -85,7 +88,6 @@ Resources:
   # https://github.com/Sage-Bionetworks/aws-infra/tree/master/lambdas/cfn-s3objects-macro
   SynapseOwnerFile:
     Type: AWS::S3::Object
-    Condition: HasSynapseUserName
     Metadata:
       cfn-lint:
         config:

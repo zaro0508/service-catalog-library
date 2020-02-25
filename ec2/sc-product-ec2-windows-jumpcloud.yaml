@@ -19,6 +19,11 @@ Parameters:
 Resources:
   scec2windowsproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
     Properties:
       Name: EC2 Windows with Jumpcloud Integration
       Description: This product builds one Microsoft Windows EC2 instance with
@@ -27,15 +32,15 @@ Resources:
         on the EC2 instance.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
-      SupportDescription: Sage IT
-      SupportEmail: it@sagebase.org
-      AcceptLanguage: en
-      SupportUrl: https://app.slack.com/client/T092YT0LV/CEFQD0KU1
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-windows-jumpcloud.yaml'
           Name: !Ref 'ProductVersionName'
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associateec2windows:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

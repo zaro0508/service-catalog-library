@@ -19,16 +19,17 @@ Parameters:
 Resources:
   WebserverProduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
     Properties:
       Name: Amazon Elastic Compute Cloud (EC2) Linux Webserver
       Description: This product builds one Amazon Linux EC2 webserver (Apache or NGINX)
         instance.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
-      SupportDescription: Operations Team
-      SupportEmail: support@yourcompany.com
-      AcceptLanguage: en
-      SupportUrl: http://helpdesk.yourcompany.com
       ProvisioningArtifactParameters:
         - Description: NGINX webserver
           Info:
@@ -38,6 +39,10 @@ Resources:
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-apache.yaml'
           Name: !Ref 'ProductVersionName'
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associatenginxcf:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

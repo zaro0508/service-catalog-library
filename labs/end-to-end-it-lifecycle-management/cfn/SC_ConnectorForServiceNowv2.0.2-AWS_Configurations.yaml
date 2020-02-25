@@ -36,21 +36,26 @@ Resources:
   
   S3Product:
     Type: "AWS::ServiceCatalog::CloudFormationProduct"
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
     Properties:
       AcceptLanguage: "en"
       Description: "S3 Product"
       Distributor: "CCOE"
       Name: "S3 WithLifeCycle"
       Owner: "CCOE"
-      SupportEmail: "email@mycompany.com"
-      SupportUrl: "https://www.mycompany.com"
-      SupportDescription: "This is a sample S3 product For SNOW-SC POC."
       ProvisioningArtifactParameters:
         - Description: "Version 3 of S3 product"
           Name: "Version - 3.0"
           Info:
             LoadTemplateFromURL : "https://raw.githubusercontent.com/aws-samples/aws-service-catalog-terraform-reference-architecture/master/ServiceCatalogSamples/sc-s3-transition-snow-ra.json"
-  
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   ExecutionRole:
     Type: AWS::IAM::Role
     Condition: CreateStackSetResources

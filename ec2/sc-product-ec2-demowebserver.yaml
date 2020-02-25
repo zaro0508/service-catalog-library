@@ -19,15 +19,16 @@ Parameters:
 Resources:
   WebserverProduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
     Properties:
       Name: Demo Linux Webserver
       Description: This product builds a webserver (Apache or NGINX) EC2 instance.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
-      SupportDescription: Operations Team
-      SupportEmail: support@yourcompany.com
-      AcceptLanguage: en
-      SupportUrl: http://helpdesk.yourcompany.com
       ProvisioningArtifactParameters:
         - Description: NGINX webserver
           Info:
@@ -37,6 +38,10 @@ Resources:
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-apache-nokey.yaml'
           Name: !Sub 'Apache ${ProductVersionName}'
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associatenginxcf:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

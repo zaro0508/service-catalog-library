@@ -16,20 +16,25 @@ Parameters:
 Resources:
   scglueproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
     Properties:
       Name: AWS Glue crawler
       Description: This product creates a glue crawler.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
-      SupportDescription: Operations Team
-      SupportEmail: support@yourcompany.com
-      AcceptLanguage: en
-      SupportUrl: http://helpdesk.yourcompany.com
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}glue/sc-glue-ra.yaml'
           Name: v1.1
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associateglue:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

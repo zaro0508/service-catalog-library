@@ -19,6 +19,11 @@ Parameters:
 Resources:
   scvpcproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
     Properties:
       Name: Amazon Virtual Private Cloud (VPC)
       Description: This product builds a multi-availability zone Amazon AWS Virtual
@@ -26,15 +31,15 @@ Resources:
         bastion instance.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
-      SupportDescription: Sage IT
-      SupportEmail: it@sagebase.org
-      AcceptLanguage: en
-      SupportUrl: https://app.slack.com/client/T092YT0LV/CEFQD0KU1
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}vpc/sc-vpc-ra.yaml'
           Name: !Ref 'ProductVersionName'
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associatevpc:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

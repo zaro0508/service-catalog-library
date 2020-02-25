@@ -19,21 +19,26 @@ Parameters:
 Resources:
   scs3product:
     Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
     Properties:
       Name: S3 Synapse Bucket
       Description: This product builds an AWS S3 bucket with private access
         for Synapse.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
-      SupportDescription: Operations Team
-      SupportEmail: support@yourcompany.com
-      AcceptLanguage: en
-      SupportUrl: http://helpdesk.yourcompany.com
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-synapse-ra.yaml'
           Name: !Ref 'ProductVersionName'
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associates3:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

@@ -19,21 +19,26 @@ Parameters:
 Resources:
   scrdsproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
     Properties:
       Name: Amazon RDS Microsoft SQL Database
       Description: This product builds an Amazon AWS RDS Microsoft SQL master database
         instance with options for a single instance or multi-az instances.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
-      SupportDescription: Operations Team
-      SupportEmail: support@yourcompany.com
-      AcceptLanguage: en
-      SupportUrl: http://helpdesk.yourcompany.com
       ProvisioningArtifactParameters:
         - Description: baseline version
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}rds/sc-rds-mssql-ra.yaml'
           Name: !Ref 'ProductVersionName'
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associaterds:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

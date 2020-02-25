@@ -62,9 +62,10 @@ Parameters:
     Type: String
     Description: S3 root url for the repository containing the product templates.
     Default: https://s3.amazonaws.com/aws-service-catalog-reference-architectures/
-  ProductVersionName:
+  StackDatetime:
     Type: String
-    Description: The product version name in the service catalog
+    Description: Last updated date and time of portfolio
+    Default: ''
 Conditions:
   CreateLaunchConstraint: !Equals
     - !Ref 'LaunchRoleName'
@@ -137,7 +138,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
+        StackDatetime: !Ref StackDatetime
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud.yaml'
       TimeoutInMinutes: 5
   ec2windowsjumpcloudproduct:
@@ -151,7 +152,7 @@ Resources:
           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
+        StackDatetime: !Ref StackDatetime
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows-jumpcloud.yaml'
       TimeoutInMinutes: 5
 Outputs:

@@ -13,9 +13,10 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
-  ProductVersionName:
+  StackDatetime:
     Type: String
-    Description: The product version name in the service catalog
+    Description: Last updated date and time of portfolio
+    Default: ''
 Resources:
   scec2windowsproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -33,10 +34,10 @@ Resources:
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:
-        - Description: baseline version
+        - Description: !Sub 'Baseline version. Last portfolio update occurred at ${StackDatetime}.'
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-windows-jumpcloud.yaml'
-          Name: !Ref 'ProductVersionName'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-windows-jumpcloud-v1.0.0.yaml'
+          Name: v1.0.0
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:

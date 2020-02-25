@@ -28,7 +28,7 @@ Metadata:
 Mappings:
   LinuxDistributions:
     Ubuntu:
-      AMIID: ami-07ebfd5b3428b6f4d
+      AMIID: ami-0944334364827dc2d
     AmazonLinux:
       AMIID: ami-0ca7208f904dc1874
 Parameters:

@@ -192,7 +192,9 @@ Parameters:
   OpenPort:
     Description: (Optional) Standard ports to open for applications
     Type: String
+    Default: NA
     AllowedValues:
+      - NA
       - Web
       - RStudio
       - MySql

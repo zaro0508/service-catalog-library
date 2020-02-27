@@ -63,7 +63,6 @@ Resources:
         LaunchRoleName: ''
         PrincipalRoleName1: ''
         RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-portfolio-ec2.yaml'
       TimeoutInMinutes: 5
   STACKrdsportfolio:

@@ -102,6 +102,5 @@ Resources:
         LaunchRoleName: ''
         PrincipalRoleName1: ''
         RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
       TemplateURL: !Sub '${RepoRootURL}s3/sc-portfolio-s3-basic.yaml'
       TimeoutInMinutes: 5

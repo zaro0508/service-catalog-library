@@ -474,9 +474,12 @@ Resources:
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupJumpcloud,SetupVolume --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
         - Key: Description
-          Value: Service-Catalog-EC2-Reference-Architecture
-
+          Value: !Sub "Service Catalog instance created by ${AWS::StackName}"
+        - Key: "parkmycloud"
+          Value: "yes"
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra

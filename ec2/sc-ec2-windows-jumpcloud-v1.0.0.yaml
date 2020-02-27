@@ -259,9 +259,11 @@ Resources:
           </script>
       Tags:
         - Key: Name
-          Value: SC-EC2-RA-Windows-Instance
+          Value: !Ref 'AWS::StackName'
         - Key: Description
-          Value: Service-Catalog-EC2-Reference-Architecture
+          Value: !Sub "Service Catalog instance created by ${AWS::StackName}"
+        - Key: "parkmycloud"
+          Value: "yes"
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra

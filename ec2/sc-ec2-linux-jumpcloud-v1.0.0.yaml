@@ -486,7 +486,7 @@ Resources:
       KeyName: 'scipool'
       BlockDeviceMappings:
         -
-          DeviceName: "/dev/sda1"
+          DeviceName: !If [IsUbuntu, "/dev/sda1", "/dev/xvda"]
           Ebs:
             DeleteOnTermination: true
             VolumeSize: !Ref VolumeSize

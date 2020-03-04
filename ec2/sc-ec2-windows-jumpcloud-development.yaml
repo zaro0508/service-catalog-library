@@ -1,0 +1,354 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Service Catalog: EC2 Reference Architecture(fdp-1oc5f3ula).'
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Windows Instance Configuration
+        Parameters:
+          - WindowsInstanceType
+          - VolumeSize
+    ParameterLabels:
+      WindowsInstanceType:
+        default: Instance Type
+      VolumeSize:
+        default: Disk Size
+Parameters:
+  WindowsInstanceType:
+    AllowedValues:
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+    Default: t3.micro
+    Description: Amazon EC2 Instance Type
+    Type: String
+  VolumeSize:
+    Description: The EC2 volume size (in GB)
+    Type: Number
+    Default: 30
+    MinValue: 10
+    MaxValue: 2000
+Resources:
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'InstanceRole'
+  WindowsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enables RDP Access to Windows EC2 Instance
+      VpcId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+      SecurityGroupIngress:
+        - Description: allow RDP
+          IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: !ImportValue
+            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpnCidr'
+      SecurityGroupEgress:
+        - Description: allow all outgoing
+          IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
+  WindowsInstance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      'AWS::CloudFormation::Init':
+        configSets:
+          SetupCfn:
+            - cfn_hup_service
+          SetupApps:
+            - install_apps
+          SetEnv:
+            - set_env_vars
+          SetupJumpcloud:
+            - install_jc
+            - config_jc
+          SetTags:
+            - tag_volume
+            - tag_instance
+        # Cfn-hup setting, it is to monitor the change of metadata.
+        # When there is change in the contents of json file in the metadata section, cfn-hup will call cfn-init.
+        cfn_hup_service:
+          files:
+             "c:\\cfn\\cfn-hup.conf":
+               content: !Sub |
+                 [main]
+                 stack=${AWS::StackId}
+                 region=${AWS::Region}
+                 interval=1
+             "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf":
+               content: !Sub |
+                 [cfn-auto-reloader-hook]
+                 triggers=post.update
+                 path=Resources.WindowsInstance.Metadata.AWS::CloudFormation::Init
+                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud,SetTags
+          services:
+            windows:
+              cfn-hup:
+                enabled: 'true'
+                ensureRunning: 'true'
+                files:
+                  - "c:\\cfn\\cfn-hup.conf"
+                  - "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf"
+        install_apps:
+          files:
+            'c:\\scripts\\install-chocolatey.ps1':
+              source: "https://chocolatey.org/install.ps1"
+              mode: "0664"
+          commands:
+            01_install_nuget:
+              command: 'Powershell.exe Install-PackageProvider -Name NuGet -Force'
+            02_install_chocolatey:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - 'Powershell.exe C:\scripts\install-chocolatey.ps1 > C:\scripts\install-chocolatey.log'
+            03_install_jq:
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install jq --yes --no-progress'
+            04_install_awscli:
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install awscli --yes --no-progress --ignore-checksums'
+            05_install_googlechrome:
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install googlechrome --yes --no-progress --ignore-checksums'
+        set_env_vars:
+          files:
+            'c:\\scripts\\set_env_vars_file.ps1':
+              content: |
+                # Get vars from flag or env var
+                Param(
+                    [String]$StackId = $env:STACK_ID
+                )
+                if(-not($StackId)) { Throw "-StackId is required" }
+
+                Function SetEnvVars() {
+                  $EC2_INSTANCE_IDENTITY_DOC_URI = "http://169.254.169.254/latest/dynamic/instance-identity/document"
+                  $AWS_REGION = (Invoke-WebRequest -Uri $EC2_INSTANCE_IDENTITY_DOC_URI -UseBasicParsing).Content | jq .region -r
+                  $EC2_METADATA_URI = "http://169.254.169.254/latest/meta-data"
+                  $EC2_INSTANCE_ID = (Invoke-WebRequest -Uri $EC2_METADATA_URI/instance-id -UseBasicParsing).Content
+                  $ROOT_DISK_ID = & aws.exe ec2 describe-volumes `
+                    --region $AWS_REGION `
+                    --filters Name=attachment.instance-id,Values=$EC2_INSTANCE_ID `
+                    --query Volumes[].VolumeId --out text
+                  $EC2_INSTANCE_TAGS = & aws.exe --region $AWS_REGION `
+                    ec2 describe-tags `
+                    --filters Name=resource-id,Values=$EC2_INSTANCE_ID
+
+                  Function ExtractTagValue([String] $KeyName) {
+                    $EC2_INSTANCE_TAGS | jq -j --arg KEYNAME "$KeyName" '.Tags[] | select(.Key == $KEYNAME).Value '
+                  }
+
+                  $DEPARTMENT = ExtractTagValue -KeyName Department
+                  $PROJECT = ExtractTagValue -KeyName Project
+                  $OWNER_EMAIL = ExtractTagValue -KeyName OwnerEmail
+
+                  $FileString = @"
+                    `$env:AWS_REGION` = "$AWS_REGION"
+                    `$env:EC2_INSTANCE_ID` = "$EC2_INSTANCE_ID"
+                    `$env:ROOT_DISK_ID` = "$ROOT_DISK_ID"
+                    `$env:DEPARTMENT` = "$DEPARTMENT"
+                    `$env:PROJECT` = "$PROJECT"
+                    `$env:OWNER_EMAIL` = "$OWNER_EMAIL"
+                    `$env:STACK_ID` = "$StackId"
+                "@
+                  Set-Content -Path C:\scripts\instance_env_vars.ps1 -Value $FileString
+
+                }
+
+                $env:Path += ";$env:ProgramFiles\Amazon\AWSCLIV2"
+                $env:Path += ";C:\ProgramData\chocolatey\lib\jq\tools"
+
+                SetEnvVars
+
+              mode: "0664"
+          commands:
+            01_set_env_vars:
+              command: !Join
+                - ''
+                - - 'Powershell.exe C:\scripts\set_env_vars_file.ps1 '
+                  - '-StackId '
+                  - !Ref AWS::StackId
+        install_jc:
+          files:
+            'c:\scripts\install-ms-vc.ps1':
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/install-ms-vc.ps1"
+              mode: "0664"
+            'c:\\scripts\\install-jc-agent.ps1':
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/install-jc-agent.ps1"
+              mode: "0664"
+          commands:
+            01_install_ms_vc:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - 'Powershell.exe C:\scripts\install-ms-vc.ps1 > C:\scripts\install-ms-vc.log'
+            02_install_jc_agent:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - 'Powershell.exe C:\scripts\install-jc-agent.ps1 '
+                  - ' -JcConnectKey '
+                  - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcConnectKey"}}
+                  - ' > C:\scripts\install-jc-agent.log'
+        config_jc:
+          files:
+            'c:\\scripts\\associate-jc-system.ps1':
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/associate-jc-system.ps1"
+              mode: "0664"
+          commands:
+            01_associate_jc_systems:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - '. C:\scripts\instance_env_vars.ps1;'
+                  - 'Powershell.exe C:\scripts\associate-jc-system.ps1 '
+                  - ' -JcServiceApiKey '
+                  - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
+                  - ' -JcSystemsGroupId '
+                  - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcSystemsGroupId"}}
+                  - ' -OwnerEmail $env:OWNER_EMAIL'
+                  - ' > C:\scripts\associate-jc-system.log'
+        tag_volume:
+          files:
+            "c:\\scripts\\tag-instance-volume.ps1":
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.3/aws/tag-instance-volume.ps1"
+              mode: "0664"
+          commands:
+            01_tag_instance_volume:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - '. C:\scripts\instance_env_vars.ps1;'
+                  - 'Powershell.exe C:\scripts\tag-instance-volume.ps1 '
+                  - ' -AwsRegion '
+                  - !Ref AWS::Region
+                  - ' -StackName '
+                  - !Ref AWS::StackName
+                  - ' -Department $env:DEPARTMENT'
+                  - ' -Project $env:PROJECT'
+                  - ' -OwnerEmail $env:OWNER_EMAIL'
+                  - ' > C:\scripts\tag-instance-volume.log'
+        tag_instance:
+          files:
+            'c:\\scripts\\tag_instance.ps1':
+              content: |
+                Function TagInstance() {
+                  Param(
+                    [String]$AwsRegion = $env:AWS_REGION,
+                    [String]$Ec2InstanceId = $env:EC2_INSTANCE_ID,
+                    [String]$StackId = $env:STACK_ID
+                  )
+                  if(-not($AwsRegion)) { Throw "-AwsRegion is required" }
+                  if(-not($Ec2InstanceId)) { Throw "-Ec2InstanceId is required" }
+                  if(-not($StackId)) { Throw "-StackId is required" }
+
+                  # Get segment of STACK_ID after last forward-slash
+                  $ResourceId = $StackId -replace '.*\/'
+
+                  # Search for provisioned product
+                  $Products = & aws.exe servicecatalog search-provisioned-products `
+                    --region $AwsRegion `
+                    --filters SearchQuery=$ResourceId
+
+                  # Check return value and verify only one product was returned
+                  $Num_Products = echo "$Products" | jq '.TotalResultsCount'
+                  If ([string]::IsNullOrEmpty($Num_Products)) {
+                    throw "Invalid response from servicecatalog"
+                  }
+
+                  If (-NOT ($Num_Products -eq 1)) {
+                    throw "There are $Num_Products provisioned products, cannot isolate a name for tagging."
+                  }
+
+                  # Get the provisioned product name
+                  $ProductName = echo "$Products" | jq '.ProvisionedProducts[0].Name'
+
+                  # Tag instance with product name
+                  & aws.exe ec2 create-tags `
+                    --region $AwsRegion `
+                    --resources $Ec2InstanceId `
+                    --tags Key=Name,Value=$ProductName
+                }
+
+                $env:Path += ";$env:ProgramFiles\Amazon\AWSCLIV2"
+                $env:Path += ";C:\ProgramData\chocolatey\lib\jq\tools"
+
+                TagInstance
+
+              mode: "0664"
+          commands:
+            01_tag_instance:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - '. C:\scripts\instance_env_vars.ps1;'
+                  - 'Powershell.exe C:\scripts\tag_instance.ps1 '
+                  - ' > C:\scripts\tag-instance.log'
+    Properties:
+      ImageId: 'ami-074545a6fb2313e2c'
+      InstanceType: !Ref 'WindowsInstanceType'
+      SubnetId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet1'
+      SecurityGroupIds:
+        - !Ref 'WindowsSecurityGroup'
+      KeyName: 'scipool'
+      IamInstanceProfile: !Ref 'InstanceProfile'
+      BlockDeviceMappings:
+        -
+          DeviceName: "/dev/sda1"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: !Ref VolumeSize
+            Encrypted: true
+      UserData:
+        Fn::Base64: !Sub |
+          <script>
+          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud,SetTags
+          cfn-signal.exe -e %errorlevel% --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region}
+          </script>
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+        - Key: Description
+          Value: !Sub "Service Catalog instance created by ${AWS::StackName}"
+        - Key: "parkmycloud"
+          Value: "yes"
+Outputs:
+  TemplateID:
+    Value: service-catalog-reference-architectures/sc-ec2-ra
+  AWSRegionName:
+    Value: !Ref 'AWS::Region'
+  WindowsInstancePrivateIpAddress:
+    Value: !GetAtt 'WindowsInstance.PrivateIp'
+  WindosInstanceAvailabilityZone:
+    Value: !GetAtt 'WindowsInstance.AvailabilityZone'
+  WindowsInstanceId:
+    Value: !Ref 'WindowsInstance'
+  WindowsInstanceType:
+    Value: !Ref 'WindowsInstanceType'
+  IAMInstanceRole:
+    Value: !Ref 'InstanceRole'
+  IAMInstanceProfile:
+    Value: !Ref 'InstanceProfile'

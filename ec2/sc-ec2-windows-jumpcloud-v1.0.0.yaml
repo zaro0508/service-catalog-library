@@ -39,6 +39,8 @@ Resources:
       ManagedPolicyArns:
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -57,7 +59,7 @@ Resources:
   WindowsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enables SSH Access to Windows EC2 Instance
+      GroupDescription: Enables RDP Access to Windows EC2 Instance
       VpcId: !ImportValue
         'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
       SecurityGroupIngress:
@@ -85,8 +87,9 @@ Resources:
           SetupJumpcloud:
             - install_jc
             - config_jc
-          SetupVolume:
+          SetTags:
             - tag_volume
+            - tag_instance
         # Cfn-hup setting, it is to monitor the change of metadata.
         # When there is change in the contents of json file in the metadata section, cfn-hup will call cfn-init.
         cfn_hup_service:
@@ -102,7 +105,7 @@ Resources:
                  [cfn-auto-reloader-hook]
                  triggers=post.update
                  path=Resources.WindowsInstance.Metadata.AWS::CloudFormation::Init
-                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud,SetupVolume
+                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud,SetTags
           services:
             windows:
               cfn-hup:
@@ -125,15 +128,21 @@ Resources:
                 - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
                   - 'Powershell.exe C:\scripts\install-chocolatey.ps1 > C:\scripts\install-chocolatey.log'
             03_install_jq:
-              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install jq --yes'
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install jq --yes --no-progress'
             04_install_awscli:
-              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install awscli --yes'
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install awscli --yes --no-progress --ignore-checksums'
             05_install_googlechrome:
-              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install googlechrome  --yes --ignore-checksums'
+              command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install googlechrome --yes --no-progress --ignore-checksums'
         set_env_vars:
           files:
             'c:\\scripts\\set_env_vars_file.ps1':
               content: |
+                # Get vars from flag or env var
+                Param(
+                    [String]$StackId = $env:STACK_ID
+                )
+                if(-not($StackId)) { Throw "-StackId is required" }
+
                 Function SetEnvVars() {
                   $EC2_INSTANCE_IDENTITY_DOC_URI = "http://169.254.169.254/latest/dynamic/instance-identity/document"
                   $AWS_REGION = (Invoke-WebRequest -Uri $EC2_INSTANCE_IDENTITY_DOC_URI -UseBasicParsing).Content | jq .region -r
@@ -156,17 +165,19 @@ Resources:
                   $OWNER_EMAIL = ExtractTagValue -KeyName OwnerEmail
 
                   $FileString = @"
+                    `$env:AWS_REGION` = "$AWS_REGION"
                     `$env:EC2_INSTANCE_ID` = "$EC2_INSTANCE_ID"
                     `$env:ROOT_DISK_ID` = "$ROOT_DISK_ID"
                     `$env:DEPARTMENT` = "$DEPARTMENT"
                     `$env:PROJECT` = "$PROJECT"
                     `$env:OWNER_EMAIL` = "$OWNER_EMAIL"
+                    `$env:STACK_ID` = "$StackId"
                 "@
                   Set-Content -Path C:\scripts\instance_env_vars.ps1 -Value $FileString
 
                 }
 
-                $env:Path += ";$env:ProgramFiles\Amazon\AWSCLI\bin"
+                $env:Path += ";$env:ProgramFiles\Amazon\AWSCLIV2"
                 $env:Path += ";C:\ProgramData\chocolatey\lib\jq\tools"
 
                 SetEnvVars
@@ -174,7 +185,11 @@ Resources:
               mode: "0664"
           commands:
             01_set_env_vars:
-              command: 'Powershell.exe C:\scripts\set_env_vars_file.ps1'
+              command: !Join
+                - ''
+                - - 'Powershell.exe C:\scripts\set_env_vars_file.ps1 '
+                  - '-StackId '
+                  - !Ref AWS::StackId
         install_jc:
           files:
             'c:\scripts\install-ms-vc.ps1':
@@ -218,7 +233,7 @@ Resources:
         tag_volume:
           files:
             "c:\\scripts\\tag-instance-volume.ps1":
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/tag-instance-volume.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.3/aws/tag-instance-volume.ps1"
               mode: "0664"
           commands:
             01_tag_instance_volume:
@@ -235,6 +250,62 @@ Resources:
                   - ' -Project $env:PROJECT'
                   - ' -OwnerEmail $env:OWNER_EMAIL'
                   - ' > C:\scripts\tag-instance-volume.log'
+        tag_instance:
+          files:
+            'c:\\scripts\\tag_instance.ps1':
+              content: |
+                Function TagInstance() {
+                  Param(
+                    [String]$AwsRegion = $env:AWS_REGION,
+                    [String]$Ec2InstanceId = $env:EC2_INSTANCE_ID,
+                    [String]$StackId = $env:STACK_ID
+                  )
+                  if(-not($AwsRegion)) { Throw "-AwsRegion is required" }
+                  if(-not($Ec2InstanceId)) { Throw "-Ec2InstanceId is required" }
+                  if(-not($StackId)) { Throw "-StackId is required" }
+
+                  # Get segment of STACK_ID after last forward-slash
+                  $ResourceId = $StackId -replace '.*\/'
+
+                  # Search for provisioned product
+                  $Products = & aws.exe servicecatalog search-provisioned-products `
+                    --region $AwsRegion `
+                    --filters SearchQuery=$ResourceId
+
+                  # Check return value and verify only one product was returned
+                  $Num_Products = echo "$Products" | jq '.TotalResultsCount'
+                  If ([string]::IsNullOrEmpty($Num_Products)) {
+                    throw "Invalid response from servicecatalog"
+                  }
+
+                  If (-NOT ($Num_Products -eq 1)) {
+                    throw "There are $Num_Products provisioned products, cannot isolate a name for tagging."
+                  }
+
+                  # Get the provisioned product name
+                  $ProductName = echo "$Products" | jq '.ProvisionedProducts[0].Name'
+
+                  # Tag instance with product name
+                  & aws.exe ec2 create-tags `
+                    --region $AwsRegion `
+                    --resources $Ec2InstanceId `
+                    --tags Key=Name,Value=$ProductName
+                }
+
+                $env:Path += ";$env:ProgramFiles\Amazon\AWSCLIV2"
+                $env:Path += ";C:\ProgramData\chocolatey\lib\jq\tools"
+
+                TagInstance
+
+              mode: "0664"
+          commands:
+            01_tag_instance:
+              command: !Join
+                - ''
+                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
+                  - '. C:\scripts\instance_env_vars.ps1;'
+                  - 'Powershell.exe C:\scripts\tag_instance.ps1 '
+                  - ' > C:\scripts\tag-instance.log'
     Properties:
       ImageId: 'ami-074545a6fb2313e2c'
       InstanceType: !Ref 'WindowsInstanceType'
@@ -254,7 +325,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           <script>
-          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud,SetupVolume
+          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud,SetTags
           cfn-signal.exe -e %errorlevel% --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region}
           </script>
       Tags:

@@ -65,34 +65,6 @@ Resources:
         RepoRootURL: !Ref 'RepoRootURL'
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-portfolio-ec2.yaml'
       TimeoutInMinutes: 5
-  STACKrdsportfolio:
-    Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - IAMenduser
-    Properties:
-      Parameters:
-        LaunchRoleName: ''
-        CreateEndUsers: 'No'
-        LinkedRole1: !Ref 'LinkedRole1'
-        LinkedRole2: !Ref 'LinkedRole2'
-        RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}rds/sc-portfolio-rds.yaml'
-      TimeoutInMinutes: 5
-  STACKemrportfolio:
-    Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - IAMenduser
-    Properties:
-      Parameters:
-        LaunchRoleName: ''
-        CreateEndUsers: 'No'
-        LinkedRole1: !Ref 'LinkedRole1'
-        LinkedRole2: !Ref 'LinkedRole2'
-        RepoRootURL: !Ref 'RepoRootURL'
-        ProductVersionName: !Ref 'ProductVersionName'
-      TemplateURL: !Sub '${RepoRootURL}emr/sc-portfolio-emr.yaml'
-      TimeoutInMinutes: 5
   STACKs3portfolio:
     Type: AWS::CloudFormation::Stack
     DependsOn:

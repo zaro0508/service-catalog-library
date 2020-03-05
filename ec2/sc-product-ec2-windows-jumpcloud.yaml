@@ -28,9 +28,7 @@ Resources:
     Properties:
       Name: EC2 Windows with Jumpcloud Integration
       Description: This product builds one Microsoft Windows EC2 instance with
-        Jumpcloud integration. It also creates a SSM patch baseline, maintenance
-        window, and patch task to scan for and install operating system updates
-        on the EC2 instance.
+        Jumpcloud integration.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:

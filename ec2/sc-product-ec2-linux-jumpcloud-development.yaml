@@ -28,9 +28,7 @@ Resources:
     Properties:
       Name: '[DEVELOPMENT] EC2 Linux with Jumpcloud Integration'
       Description: This product builds one Linux EC2 instance, either
-        Amazon Linux or Ubuntu, with Jumpcloud integration. It also creates a
-        SSM patch baseline, maintenance window, and patch task to scan for
-        and install operating system updates on the EC2 instance.
+        Amazon Linux or Ubuntu, with Jumpcloud integration.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:

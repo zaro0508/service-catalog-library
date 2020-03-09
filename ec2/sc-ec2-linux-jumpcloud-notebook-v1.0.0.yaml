@@ -7,7 +7,7 @@ Metadata:
           default: Linux Instance Configuration
         Parameters:
           - EC2InstanceType
-          - LinuxDistribution
+          - NotebookType
           - VolumeSize
           - PrivateNetwork
     ParameterLabels:

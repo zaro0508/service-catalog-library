@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Service Catalog: EC2 Reference Architecture(fdp-1oc5f3ula).'
+Description: 'Service Catalog: Windows EC2 with Jumpcloud integration.'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

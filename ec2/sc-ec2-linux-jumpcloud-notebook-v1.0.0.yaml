@@ -22,7 +22,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: ami-036688a77595e31cf
+      AMIID: ami-036688a77595e31cf # from packer-rstudio build https://travis-ci.org/Sage-Bionetworks/packer-rstudio/builds/658411244
 Parameters:
   PrivateNetwork:
     Type: String

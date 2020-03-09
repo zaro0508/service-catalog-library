@@ -1,36 +1,28 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Service Catalog: Linux EC2 with Jumpcloud integration.'
+Description: 'Service Catalog: Notebook Linux EC2 with Jumpcloud integration.'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: General Configuration
-        Parameters:
-          - PrivateNetwork
-          - OpenPort
-      - Label:
           default: Linux Instance Configuration
         Parameters:
           - EC2InstanceType
-          - LinuxDistribution
+          - NotebookType
           - VolumeSize
+          - PrivateNetwork
     ParameterLabels:
-      PrivateNetwork:
-        default: Use private network?
-      OpenPort:
-        default: Open Ports (Public Network Only)
       EC2InstanceType:
         default: EC2 Instance Type
-      LinuxDistribution:
-        default: Linux Distribution
+      NotebookType:
+        default: Notebook Type
       VolumeSize:
         default: Disk Size
+      PrivateNetwork:
+        default: Use private network?
 Mappings:
-  LinuxDistributions:
-    Ubuntu:
-      AMIID: ami-0944334364827dc2d
-    AmazonLinux:
-      AMIID: ami-0ca7208f904dc1874
+  NotebookTypes:
+    Rstudio:
+      AMIID: ami-036688a77595e31cf # from packer-rstudio build https://travis-ci.org/Sage-Bionetworks/packer-rstudio/builds/658411244
 Parameters:
   PrivateNetwork:
     Type: String
@@ -189,36 +181,20 @@ Parameters:
     Default: t3.micro
     Description: Amazon EC2 Instance Type
     Type: String
-  OpenPort:
-    Description: (Optional) Standard ports to open for applications
+  NotebookType:
     Type: String
-    Default: NA
+    Description: Type of notebook software to install
+    Default: Rstudio
     AllowedValues:
-      - NA
-      - Web
-      - RStudio
-      - MySql
-  LinuxDistribution:
-    Type: String
-    Description: Linux distribution to use for instance operation system
-    Default: AmazonLinux
-    AllowedValues:
-      - AmazonLinux
-      - Ubuntu
+      - Rstudio
   VolumeSize:
     Description: The EC2 volume size (in GB)
     Type: Number
-    Default: 8
-    MinValue: 8
+    Default: 16
+    MinValue: 16
     MaxValue: 2000
 Conditions:
-  UsePrivateSubnet: !Equals [!Ref PrivateNetwork, 'true']
   UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
-  IsUbuntu: !Equals [!Ref LinuxDistribution, 'Ubuntu']
-  OpenWebPort: !Equals [!Ref OpenPort, 'Web']
-  OpenRStudioPort: !Equals [!Ref OpenPort, 'RStudio']
-  OpenMySqlPort: !Equals [!Ref OpenPort, 'MySql']
-  OpenHTTPSPort: !Or [{"Condition": "OpenWebPort"}, {"Condition": "OpenRStudioPort"}]
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -270,15 +246,14 @@ Resources:
       GroupDescription: Allow SSH to port 22
       VpcId: !ImportValue
         'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
-      SecurityGroupIngress: [
-        {"Description": "allow SSH", "IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "CidrIp": "0.0.0.0/0"},
-        !If [OpenWebPort, {"Description": "allow HTTP", "IpProtocol": "tcp", "FromPort": 80, "ToPort": 80, "CidrIp": "0.0.0.0/0"}, !Ref "AWS::NoValue"],
-        !If [OpenRStudioPort, {"Description": "allow RStudio", "IpProtocol": "tcp", "FromPort": 8787, "ToPort": 8787, "CidrIp": "0.0.0.0/0"}, !Ref "AWS::NoValue"],
-        !If [OpenMySqlPort, {"Description": "allow MySql", "IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "CidrIp": "0.0.0.0/0"}, !Ref "AWS::NoValue"],
-        !If [OpenHTTPSPort, {"Description": "allow HTTPS", "IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "CidrIp": "0.0.0.0/0"}, !Ref "AWS::NoValue"],
-      ]
+      SecurityGroupIngress:
+        - Description: 'allow SSH'
+          IpProtocol: 'tcp'
+          FromPort: 22
+          ToPort: 22
+          CidrIp: '0.0.0.0/0'
       SecurityGroupEgress:
-        - Description: allow all outgoing
+        - Description: 'allow all outgoing'
           IpProtocol: '-1'
           CidrIp: '0.0.0.0/0'
   LinuxInstance:
@@ -343,15 +318,9 @@ Resources:
               command: "/bin/systemctl start cfn-hup.service"
         set_env_vars:
           packages:
-            !If
-            - IsUbuntu
-            -
-              apt:
-                awscli: []
-                jq: []
-            -
-              yum:
-                jq: []
+            apt:
+              awscli: []
+              jq: []
           files:
             /opt/sage/bin/make_env_vars_file.sh:
               content: !Sub |
@@ -471,7 +440,7 @@ Resources:
             01_name_tag:
               command: "/opt/sage/bin/apply_name_tag.sh"
     Properties:
-      ImageId: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, AMIID]
+      ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !If
         - UsePublicSubnet
@@ -486,7 +455,7 @@ Resources:
       KeyName: 'scipool'
       BlockDeviceMappings:
         -
-          DeviceName: !If [IsUbuntu, "/dev/sda1", "/dev/xvda"]
+          DeviceName: "/dev/sda1"
           Ebs:
             DeleteOnTermination: true
             VolumeSize: !Ref VolumeSize
@@ -495,16 +464,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          if [[ ${LinuxDistribution} == "Ubuntu" ]]; then
-            export DEBIAN_FRONTEND=noninteractive
-            /usr/bin/apt-get update -y
-            /usr/bin/apt-get install -y python-pip
-            /usr/bin/apt-get install -y python-setuptools
-            /bin/mkdir -p /opt/aws/bin /opt/sage/bin
-            /usr/bin/python /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
-          else
-            /bin/yum update -y aws-cfn-bootstrap
-          fi
+          export DEBIAN_FRONTEND=noninteractive
+          /usr/bin/apt-get update -y
+          /usr/bin/apt-get install -y python-pip
+          /usr/bin/apt-get install -y python-setuptools
+          /bin/mkdir -p /opt/aws/bin /opt/sage/bin
+          /usr/bin/python /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupJumpcloud,SetTags --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
@@ -527,8 +492,6 @@ Outputs:
     Value: !GetAtt 'LinuxInstance.AvailabilityZone'
   EC2InstanceType:
     Value: !Ref 'EC2InstanceType'
-  OpenPort:
-    Value: !Ref OpenPort
   IAMInstanceRole:
     Value: !Ref 'InstanceRole'
   IAMInstanceProfile:

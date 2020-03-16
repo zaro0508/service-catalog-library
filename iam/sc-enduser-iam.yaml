@@ -34,7 +34,10 @@ Resources:
           - Effect: Allow
             Principal:
               AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+              # Synapse OIDC identity provider
+              Federated: !Sub 'arn:aws:iam::${AWS::AccountId}:oidc-provider/repo-prod.prod.sagebase.org/auth/v1'
             Action:
+              - 'sts:AssumeRoleWithWebIdentity'
               - 'sts:AssumeRole'
   SCEnduserExpandedPolicy:
     Type: AWS::IAM::ManagedPolicy

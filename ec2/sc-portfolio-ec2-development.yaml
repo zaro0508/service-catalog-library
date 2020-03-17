@@ -155,6 +155,20 @@ Resources:
         StackDatetime: !Ref StackDatetime
       TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud-notebook-development.yaml'
       TimeoutInMinutes: 5
+  Ec2LinuxJumpcloudWorkflowsProduct:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        PortfolioProvider: !Ref 'PortfolioProvider'
+        LaunchConstraintARN: !If
+          - CreateLaunchConstraint
+          - !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleArn'
+          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
+        PortfolioId: !Ref 'SCEC2portfolio'
+        RepoRootURL: !Ref 'RepoRootURL'
+        StackDatetime: !Ref StackDatetime
+      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud-workflows-development.yaml'
+      TimeoutInMinutes: 5
   Ec2WindowsJumpcloudProduct:
     Type: AWS::CloudFormation::Stack
     Properties:

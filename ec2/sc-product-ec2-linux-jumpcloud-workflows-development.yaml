@@ -18,7 +18,7 @@ Parameters:
     Description: Last updated date and time of portfolio
     Default: ''
 Resources:
-  ScEc2LinuxJumpcloudNotebookProduct:
+  ScEc2LinuxJumpcloudWorkflowsProduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
     Metadata:
       cfn-lint:
@@ -55,4 +55,4 @@ Resources:
       Description: !Ref 'LaunchConstraintARN'
 Outputs:
   ProductId:
-    Value: !Ref 'ScEc2LinuxJumpcloudNotebookProduct'
+    Value: !Ref 'ScEc2LinuxJumpcloudWorkflowsProduct'

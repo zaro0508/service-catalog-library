@@ -11,9 +11,9 @@ S3_BUCKET_URL=s3://bootstrap-awss3cloudformationbucket-19qromfd235z9/scipoolprod
 
 # list the templates you're testing
 templates=(
-  ec2/sc-portfolio-ec2-development.yaml
-  ec2/sc-product-ec2-linux-jumpcloud-workflows-development.yaml
-  ec2/sc-ec2-linux-jumpcloud-workflows-development.yaml
+  ec2/development/sc-portfolio-ec2-development-tthyer.yaml
+  ec2/development/sc-product-ec2-linux-jumpcloud-development-tthyer.yaml
+  ec2/development/sc-ec2-linux-jumpcloud-development-tthyer.yaml
 )
 
 for template in "${templates[@]}"

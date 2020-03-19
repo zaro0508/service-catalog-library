@@ -7,7 +7,6 @@ Metadata:
           default: General Configuration
         Parameters:
           - PrivateNetwork
-          - OpenPort
       - Label:
           default: Linux Instance Configuration
         Parameters:
@@ -17,8 +16,6 @@ Metadata:
     ParameterLabels:
       PrivateNetwork:
         default: Use private network?
-      OpenPort:
-        default: Open Ports (Public Network Only)
       EC2InstanceType:
         default: EC2 Instance Type
       LinuxDistribution:
@@ -189,15 +186,6 @@ Parameters:
     Default: t3.micro
     Description: Amazon EC2 Instance Type
     Type: String
-  OpenPort:
-    Description: (Optional) Standard ports to open for applications
-    Type: String
-    Default: NA
-    AllowedValues:
-      - NA
-      - Web
-      - RStudio
-      - MySql
   LinuxDistribution:
     Type: String
     Description: Linux distribution to use for instance operation system
@@ -212,13 +200,8 @@ Parameters:
     MinValue: 8
     MaxValue: 2000
 Conditions:
-  UsePrivateSubnet: !Equals [!Ref PrivateNetwork, 'true']
   UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
   IsUbuntu: !Equals [!Ref LinuxDistribution, 'Ubuntu']
-  OpenWebPort: !Equals [!Ref OpenPort, 'Web']
-  OpenRStudioPort: !Equals [!Ref OpenPort, 'RStudio']
-  OpenMySqlPort: !Equals [!Ref OpenPort, 'MySql']
-  OpenHTTPSPort: !Or [{"Condition": "OpenWebPort"}, {"Condition": "OpenRStudioPort"}]
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -270,15 +253,14 @@ Resources:
       GroupDescription: Allow SSH to port 22
       VpcId: !ImportValue
         'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
-      SecurityGroupIngress: [
-        {"Description": "allow SSH", "IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "CidrIp": "0.0.0.0/0"},
-        !If [OpenWebPort, {"Description": "allow HTTP", "IpProtocol": "tcp", "FromPort": 80, "ToPort": 80, "CidrIp": "0.0.0.0/0"}, !Ref "AWS::NoValue"],
-        !If [OpenRStudioPort, {"Description": "allow RStudio", "IpProtocol": "tcp", "FromPort": 8787, "ToPort": 8787, "CidrIp": "0.0.0.0/0"}, !Ref "AWS::NoValue"],
-        !If [OpenMySqlPort, {"Description": "allow MySql", "IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "CidrIp": "0.0.0.0/0"}, !Ref "AWS::NoValue"],
-        !If [OpenHTTPSPort, {"Description": "allow HTTPS", "IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "CidrIp": "0.0.0.0/0"}, !Ref "AWS::NoValue"],
-      ]
+      SecurityGroupIngress:
+        - Description: 'allow SSH'
+          IpProtocol: 'tcp'
+          FromPort: 22
+          ToPort: 22
+          CidrIp: '0.0.0.0/0'
       SecurityGroupEgress:
-        - Description: allow all outgoing
+        - Description: 'allow all outgoing'
           IpProtocol: '-1'
           CidrIp: '0.0.0.0/0'
   LinuxInstance:
@@ -527,8 +509,6 @@ Outputs:
     Value: !GetAtt 'LinuxInstance.AvailabilityZone'
   EC2InstanceType:
     Value: !Ref 'EC2InstanceType'
-  OpenPort:
-    Value: !Ref OpenPort
   IAMInstanceRole:
     Value: !Ref 'InstanceRole'
   IAMInstanceProfile:

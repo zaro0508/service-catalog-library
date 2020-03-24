@@ -34,7 +34,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: !Sub 'DEVELOPMENT version. Last portfolio update occurred at ${StackDatetime}.'
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-workflows-development.yaml'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/development/sc-ec2-linux-jumpcloud-workflows-development.yaml'
           Name: development
       'Fn::Transform':
         Name: 'AWS::Include'

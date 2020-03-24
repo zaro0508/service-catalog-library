@@ -34,7 +34,7 @@ Resources:
       ProvisioningArtifactParameters:
         - Description: !Sub 'DEVELOPMENT version. Last portfolio update occurred at ${StackDatetime}.'
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-synapse-ra-development.yaml'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}s3/development/sc-s3-synapse-ra-development.yaml'
           Name: development
       'Fn::Transform':
         Name: 'AWS::Include'

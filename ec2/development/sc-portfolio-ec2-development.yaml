@@ -139,7 +139,7 @@ Resources:
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
         StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud-development.yaml'
+      TemplateURL: !Sub '${RepoRootURL}ec2/development/sc-product-ec2-linux-jumpcloud-development.yaml'
       TimeoutInMinutes: 5
   Ec2LinuxJumpcloudNotebookProduct:
     Type: AWS::CloudFormation::Stack
@@ -153,7 +153,7 @@ Resources:
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
         StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud-notebook-development.yaml'
+      TemplateURL: !Sub '${RepoRootURL}ec2/development/sc-product-ec2-linux-jumpcloud-notebook-development.yaml'
       TimeoutInMinutes: 5
   Ec2LinuxJumpcloudWorkflowsProduct:
     Type: AWS::CloudFormation::Stack
@@ -167,7 +167,7 @@ Resources:
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
         StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud-workflows-development.yaml'
+      TemplateURL: !Sub '${RepoRootURL}ec2/development/sc-product-ec2-linux-jumpcloud-workflows-development.yaml'
       TimeoutInMinutes: 5
   Ec2WindowsJumpcloudProduct:
     Type: AWS::CloudFormation::Stack
@@ -181,7 +181,7 @@ Resources:
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
         StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows-jumpcloud-development.yaml'
+      TemplateURL: !Sub '${RepoRootURL}ec2/development/sc-product-ec2-windows-jumpcloud-development.yaml'
       TimeoutInMinutes: 5
 Outputs:
   LaunchConstraintRoleARN:

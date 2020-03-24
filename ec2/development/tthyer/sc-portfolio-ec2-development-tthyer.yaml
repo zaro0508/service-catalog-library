@@ -139,7 +139,7 @@ Resources:
         PortfolioId: !Ref 'SCEC2portfolio'
         RepoRootURL: !Ref 'RepoRootURL'
         StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/development/sc-product-ec2-linux-jumpcloud-development-tthyer.yaml'
+      TemplateURL: !Sub '${RepoRootURL}ec2/development/tthyer/sc-product-ec2-linux-jumpcloud-development-tthyer.yaml'
       TimeoutInMinutes: 5
 Outputs:
   LaunchConstraintRoleARN:

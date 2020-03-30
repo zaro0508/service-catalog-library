@@ -25,7 +25,7 @@ Metadata:
 Mappings:
   LinuxDistributions:
     Ubuntu:
-      AMIID: ami-08030043dfd4f797a  # https://github.com/Sage-Bionetworks/packer-base-ubuntu-bionic/tree/v1.0.5
+      AMIID: ami-093ca9e768e56b1bc  # https://github.com/Sage-Bionetworks/packer-base-ubuntu-bionic/tree/v1.0.6
     AmazonLinux:
       AMIID: ami-0ca7208f904dc1874
 Parameters:

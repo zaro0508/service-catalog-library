@@ -22,7 +22,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: ami-036688a77595e31cf # from packer-rstudio build https://travis-ci.org/Sage-Bionetworks/packer-rstudio/builds/658411244
+      AMIID: ami-0571ea73672b03ce7  # https://github.com/Sage-Bionetworks/packer-rstudio/tree/v1.0.1
 Parameters:
   PrivateNetwork:
     Type: String
@@ -423,7 +423,7 @@ Resources:
           /usr/bin/apt-get install -y python-pip
           /usr/bin/apt-get install -y python-setuptools
           /bin/mkdir -p /opt/aws/bin /opt/sage/bin
-          /usr/bin/python /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+          /usr/bin/python2.7 /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupJumpcloud,SetTags --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:

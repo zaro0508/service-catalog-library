@@ -27,7 +27,7 @@ Mappings:
     Ubuntu:
       AMIID: ami-093ca9e768e56b1bc  # https://github.com/Sage-Bionetworks/packer-base-ubuntu-bionic/tree/v1.0.6
     AmazonLinux:
-      AMIID: ami-0ca7208f904dc1874
+      AMIID: ami-06c6e00f3d3eaf56c  # https://github.com/Sage-Bionetworks/packer-base-amazonlinux2/tree/v1.0.1
 Parameters:
   PrivateNetwork:
     Type: String

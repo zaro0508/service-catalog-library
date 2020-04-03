@@ -29,6 +29,10 @@ Mappings:
     AmazonLinux:
       AMIID: ami-06c6e00f3d3eaf56c  # https://github.com/Sage-Bionetworks/packer-base-amazonlinux2/tree/v1.0.1
 Parameters:
+  VpcName:
+    Type: String
+    Description: The VPC to put resources into
+    Default: 'internalpoolvpc'
   PrivateNetwork:
     Type: String
     Description: In the private subnet (recommended) as opposed to a public subnet
@@ -233,10 +237,10 @@ Resources:
       GroupDescription: >-
         Allow all traffic to an instance originating from the VPN
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
       SecurityGroupIngress:
         - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpnCidr'
+            'Fn::Sub': '${AWS::Region}-${VpcName}-VpnCidr'
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
@@ -252,7 +256,7 @@ Resources:
     Properties:
       GroupDescription: Allow SSH to port 22
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
       SecurityGroupIngress:
         - Description: 'allow SSH'
           IpProtocol: 'tcp'
@@ -412,9 +416,9 @@ Resources:
       SubnetId: !If
         - UsePublicSubnet
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PublicSubnet'
+          'Fn::Sub': '${AWS::Region}-${VpcName}-PublicSubnet'
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet'
+          'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
       SecurityGroupIds: !If
         - UsePublicSubnet
         - [!Ref PrivateSubnetSecurityGroup, !Ref PublicSubnetSecurityGroup]

@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: '[DEVELOPMENT-TTHYER] Linux EC2 ServiceCatalog product with Jumpcloud integration.'
 Parameters:
+  VpcName:
+    Type: String
+    Description: The VPC to put resources into
+    Default: 'internalpoolvpc'
   PortfolioProvider:
     Type: String
     Description: Owner and Distributor Name

@@ -14,6 +14,10 @@ Metadata:
       VolumeSize:
         default: Disk Size
 Parameters:
+  VpcName:
+    Type: String
+    Description: The VPC to put resources into
+    Default: 'internalpoolvpc'
   WindowsInstanceType:
     AllowedValues:
       - t3.nano
@@ -61,14 +65,14 @@ Resources:
     Properties:
       GroupDescription: Enables RDP Access to Windows EC2 Instance
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
       SecurityGroupIngress:
         - Description: allow RDP
           IpProtocol: tcp
           FromPort: 3389
           ToPort: 3389
           CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpnCidr'
+            'Fn::Sub': '${AWS::Region}-${VpcName}-VpnCidr'
       SecurityGroupEgress:
         - Description: allow all outgoing
           IpProtocol: '-1'
@@ -222,7 +226,7 @@ Resources:
       ImageId: 'ami-074545a6fb2313e2c'
       InstanceType: !Ref 'WindowsInstanceType'
       SubnetId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet1'
+        'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet1'
       SecurityGroupIds:
         - !Ref 'WindowsSecurityGroup'
       KeyName: 'scipool'

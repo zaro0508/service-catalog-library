@@ -192,6 +192,7 @@ Resources:
           'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
+        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore' #For maintenance tasks
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -199,6 +200,7 @@ Resources:
             Principal:
               Service:
                 - ec2.amazonaws.com
+                - ssm.amazonaws.com #For maintenance service
             Action:
               - sts:AssumeRole
   InstanceProfile:

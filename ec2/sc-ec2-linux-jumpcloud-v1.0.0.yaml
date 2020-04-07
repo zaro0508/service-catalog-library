@@ -452,6 +452,10 @@ Resources:
           Value: !Sub "Service Catalog instance created by ${AWS::StackName}"
         - Key: "parkmycloud"
           Value: "yes"
+        - Key: "ManagedInstanceMaintenanceTarget"
+          Value: "yes"
+        - Key: "PatchGroup"
+          Value: "Default"
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra

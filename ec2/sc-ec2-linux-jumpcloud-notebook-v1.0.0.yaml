@@ -438,7 +438,7 @@ Resources:
         - Key: "ManagedInstanceMaintenanceTarget"
           Value: "yes"
         - Key: "PatchGroup"
-          Value: "Default"
+          Value: "prod"
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra

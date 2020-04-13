@@ -100,6 +100,13 @@ Resources:
         ContentType: text
         ACL: authenticated-read
       Body: !Ref SynapseUserName
+  S3BucketTagger:
+    Type: Custom::S3BucketTagger
+    DependsOn: S3Bucket
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-set-bucket-tags-macro-SetBucketTagsFunctionArn'
+      BucketName: !Ref S3Bucket
 Outputs:
   BucketName:
     Value: !Ref 'S3Bucket'

@@ -22,7 +22,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: ami-0571ea73672b03ce7  # https://github.com/Sage-Bionetworks/packer-rstudio/tree/v1.0.1
+      AMIID: "ami-01db72ecb09a90a60"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v1.0.2
 Parameters:
   VpcName:
     Type: String
@@ -321,10 +321,6 @@ Resources:
             02_start_cfn-hup:
               command: "/bin/systemctl start cfn-hup.service"
         set_env_vars:
-          packages:
-            apt:
-              awscli: []
-              jq: []
           files:
             /opt/sage/bin/make_env_vars_file.sh:
               source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.0/linux/opt/sage/bin/make_env_vars_file.sh"
@@ -422,12 +418,6 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          export DEBIAN_FRONTEND=noninteractive
-          /usr/bin/apt-get update -y
-          /usr/bin/apt-get install -y python-pip
-          /usr/bin/apt-get install -y python-setuptools
-          /bin/mkdir -p /opt/aws/bin /opt/sage/bin
-          /usr/bin/python2.7 /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupJumpcloud,SetTags --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:

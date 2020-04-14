@@ -310,10 +310,6 @@ Resources:
             02_start_cfn-hup:
               command: "/bin/systemctl start cfn-hup.service"
         set_env_vars:
-          packages:
-            apt:
-              awscli: []
-              jq: []
           files:
             /opt/sage/bin/make_env_vars_file.sh:
               source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.0/linux/opt/sage/bin/make_env_vars_file.sh"
@@ -394,7 +390,7 @@ Resources:
             01_add_jc_user_to_docker_group:
               command: "gpasswd -a $(cat /opt/sage/jcusername) docker"
     Properties:
-      ImageId: ami-019e39721f2e229b0  # https://github.com/Sage-Bionetworks/packer-workflows/releases/tag/v1.0.1
+      ImageId: "ami-0e42922cf0e599fbc"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.2
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !If
         - UsePublicSubnet
@@ -418,12 +414,6 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          export DEBIAN_FRONTEND=noninteractive
-          /usr/bin/apt-get update -y
-          /usr/bin/apt-get install -y python-pip
-          /usr/bin/apt-get install -y python-setuptools
-          /bin/mkdir -p /opt/aws/bin /opt/sage/bin
-          /usr/bin/python2.7 /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupJumpcloud,SetTags,SetupDocker --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:

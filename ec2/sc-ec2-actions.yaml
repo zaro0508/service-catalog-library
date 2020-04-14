@@ -40,7 +40,7 @@ Outputs:
   StopEC2InstanceActionId:
     Value: !Ref StopEC2InstanceAction
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-RestartEC2InstanceActionId'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-StopEC2InstanceActionId'
   StartEC2InstanceActionId:
     Value: !Ref StartEC2InstanceAction
     Export:

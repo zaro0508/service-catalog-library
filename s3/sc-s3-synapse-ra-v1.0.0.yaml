@@ -102,7 +102,6 @@ Resources:
       Body: !Ref SynapseUserName
   S3BucketTagger:
     Type: Custom::S3BucketTagger
-    DependsOn: S3Bucket
     Properties:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-set-bucket-tags-macro-SetBucketTagsFunctionArn'

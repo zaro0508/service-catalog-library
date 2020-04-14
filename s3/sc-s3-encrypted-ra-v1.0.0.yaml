@@ -77,7 +77,7 @@ Resources:
     Type: Custom::S3BucketTagger
     Properties:
       ServiceToken: !ImportValue
-        'Fn::Sub': '${AWS::Region}-set-bucket-tags-macro-SetBucketTagsFunctionArn'
+        'Fn::Sub': '${AWS::Region}-cfn-cr-bucket-tagger-FunctionArn'
       BucketName: !Ref S3Bucket
 Outputs:
   BucketName:

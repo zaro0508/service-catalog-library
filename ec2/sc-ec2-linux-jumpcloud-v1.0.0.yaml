@@ -207,6 +207,48 @@ Conditions:
   UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
   IsUbuntu: !Equals [!Ref LinuxDistribution, 'Ubuntu']
 Resources:
+  #TODO marker for proposed SSM connect policy
+  #TODO remove this snippet
+  AllowRemoteAccessThroughSSMPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowStartSession
+            Effect: Allow
+            Action:
+              - ssm:StartSession
+            Resource: 
+              - !GetAtt LinuxInstance.Arn
+          - Sid: AllowManageSessions
+            Effect: Allow
+            Action:
+              - ssm:DescribeSessions
+              - ssm:GetConnectionStatus
+              - ssm:DescribeInstanceProperties
+              - ec2:DescribeInstances
+            Resource:
+              - !GetAtt LinuxInstance.Arn
+          - Sid: SSM-SessionManagerRunShell
+            Effect: Allow
+            Action:
+              - ssm:GetDocument
+            Resource:
+              - 'arn:aws:ssm:::document/SSM-SessionManagerRunShell'
+          - Sid: AllowTerminateSession
+            Effect: Allow
+            Action:
+              - ssm:TerminateSession
+            Resource:
+              - !GetAtt LinuxInstance.Arn
+          - Sid: DenyOtherSSMActions
+            Effect: Deny
+            Action:
+              - ssm:*
+            NotResource:
+              - !GetAtt LinuxInstance.Arn
+      Roles: 'arn:aws:sts::AWS-account-ID:assumed-role/ServiceCatalogEndUsers/role-session-name'
   InstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -216,6 +258,8 @@ Resources:
           'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
+        - !Ref AllowRemoteAccessThroughSSMPolicy #TODO added
+        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore" #TODO added to allow interaction with SSM service
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

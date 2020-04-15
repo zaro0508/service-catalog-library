@@ -40,6 +40,33 @@ Resources:
         Name: 'AWS::Include'
         Parameters:
           Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
+  RestartEC2InstanceActionAssociation:
+    Type: Custom::ScActionsProvider
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-AssociateFunctionArn'
+      ServiceActionId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-RestartEC2InstanceActionId'
+      ProductId: !Ref scec2windowsproduct
+      ProvisioningArtifactId: !GetAtt scec2windowsproduct.ProvisioningArtifactIds
+  StopEC2InstanceActionAssociation:
+    Type: Custom::ScActionsProvider
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-AssociateFunctionArn'
+      ServiceActionId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-StopEC2InstanceActionId'
+      ProductId: !Ref scec2windowsproduct
+      ProvisioningArtifactId: !GetAtt scec2windowsproduct.ProvisioningArtifactIds
+  StartEC2InstanceActionAssociation:
+    Type: Custom::ScActionsProvider
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-AssociateFunctionArn'
+      ServiceActionId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-StartEC2InstanceActionId'
+      ProductId: !Ref scec2windowsproduct
+      ProvisioningArtifactId: !GetAtt scec2windowsproduct.ProvisioningArtifactIds
   Associateec2windows:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

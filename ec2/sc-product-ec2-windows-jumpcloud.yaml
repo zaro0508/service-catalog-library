@@ -46,7 +46,7 @@ Resources:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-AssociateFunctionArn'
       ServiceActionId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-RestartEC2InstanceActionId'
+        'Fn::Sub': '${AWS::Region}-sc-ec2-actions-RestartEC2InstanceActionId'
       ProductId: !Ref scec2windowsproduct
       ProvisioningArtifactId: !GetAtt scec2windowsproduct.ProvisioningArtifactIds
   StopEC2InstanceActionAssociation:
@@ -64,7 +64,7 @@ Resources:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-AssociateFunctionArn'
       ServiceActionId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-StartEC2InstanceActionId'
+        'Fn::Sub': '${AWS::Region}-sc-ec2-actions-StartEC2InstanceActionId'
       ProductId: !Ref scec2windowsproduct
       ProvisioningArtifactId: !GetAtt scec2windowsproduct.ProvisioningArtifactIds
   Associateec2windows:

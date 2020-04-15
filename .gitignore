@@ -9,3 +9,7 @@
 # pipenv
 Pipfile
 Pipfile.lock
+
+# temp
+tmp/
+temp/

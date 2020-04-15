@@ -9,8 +9,6 @@ install:
   - pip install pre-commit
 stages:
   - name: validate
-  - name: test
-    if: branch = master AND type = push
   - name: deploy
     if: (tag =~ ^v) OR (branch = master AND type = push)
 jobs:
@@ -20,19 +18,6 @@ jobs:
       script:
         - pre-commit autoupdate
         - pre-commit run --all-files
-    - stage: test
-      script:
-        - taskcat -c ci/taskcat-all.yaml --tag owner=taskcat
-        - ./save-taskcat-outputs.sh
-        - |
-          if $(grep -Fq "CREATE_FAILED" taskcat_outputs/index.html)
-          then
-            echo Validation FAILED!
-            exit 1
-          else
-            echo Validation Passed!
-            exit 0
-          fi
     - stage: deploy
       script:
         - ./deploy-templates.sh || travis_terminate 1

@@ -55,7 +55,7 @@ Resources:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-AssociateFunctionArn'
       ServiceActionId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-StopEC2InstanceActionId'
+        'Fn::Sub': '${AWS::Region}-sc-ec2-actions-StopEC2InstanceActionId'
       ProductId: !Ref scec2linuxproduct
       ProvisioningArtifactId: !GetAtt scec2linuxproduct.ProvisioningArtifactIds
   StartEC2InstanceActionAssociation:

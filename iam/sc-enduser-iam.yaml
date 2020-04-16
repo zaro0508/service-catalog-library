@@ -18,7 +18,6 @@ Resources:
         - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
         - !Ref SCEnduserExpandedPolicy
         - !Ref CFNDenyGetTemplateSummaryPolicy
-        - !Ref SCEnduserRemoteAccessPolicy
       Path: /
   SCEnduserRole:
     Type: AWS::IAM::Role
@@ -28,7 +27,6 @@ Resources:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
         - !Ref SCEnduserExpandedPolicy
         - !Ref CFNDenyGetTemplateSummaryPolicy
-        - !Ref SCEnduserRemoteAccessPolicy
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -53,28 +51,6 @@ Resources:
             Action:
               - organizations:DescribeOrganization
               - servicecatalog:DescribeProvisionedProduct
-            Resource: "*"
-  SCEnduserRemoteAccessPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      Description: Allow calling StartSession on tagged instances
-      Path: "/"
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action:
-              - ssm:StartSession
-            Resource: "arn:aws:ec2::${AWS::AccountId}:instance/*"
-            Condition:
-              - StringLike:
-                - "ssm:ResourceTag/AccessApprovedCaller": "${aws:userid}"
-          - Effect: Allow
-            Action:
-              - ssm:DescribeSessions
-              - ssm:GetConnectionStatus
-              - ssm:DescribeInstanceProperties
-              - ec2:DescribeInstances
             Resource: "*"
   CFNDenyGetTemplateSummaryPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
@@ -109,7 +85,3 @@ Outputs:
     Value: !Ref SCEnduserExpandedPolicy
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SCEnduserExpandedPolicy'
-  EndUserRemoteAccessPolicy:
-    Value: !Ref SCEnduserRemoteAccessPolicy
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SCEnduserRemoteAccessPolicy'

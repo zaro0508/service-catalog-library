@@ -216,7 +216,6 @@ Resources:
           'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
-        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore" 
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -435,9 +434,6 @@ Resources:
           Value: !Sub "Service Catalog instance created by ${AWS::StackName}"
         - Key: "parkmycloud"
           Value: "yes"
-          #The session name appended to this roleid becomes the value of the AccessApprovedCaller tag
-        - Key: "AccessApprovedRoleId"
-          Value: !GetAtt 'ServiceCatalogEnduser.RoleId' 
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra
@@ -457,5 +453,3 @@ Outputs:
     Value: !Ref 'InstanceProfile'
   ConnectionInstructions:
     Value: "https://sagebionetworks.jira.com/wiki/spaces/IT/pages/996376579/Connect+to+Provisioned+Instances"
-  ConnectionURI:
-    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"

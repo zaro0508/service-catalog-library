@@ -65,10 +65,10 @@ Resources:
           - Effect: Allow
             Action:
               - ssm:StartSession
-            Resource: "arn:aws:ec2::${AWS::AccountId}:instance/*"
+            Resource: !Sub "arn:aws:ec2::${AWS::AccountId}:instance/*"
             Condition:
-              - StringLike:
-                - "ssm:ResourceTag/AccessApprovedCaller": "${aws:userid}"
+              StringLike:
+                "ssm:ResourceTag/AccessApprovedCaller": "${aws:userid}"
           - Effect: Allow
             Action:
               - ssm:DescribeSessions

@@ -22,7 +22,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: "ami-01db72ecb09a90a60"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v1.0.2
+      AMIID: "ami-01866cea595e4f968"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v1.0.3
 Parameters:
   VpcName:
     Type: String

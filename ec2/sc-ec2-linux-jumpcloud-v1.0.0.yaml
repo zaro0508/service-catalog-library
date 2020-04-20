@@ -25,10 +25,14 @@ Metadata:
 Mappings:
   LinuxDistributions:
     Ubuntu:
-      AMIID: ami-093ca9e768e56b1bc  # https://github.com/Sage-Bionetworks/packer-base-ubuntu-bionic/tree/v1.0.6
+      AMIID: "ami-0447d7789ebc37ae3"  # https://github.com/Sage-Bionetworks-IT/packer-base-ubuntu-bionic/tree/v1.0.7
     AmazonLinux:
-      AMIID: ami-0ca7208f904dc1874
+      AMIID: "ami-0810a318c4b1243c5"  # https://github.com/Sage-Bionetworks-IT/packer-base-amazonlinux2/tree/v1.0.2
 Parameters:
+  VpcName:
+    Type: String
+    Description: The VPC to put resources into
+    Default: 'internalpoolvpc'
   PrivateNetwork:
     Type: String
     Description: In the private subnet (recommended) as opposed to a public subnet
@@ -212,7 +216,7 @@ Resources:
           'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
-        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore' #For maintenance tasks
+        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore" 
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -235,10 +239,10 @@ Resources:
       GroupDescription: >-
         Allow all traffic to an instance originating from the VPN
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
       SecurityGroupIngress:
         - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpnCidr'
+            'Fn::Sub': '${AWS::Region}-${VpcName}-VpnCidr'
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
@@ -254,7 +258,7 @@ Resources:
     Properties:
       GroupDescription: Allow SSH to port 22
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
       SecurityGroupIngress:
         - Description: 'allow SSH'
           IpProtocol: 'tcp'
@@ -326,16 +330,6 @@ Resources:
             02_start_cfn-hup:
               command: "/bin/systemctl start cfn-hup.service"
         set_env_vars:
-          packages:
-            !If
-            - IsUbuntu
-            -
-              apt:
-                awscli: []
-                jq: []
-            -
-              yum:
-                jq: []
           files:
             /opt/sage/bin/make_env_vars_file.sh:
               source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.0/linux/opt/sage/bin/make_env_vars_file.sh"
@@ -414,9 +408,9 @@ Resources:
       SubnetId: !If
         - UsePublicSubnet
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PublicSubnet'
+          'Fn::Sub': '${AWS::Region}-${VpcName}-PublicSubnet'
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet'
+          'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
       SecurityGroupIds: !If
         - UsePublicSubnet
         - [!Ref PrivateSubnetSecurityGroup, !Ref PublicSubnetSecurityGroup]
@@ -433,16 +427,6 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          if [[ ${LinuxDistribution} == "Ubuntu" ]]; then
-            export DEBIAN_FRONTEND=noninteractive
-            /usr/bin/apt-get update -y
-            /usr/bin/apt-get install -y python-pip
-            /usr/bin/apt-get install -y python-setuptools
-            /bin/mkdir -p /opt/aws/bin /opt/sage/bin
-            /usr/bin/python2.7 /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
-          else
-            /bin/yum update -y aws-cfn-bootstrap
-          fi
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupJumpcloud,SetTags --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
@@ -456,6 +440,9 @@ Resources:
           Value: "yes"
         - Key: "PatchGroup"
           Value: "prod-default"
+          #The session name appended to this roleid becomes the value of the AccessApprovedCaller tag
+        - Key: "AccessApprovedRoleId"
+          Value: !GetAtt 'ServiceCatalogEnduser.RoleId' 
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra
@@ -475,3 +462,5 @@ Outputs:
     Value: !Ref 'InstanceProfile'
   ConnectionInstructions:
     Value: "https://sagebionetworks.jira.com/wiki/spaces/IT/pages/996376579/Connect+to+Provisioned+Instances"
+  ConnectionURI:
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"

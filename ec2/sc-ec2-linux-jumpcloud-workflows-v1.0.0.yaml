@@ -17,6 +17,10 @@ Metadata:
       PrivateNetwork:
         default: Use private network?
 Parameters:
+  VpcName:
+    Type: String
+    Description: The VPC to put resources into
+    Default: 'internalpoolvpc'
   PrivateNetwork:
     Type: String
     Description: In the private subnet (recommended) as opposed to a public subnet
@@ -215,10 +219,10 @@ Resources:
       GroupDescription: >-
         Allow all traffic to an instance originating from the VPN
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
       SecurityGroupIngress:
         - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-internalpoolvpc-VpnCidr'
+            'Fn::Sub': '${AWS::Region}-${VpcName}-VpnCidr'
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
@@ -234,7 +238,7 @@ Resources:
     Properties:
       GroupDescription: Allow SSH to port 22
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-internalpoolvpc-VPCId'
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
       SecurityGroupIngress:
         - Description: 'allow SSH'
           IpProtocol: 'tcp'
@@ -308,10 +312,6 @@ Resources:
             02_start_cfn-hup:
               command: "/bin/systemctl start cfn-hup.service"
         set_env_vars:
-          packages:
-            apt:
-              awscli: []
-              jq: []
           files:
             /opt/sage/bin/make_env_vars_file.sh:
               source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.0/linux/opt/sage/bin/make_env_vars_file.sh"
@@ -392,14 +392,14 @@ Resources:
             01_add_jc_user_to_docker_group:
               command: "gpasswd -a $(cat /opt/sage/jcusername) docker"
     Properties:
-      ImageId: ami-0144434f91f561456  # https://github.com/Sage-Bionetworks/packer-workflows/releases/tag/v1.0.0
+      ImageId: "ami-0e42922cf0e599fbc"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.2
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !If
         - UsePublicSubnet
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PublicSubnet'
+          'Fn::Sub': '${AWS::Region}-${VpcName}-PublicSubnet'
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-internalpoolvpc-PrivateSubnet'
+          'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
       SecurityGroupIds: !If
         - UsePublicSubnet
         - [!Ref PrivateSubnetSecurityGroup, !Ref PublicSubnetSecurityGroup]
@@ -416,12 +416,6 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          export DEBIAN_FRONTEND=noninteractive
-          /usr/bin/apt-get update -y
-          /usr/bin/apt-get install -y python-pip
-          /usr/bin/apt-get install -y python-setuptools
-          /bin/mkdir -p /opt/aws/bin /opt/sage/bin
-          /usr/bin/python2.7 /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupJumpcloud,SetTags,SetupDocker --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:

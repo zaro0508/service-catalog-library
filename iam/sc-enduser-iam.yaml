@@ -97,10 +97,6 @@ Outputs:
     Value: !Ref SCEnduserGroup
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-GroupName'
-  EndUserRoleId:
-    Value: !Ref SCEnduserRole.RoleId
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-RoleId'
   EndUserRoleArn:
     Value: !GetAtt SCEnduserRole.Arn
     Export:

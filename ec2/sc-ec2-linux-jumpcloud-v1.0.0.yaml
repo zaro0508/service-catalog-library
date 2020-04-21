@@ -442,7 +442,7 @@ Resources:
           Value: "prod-default"
           #The session name appended to this roleid becomes the value of the AccessApprovedCaller tag
         - Key: "AccessApprovedRoleId"
-          Value: !GetAtt 'ServiceCatalogEndusers.RoleId' 
+          Value: !ImportValue 'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra

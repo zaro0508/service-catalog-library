@@ -1,14 +1,9 @@
 Description: "ServiceCatalog End User policy and group (fdp-1p4dlgcp7)"
-Parameters:
-  RoleAndGroupName:
-    Description: 'Name that will be used for the IAM Group and IAM Role'
-    Type: String
-    Default: ServiceCatalogEndusers
 Resources:
   SCEnduserGroup:
     Type: AWS::IAM::Group
     Properties:
-      GroupName: !Ref RoleAndGroupName
+      GroupName: ServiceCatalogEndusers
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
@@ -23,7 +18,7 @@ Resources:
   SCEnduserRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Ref RoleAndGroupName
+      RoleName: ServiceCatalogEndusers
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
         - !Ref SCEnduserExpandedPolicy
@@ -92,23 +87,23 @@ Outputs:
   EndUserGroupArn:
     Value: !GetAtt SCEnduserGroup.Arn
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-GroupArn'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogEndusers-GroupArn'
   EndUserGroupName:
     Value: !Ref SCEnduserGroup
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-GroupName'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogEndusers-GroupName'
   EndUserRoleId:
     Value: !GetAtt SCEnduserRole.RoleId
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-RoleId'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogEndusers-RoleId'
   EndUserRoleArn:
     Value: !GetAtt SCEnduserRole.Arn
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-RoleArn'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogEndusers-RoleArn'
   EndUserRoleName:
     Value: !Ref SCEnduserRole
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-${RoleAndGroupName}-RoleName'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogEndusers-RoleName'
   EndUserExpandPolicy:
     Value: !Ref SCEnduserExpandedPolicy
     Export:

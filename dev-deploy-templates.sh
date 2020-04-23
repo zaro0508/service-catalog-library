@@ -19,7 +19,7 @@ else
   exit 1
 fi 
 
-S3_BUCKET_URL=s3://bootstrap-awss3cloudformationbucket-19qromfd235z9/scipoolprod-sc-lib-infra/master/
+S3_BUCKET_URL=s3://bootstrap-awss3cloudformationbucket-19qromfd235z9/service-catalog-library/master/
 
 for template in "${templates[@]}"
 do

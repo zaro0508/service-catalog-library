@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: '[DEVELOPMENT-TTHYER] Linux EC2 ServiceCatalog product with Jumpcloud integration.'
+Parameters:
+  VpcName:
+    Type: String
+    Description: The VPC to put resources into
+    Default: 'internalpoolvpc'
+  PortfolioProvider:
+    Type: String
+    Description: Owner and Distributor Name
+  LaunchConstraintARN:
+    Type: String
+    Description: ARN of the launch constraint role for EC2 products.
+  PortfolioId:
+    Type: String
+    Description: The ServiceCatalog portfolio this product will be attached to.
+  RepoRootURL:
+    Type: String
+    Description: Root url for the repo containing the product templates.
+  StackDatetime:
+    Type: String
+    Description: Last updated date and time of portfolio
+    Default: ''
+Resources:
+  scec2linuxproduct:
+    Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
+    Properties:
+      Name: '[DEVELOPMENT-TTHYER] EC2 Linux with Jumpcloud Integration'
+      Description: This product builds one Linux EC2 instance, either
+        Amazon Linux or Ubuntu, with Jumpcloud integration.
+      Owner: !Ref 'PortfolioProvider'
+      Distributor: !Ref 'PortfolioProvider'
+      ProvisioningArtifactParameters:
+        - Description: !Sub 'DEVELOPMENT version. Last portfolio update occurred at ${StackDatetime}.'
+          Info:
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/development/tthyer/sc-ec2-linux-jumpcloud-development-tthyer.yaml'
+          Name: development
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
+  Associateec2linux:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      PortfolioId: !Ref 'PortfolioId'
+      ProductId: !Ref 'scec2linuxproduct'
+  constraintec2linux:
+    Type: AWS::ServiceCatalog::LaunchRoleConstraint
+    DependsOn: Associateec2linux
+    Properties:
+      PortfolioId: !Ref 'PortfolioId'
+      ProductId: !Ref 'scec2linuxproduct'
+      RoleArn: !Ref 'LaunchConstraintARN'
+      Description: !Ref 'LaunchConstraintARN'
+Outputs:
+  ProductId:
+    Value: !Ref 'scec2linuxproduct'

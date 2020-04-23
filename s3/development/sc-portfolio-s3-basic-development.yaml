@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: '[DEVELOPMENT] S3 Portfolio for Service Catalog.'
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Portfolio Information
+        Parameters:
+          - PorfolioName
+          - PortfolioProvider
+          - PorfolioDescription
+      - Label:
+          default: IAM Settings
+        Parameters:
+          - LaunchRoleName
+          - PrincipalRoleName1
+          - PrincipalGroupName1
+          - PrincipalRoleName2
+          - PrincipalGroupName2
+      - Label:
+          default: Product Settings
+        Parameters:
+          - RepoRootURL
+Parameters:
+  PortfolioProvider:
+    Type: String
+    Description: Provider Name
+    Default: IT Services
+  PorfolioName:
+    Type: String
+    Description: Portfolio Name
+    Default: '[DEVELOPMENT] Service Catalog S3 Reference Architecture'
+  PorfolioDescription:
+    Type: String
+    Description: Portfolio Description
+    Default: Service Catalog Portfolio that contains reference architecture products
+      for Amazon Simple Storage Service.
+  LaunchRoleName:
+    Type: String
+    Description: Name of the launch constraint role for VPC products. leave this blank
+      to create the role.
+  PrincipalRoleName1:
+    Type: String
+    Description: Name of an IAM role which can execute products
+      in this portfolio.
+  PrincipalGroupName1:
+    Type: String
+    Description: (Optional) Name of an IAM  group which can execute products
+      in this portfolio.
+    Default: ''
+  PrincipalRoleName2:
+    Type: String
+    Description: (Optional) Name of an IAM role which can execute products
+      in this portfolio.
+    Default: ''
+  PrincipalGroupName2:
+    Type: String
+    Description: (Optional) Name of an IAM  group which can execute products
+      in this portfolio.
+    Default: ''
+  RepoRootURL:
+    Type: String
+    Description: Root url for the repo containing the product templates.
+    Default: https://s3.amazonaws.com/aws-service-catalog-reference-architectures/
+  StackDatetime:
+    Type: String
+    Description: Last updated date and time of portfolio
+    Default: ''
+Conditions:
+  CreateLaunchConstraint: !Equals
+    - !Ref 'LaunchRoleName'
+    - ''
+  CondPrincipalRoleName1: !Not
+    - !Equals
+      - !Ref 'PrincipalRoleName1'
+      - ''
+  CondPrincipalGroupName1: !Not
+    - !Equals
+      - !Ref 'PrincipalGroupName1'
+      - ''
+  CondPrincipalRoleName2: !Not
+    - !Equals
+      - !Ref 'PrincipalRoleName2'
+      - ''
+  CondPrincipalGroupName2: !Not
+    - !Equals
+      - !Ref 'PrincipalGroupName2'
+      - ''
+Resources:
+  SCS3portfolio:
+    Type: AWS::ServiceCatalog::Portfolio
+    Properties:
+      ProviderName: !Ref 'PortfolioProvider'
+      Description: !Ref 'PorfolioDescription'
+      DisplayName: !Ref 'PorfolioName'
+  LaunchConstraintRole:
+    Type: AWS::CloudFormation::Stack
+    Condition: CreateLaunchConstraint
+    Properties:
+      TemplateURL: !Sub '${RepoRootURL}iam/sc-s3-launchrole.yaml'
+      TimeoutInMinutes: 5
+  LinkEndusersRole:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Condition: CondPrincipalRoleName1
+    Properties:
+      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${PrincipalRoleName1}'
+      PortfolioId: !Ref 'SCS3portfolio'
+      PrincipalType: IAM
+  LinkEndusersGroup:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Condition: CondPrincipalGroupName1
+    Properties:
+      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName1}'
+      PortfolioId: !Ref 'SCS3portfolio'
+      PrincipalType: IAM
+  LinkEndusersAltRole:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Condition: CondPrincipalRoleName2
+    Properties:
+      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${PrincipalRoleName2}'
+      PortfolioId: !Ref 'SCS3portfolio'
+      PrincipalType: IAM
+  LinkEndusersAltGroup:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Condition: CondPrincipalGroupName2
+    Properties:
+      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName2}'
+      PortfolioId: !Ref 'SCS3portfolio'
+      PrincipalType: IAM
+  s3privateEncproduct:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        PortfolioProvider: !Ref 'PortfolioProvider'
+        LaunchConstraintARN: !If
+          - CreateLaunchConstraint
+          - !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleArn'
+          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
+        PortfolioId: !Ref 'SCS3portfolio'
+        RepoRootURL: !Ref 'RepoRootURL'
+        StackDatetime: !Ref StackDatetime
+      TemplateURL: !Sub '${RepoRootURL}s3/development/sc-product-s3-private-enc-development.yaml'
+      TimeoutInMinutes: 5
+  s3synapseproduct:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        PortfolioProvider: !Ref 'PortfolioProvider'
+        LaunchConstraintARN: !If
+          - CreateLaunchConstraint
+          - !GetAtt 'LaunchConstraintRole.Outputs.LaunchRoleArn'
+          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LaunchRoleName}'
+        PortfolioId: !Ref 'SCS3portfolio'
+        RepoRootURL: !Ref 'RepoRootURL'
+        StackDatetime: !Ref StackDatetime
+      TemplateURL: !Sub '${RepoRootURL}s3/development/sc-product-s3-synapse-development.yaml'
+      TimeoutInMinutes: 5

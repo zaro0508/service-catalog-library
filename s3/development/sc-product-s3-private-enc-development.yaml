@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: '[DEVELOPMENT] S3 private encrypted ServiceCatalog product.'
+Parameters:
+  PortfolioProvider:
+    Type: String
+    Description: Owner and Distributor Name
+  LaunchConstraintARN:
+    Type: String
+    Description: ARN of the launch constraint role for S3 products.
+  PortfolioId:
+    Type: String
+    Description: The ServiceCatalog portfolio this product will be attached to.
+  RepoRootURL:
+    Type: String
+    Description: Root url for the repo containing the product templates.
+  StackDatetime:
+    Type: String
+    Description: Last updated date and time of portfolio
+    Default: ''
+Resources:
+  scs3product:
+    Type: AWS::ServiceCatalog::CloudFormationProduct
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002
+    Properties:
+      Name: '[DEVELOPMENT] S3 Private Encrypted Bucket'
+      Description: This product builds an AWS S3 bucket encrypted with private
+        access accessible from any source.
+      Owner: !Ref 'PortfolioProvider'
+      Distributor: !Ref 'PortfolioProvider'
+      ProvisioningArtifactParameters:
+        - Description: !Sub 'DEVELOPMENT version. Last portfolio update occurred at ${StackDatetime}.'
+          Info:
+            LoadTemplateFromURL: !Sub '${RepoRootURL}s3/development/sc-s3-encrypted-ra-development.yaml'
+          Name: development
+      'Fn::Transform':
+        Name: 'AWS::Include'
+        Parameters:
+          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
+  Associates3:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      PortfolioId: !Ref 'PortfolioId'
+      ProductId: !Ref 'scs3product'
+  constraintec2linux:
+    Type: AWS::ServiceCatalog::LaunchRoleConstraint
+    DependsOn: Associates3
+    Properties:
+      PortfolioId: !Ref 'PortfolioId'
+      ProductId: !Ref 'scs3product'
+      RoleArn: !Ref 'LaunchConstraintARN'
+      Description: !Ref 'LaunchConstraintARN'

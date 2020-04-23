@@ -198,3 +198,7 @@ Outputs:
     Value: !GetAtt 'Ec2LinuxJumpcloudWorkflowsProduct.Outputs.ProductId'
   Ec2WindowsJumpcloudProductId:
     Value: !GetAtt 'Ec2WindowsJumpcloudProduct.Outputs.ProductId'
+  SCEC2portfolioId:
+    Value: !Ref SCEC2portfolio
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SCEC2portfolioId'

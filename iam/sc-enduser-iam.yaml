@@ -71,6 +71,13 @@ Resources:
               - ssm:DescribeInstanceProperties
               - ec2:DescribeInstances
             Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:TerminateSession
+            Resource: "*"
+            Condition:
+              StringLike:
+                "ssm:ResourceTag/aws::ssmmessages:session-id": "${aws:userid}"
   CFNDenyGetTemplateSummaryPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:

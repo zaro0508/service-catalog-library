@@ -39,7 +39,7 @@ Resources:
   LinkEndusersGroup:
     Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
     Properties:
-      PrincipalARN: !Sub 'arn:aws:iam::${AWS::AccountId}:group/${PrincipalGroupName1}'
+      PrincipalARN: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-GroupArn'
       PortfolioId: !Ref 'SCEC2portfolio'
       PrincipalType: IAM

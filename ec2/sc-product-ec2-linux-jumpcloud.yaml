@@ -4,12 +4,7 @@ Parameters:
   PortfolioProvider:
     Type: String
     Description: Owner and Distributor Name
-  LaunchConstraintARN:
-    Type: String
-    Description: ARN of the launch constraint role for EC2 products.
-  PortfolioId:
-    Type: String
-    Description: The ServiceCatalog portfolio this product will be attached to.
+    Default: IT Services
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
@@ -43,16 +38,20 @@ Resources:
   Associateec2linux:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:
-      PortfolioId: !Ref 'PortfolioId'
+      PortfolioId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-portfolio-ec2-SCEC2portfolioId'
       ProductId: !Ref 'scec2linuxproduct'
   constraintec2linux:
     Type: AWS::ServiceCatalog::LaunchRoleConstraint
     DependsOn: Associateec2linux
     Properties:
-      PortfolioId: !Ref 'PortfolioId'
+      PortfolioId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-portfolio-ec2-SCEC2portfolioId'
       ProductId: !Ref 'scec2linuxproduct'
-      RoleArn: !Ref 'LaunchConstraintARN'
-      Description: !Ref 'LaunchConstraintARN'
+      RoleArn: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
 Outputs:
   ProductId:
     Value: !Ref 'scec2linuxproduct'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ProductId'

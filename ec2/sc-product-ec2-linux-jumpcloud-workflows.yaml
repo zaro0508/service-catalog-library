@@ -53,3 +53,5 @@ Resources:
 Outputs:
   ProductId:
     Value: !Ref 'ScEc2LinuxJumpcloudWorkflowsProduct'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ProductId'

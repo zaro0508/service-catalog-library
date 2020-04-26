@@ -4,12 +4,7 @@ Parameters:
   PortfolioProvider:
     Type: String
     Description: Owner and Distributor Name
-  LaunchConstraintARN:
-    Type: String
-    Description: ARN of the launch constraint role for S3 products.
-  PortfolioId:
-    Type: String
-    Description: The ServiceCatalog portfolio this product will be attached to.
+    Default: IT Services
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
@@ -43,16 +38,19 @@ Resources:
   Associates3:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:
-      PortfolioId: !Ref 'PortfolioId'
+      PortfolioId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-SCS3portfolioId'
+      !Ref 'PortfolioId'
       ProductId: !Ref 'scs3product'
   constraintec2linux:
     Type: AWS::ServiceCatalog::LaunchRoleConstraint
     DependsOn: Associates3
     Properties:
-      PortfolioId: !Ref 'PortfolioId'
+      PortfolioId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-SCS3portfolioId'
       ProductId: !Ref 'scs3product'
-      RoleArn: !Ref 'LaunchConstraintARN'
-      Description: !Ref 'LaunchConstraintARN'
+      RoleArn: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-s3-launchrole-LaunchRoleArn'
 Outputs:
   ProductId:
     Value: !Ref 'scs3product'

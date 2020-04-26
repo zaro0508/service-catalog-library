@@ -53,3 +53,8 @@ Resources:
       ProductId: !Ref 'scs3product'
       RoleArn: !Ref 'LaunchConstraintARN'
       Description: !Ref 'LaunchConstraintARN'
+Outputs:
+  ProductId:
+    Value: !Ref 'scs3product'
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ProductId'

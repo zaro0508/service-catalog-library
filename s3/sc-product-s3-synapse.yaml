@@ -12,6 +12,9 @@ Parameters:
     Type: String
     Description: Last updated date and time of portfolio
     Default: ''
+  PortfolioId:
+    Type: String
+    Description: ID of the portfolio that will contain this product
 Resources:
   scs3product:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -38,15 +41,13 @@ Resources:
   Associates3:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:
-      PortfolioId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-SCS3portfolioId'
+      PortfolioId:  !Ref PortfolioId
       ProductId: !Ref 'scs3product'
   constraintec2linux:
     Type: AWS::ServiceCatalog::LaunchRoleConstraint
     DependsOn: Associates3
     Properties:
-      PortfolioId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-SCS3portfolioId'
+      PortfolioId:  !Ref PortfolioId
       ProductId: !Ref 'scs3product'
       RoleArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-s3-launchrole-LaunchRoleArn'

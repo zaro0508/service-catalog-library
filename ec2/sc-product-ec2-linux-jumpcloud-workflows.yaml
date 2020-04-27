@@ -12,6 +12,9 @@ Parameters:
     Type: String
     Description: Last updated date and time of portfolio
     Default: ''
+  PortfolioId:
+    Type: String
+    Description: ID of the portfolio that will contain this product
 Resources:
   ScEc2LinuxJumpcloudWorkflowsProduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -38,16 +41,13 @@ Resources:
   Associateec2linux:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:
-      PortfolioId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-portfolio-ec2-SCEC2portfolioId'
+      PortfolioId: !Ref PortfolioId
       ProductId: !Ref 'ScEc2LinuxJumpcloudWorkflowsProduct'
   constraintec2linux:
     Type: AWS::ServiceCatalog::LaunchRoleConstraint
     DependsOn: Associateec2linux
     Properties:
-      PortfolioId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-portfolio-ec2-SCEC2portfolioId'
-      ProductId: !Ref 'ScEc2LinuxJumpcloudWorkflowsProduct'
+      PortfolioId: !Ref PortfolioId
       RoleArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
 Outputs:

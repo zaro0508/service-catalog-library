@@ -40,7 +40,6 @@ Resources:
     Properties:
       PortfolioId: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-SCS3portfolioId'
-      !Ref 'PortfolioId'
       ProductId: !Ref 'scs3product'
   constraintec2linux:
     Type: AWS::ServiceCatalog::LaunchRoleConstraint

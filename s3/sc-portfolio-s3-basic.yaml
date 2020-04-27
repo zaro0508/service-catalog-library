@@ -14,14 +14,6 @@ Parameters:
     Description: Portfolio Description
     Default: Service Catalog Portfolio that contains reference architecture products
       for Amazon Simple Storage Service.
-  RepoRootURL:
-    Type: String
-    Description: Root url for the repo containing the product templates.
-    Default: https://s3.amazonaws.com/aws-service-catalog-reference-architectures/
-  StackDatetime:
-    Type: String
-    Description: Last updated date and time of portfolio
-    Default: ''
 Resources:
   SCS3portfolio:
     Type: AWS::ServiceCatalog::Portfolio
@@ -43,41 +35,8 @@ Resources:
         'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-GroupArn'
       PortfolioId: !Ref 'SCS3portfolio'
       PrincipalType: IAM
-  s3privateEncproduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !ImportValue
-          'Fn::Sub': '${AWS::Region}-sc-s3-launchrole-LaunchRoleArn'
-        PortfolioId: !Ref 'SCS3portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-private-enc.yaml'
-      TimeoutInMinutes: 5
-  s3synapseproduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !ImportValue
-          'Fn::Sub': '${AWS::Region}-sc-s3-launchrole-LaunchRoleArn'
-        PortfolioId: !Ref 'SCS3portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}s3/sc-product-s3-synapse.yaml'
-      TimeoutInMinutes: 5
-
 Outputs:
   SCS3portfolioId:
     Value: !Ref SCS3portfolio
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SCS3portfolioId'
-  s3privateEncproductId:
-    Value: !GetAtt 's3privateEncproduct.Outputs.ProductId'
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-s3privateEncproductId'
-  s3synapseproductId:
-    Value: !GetAtt 's3synapseproduct.Outputs.ProductId'
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-s3synapseproductId'

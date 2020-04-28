@@ -48,6 +48,7 @@ Resources:
     DependsOn: Associateec2linux
     Properties:
       PortfolioId: !Ref PortfolioId
+      ProductId: !Ref 'ScEc2LinuxJumpcloudWorkflowsProduct'
       RoleArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
 Outputs:

@@ -12,6 +12,9 @@ Parameters:
     Type: String
     Description: Last updated date and time of portfolio
     Default: ''
+  PortfolioId:
+    Type: String
+    Description: ID of the portfolio that will contain this product
 Resources:
   scec2windowsproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -38,15 +41,13 @@ Resources:
   Associateec2windows:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:
-      PortfolioId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-portfolio-ec2-SCEC2portfolioId'
+      PortfolioId: !Ref PortfolioId
       ProductId: !Ref 'scec2windowsproduct'
   constraintec2linux:
     Type: AWS::ServiceCatalog::LaunchRoleConstraint
     DependsOn: Associateec2windows
     Properties:
-      PortfolioId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-portfolio-ec2-SCEC2portfolioId'
+      PortfolioId: !Ref PortfolioId
       ProductId: !Ref 'scec2windowsproduct'
       RoleArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'

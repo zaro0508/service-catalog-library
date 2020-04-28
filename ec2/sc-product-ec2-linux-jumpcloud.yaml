@@ -15,6 +15,10 @@ Parameters:
   PortfolioId:
     Type: String
     Description: ID of the portfolio that will contain this product
+  ProductName:
+    Type: String
+    Description: Name of the product that will be visible to the end user
+    Default: 'EC2 Linux with Jumpcloud Integration'
 Resources:
   scec2linuxproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -24,7 +28,7 @@ Resources:
           ignore_checks:
             - E3002
     Properties:
-      Name: EC2 Linux with Jumpcloud Integration
+      Name: !Ref ProductName
       Description: This product builds one Linux EC2 instance, either
         Amazon Linux or Ubuntu, with Jumpcloud integration.
       Owner: !Ref 'PortfolioProvider'

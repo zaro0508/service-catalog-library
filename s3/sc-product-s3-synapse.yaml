@@ -15,6 +15,10 @@ Parameters:
   PortfolioId:
     Type: String
     Description: ID of the portfolio that will contain this product
+  ProductName:
+    Type: String
+    Description: Name of the product that will be visible to the end user
+    Default: 'S3 Synapse Bucket'
 Resources:
   scs3product:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -24,7 +28,7 @@ Resources:
           ignore_checks:
             - E3002
     Properties:
-      Name: S3 Synapse Bucket
+      Name: !Ref ProductName
       Description: This product builds an AWS S3 bucket with private access
         for Synapse.
       Owner: !Ref 'PortfolioProvider'

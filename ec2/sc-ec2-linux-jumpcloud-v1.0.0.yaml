@@ -217,7 +217,6 @@ Resources:
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
         - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore" 
-        - !Ref ReadAssumedRoleInformationPolicy
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -225,20 +224,9 @@ Resources:
             Principal:
               Service:
                 - ec2.amazonaws.com
-                - ssm.amazonaws.com 
+                - ssm.amazonaws.com #For maintenance service
             Action:
               - sts:AssumeRole
-  ReadAssumedRoleInformationPolicy:
-    Type: "AWS::IAM::ManagedPolicy"
-    Properties:
-      PolicyDocument:
-      Version: 2012-10-17
-      Statement:
-        - Sid: ReadAssumedRoleInformation
-          Effect: Allow
-          Action:
-            - "iam:GetRole"
-          Resource: "*"
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:

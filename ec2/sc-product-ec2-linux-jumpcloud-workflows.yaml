@@ -55,6 +55,33 @@ Resources:
       ProductId: !Ref 'ScEc2LinuxJumpcloudWorkflowsProduct'
       RoleArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
+  AssociateRestartEC2InstanceAction:
+    Type: Custom::ScActionsProvider
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-AssociateFunctionArn'
+      ServiceActionId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-ec2-actions-RestartEC2InstanceActionId'
+      ProductId: !Ref ScEc2LinuxJumpcloudWorkflowsProduct
+      ProvisioningArtifactId: !GetAtt ScEc2LinuxJumpcloudWorkflowsProduct.ProvisioningArtifactIds
+  AssociateStartEC2InstanceAction:
+    Type: Custom::ScActionsProvider
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-AssociateFunctionArn'
+      ServiceActionId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-ec2-actions-StartEC2InstanceActionId'
+      ProductId: !Ref ScEc2LinuxJumpcloudWorkflowsProduct
+      ProvisioningArtifactId: !GetAtt ScEc2LinuxJumpcloudWorkflowsProduct.ProvisioningArtifactIds
+  AssociateStopEC2InstanceAction:
+    Type: Custom::ScActionsProvider
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-AssociateFunctionArn'
+      ServiceActionId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-ec2-actions-StopEC2InstanceActionId'
+      ProductId: !Ref ScEc2LinuxJumpcloudWorkflowsProduct
+      ProvisioningArtifactId: !GetAtt ScEc2LinuxJumpcloudWorkflowsProduct.ProvisioningArtifactIds
 Outputs:
   ProductId:
     Value: !Ref 'ScEc2LinuxJumpcloudWorkflowsProduct'

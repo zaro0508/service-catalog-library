@@ -9,7 +9,7 @@ Resources:
     Type: Custom::ScActionsProvider
     Properties:
      ServiceToken: !ImportValue
-      'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-CreateFunctionArn'
+      'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-CreateFunctionArn'
      SsmDocName: "AWS-RestartEC2Instance"
      SsmDocVersion: "1"
      Name: !Sub '${AWS::StackName}-RestartEC2Instance'
@@ -18,7 +18,7 @@ Resources:
     Type: Custom::ScActionsProvider
     Properties:
      ServiceToken: !ImportValue
-      'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-CreateFunctionArn'
+      'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-CreateFunctionArn'
      SsmDocName: "AWS-StopEC2Instance"
      SsmDocVersion: "1"
      Name: !Sub '${AWS::StackName}-StopEC2Instance'
@@ -27,7 +27,7 @@ Resources:
     Type: Custom::ScActionsProvider
     Properties:
      ServiceToken: !ImportValue
-      'Fn::Sub': '${AWS::Region}-cfn-sc-actions-provider-CreateFunctionArn'
+      'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-CreateFunctionArn'
      SsmDocName: "AWS-StartEC2Instance"
      SsmDocVersion: "1"
      Name: !Sub '${AWS::StackName}-StartEC2Instance'

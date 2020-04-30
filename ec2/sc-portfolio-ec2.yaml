@@ -14,14 +14,6 @@ Parameters:
     Description: Portfolio Description
     Default: Service Catalog Portfolio that contains reference architecture products
       for Amazon Elastic Compute Cloud (EC2).
-  RepoRootURL:
-    Type: String
-    Description: S3 root url for the repository containing the product templates.
-    Default: https://s3.amazonaws.com/aws-service-catalog-reference-architectures/
-  StackDatetime:
-    Type: String
-    Description: Last updated date and time of portfolio
-    Default: ''
 Resources:
   SCEC2portfolio:
     Type: AWS::ServiceCatalog::Portfolio
@@ -43,71 +35,7 @@ Resources:
         'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-GroupArn'
       PortfolioId: !Ref 'SCEC2portfolio'
       PrincipalType: IAM
-  Ec2LinuxJumpcloudProduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !ImportValue
-          'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
-        PortfolioId: !Ref 'SCEC2portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud.yaml'
-      TimeoutInMinutes: 5
-  Ec2LinuxJumpcloudNotebookProduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !ImportValue
-          'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
-        PortfolioId: !Ref 'SCEC2portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud-notebook.yaml'
-      TimeoutInMinutes: 5
-  Ec2LinuxJumpcloudWorkflowsProduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !ImportValue
-          'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
-        PortfolioId: !Ref 'SCEC2portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-linux-jumpcloud-workflows.yaml'
-      TimeoutInMinutes: 5
-  Ec2WindowsJumpcloudProduct:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PortfolioProvider: !Ref 'PortfolioProvider'
-        LaunchConstraintARN: !ImportValue
-          'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
-        PortfolioId: !Ref 'SCEC2portfolio'
-        RepoRootURL: !Ref 'RepoRootURL'
-        StackDatetime: !Ref StackDatetime
-      TemplateURL: !Sub '${RepoRootURL}ec2/sc-product-ec2-windows-jumpcloud.yaml'
-      TimeoutInMinutes: 5
 Outputs:
-  Ec2LinuxJumpcloudProductId:
-    Value: !GetAtt 'Ec2LinuxJumpcloudProduct.Outputs.ProductId'
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-Ec2LinuxJumpcloudProductId'
-  Ec2LinuxJumpcloudNotebookProductId:
-    Value: !GetAtt 'Ec2LinuxJumpcloudNotebookProduct.Outputs.ProductId'
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-Ec2LinuxJumpcloudNotebookProductId'
-  Ec2LinuxJumpcloudWorkflowsProductId:
-    Value: !GetAtt 'Ec2LinuxJumpcloudWorkflowsProduct.Outputs.ProductId'
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-Ec2LinuxJumpcloudWorkflowsProductId'
-  Ec2WindowsJumpcloudProductId:
-    Value: !GetAtt 'Ec2WindowsJumpcloudProduct.Outputs.ProductId'
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-Ec2WindowsJumpcloudProductId'
   SCEC2portfolioId:
     Value: !Ref SCEC2portfolio
     Export:

@@ -1,0 +1,18 @@
+Description: "Extra policies needed for remote connection filtering"
+Resources:
+  ReadAssumedRoleInformationPolicy: #This policy is attached to an instance created by an enduser
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Sid: ReadAssumedRoleInformation
+            Effect: Allow
+            Action: "iam:GetRole"
+            Resource: "*" #this matches role names, not ARN strings
+Outputs:
+  ReadAssumedRoleInformationPolicy:
+    Value: !Ref ReadAssumedRoleInformationPolicy
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ReadAssumedRoleInformationPolicy'

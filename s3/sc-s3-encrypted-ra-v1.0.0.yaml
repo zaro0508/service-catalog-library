@@ -1,9 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Service Catalog: S3 Reference Architecture: Private encrypted bucket
-  using AES256 with retention on object deletion. (fdp-1oc5gsre6)'
+Description: >-
+  Service Catalog S3 Reference Architecture: Private encrypted bucket
+  using AES256 with retention on object deletion.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
+      - Label:
+          default: S3 Bucket Configuration
+        Parameters:
+          - BucketName
       - Label:
           default: S3 Bucket Policy Configuration
         Parameters:
@@ -11,74 +16,40 @@ Metadata:
 Parameters:
   S3UserARNs:
     Type: CommaDelimitedList
+    Description: >-
+      (Optional) User ARNs allowed to access S3 Bucket,
+      in addition to provisioning user
+    ConstraintDescription: >-
+      List of ARNs separated by commas (e.g.
+      arn:aws:iam::011223344556:user/jdoe,arn:aws:iam::544332211006:user/rjones)
+  BucketName:
+    Type: String
+    Description: (Optional) Name of the created bucket.
     Default: ""
-    Description: User ARNs allowed to access S3 Bucket
-    ConstraintDescription: List of ARNs separated by commas (i.e. arn:aws:iam::011223344556:user/jsmith,arn:aws:iam::544332211006:user/rjones)
-Conditions:
-  AllowUserAccess: !Not [!Equals [!Join ['', !Ref S3UserARNs], "[]"]]
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
     Properties:
+      BucketName: !If [HasBucketName, !Ref BucketName, !Ref 'AWS::NoValue']
       AccessControl: Private
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      Tags:
-        - Key: Name
-          Value: SC-S3-RA-S3-Bucket
-  BucketPolicy:
-    Type: "AWS::S3::BucketPolicy"
-    Condition: AllowUserAccess
-    Properties:
-      Bucket: !Ref 'S3Bucket'
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          -
-            Sid: "ReadAccess"
-            Effect: "Allow"
-            Principal:
-              AWS: !Ref 'S3UserARNs'
-            Action:
-              - "s3:ListBucket*"
-              - "s3:GetBucketLocation"
-            Resource: !GetAtt S3Bucket.Arn
-          -
-            Sid: "WriteAccess"
-            Effect: "Allow"
-            Principal:
-              AWS: !Ref 'S3UserARNs'
-            Action:
-              - "s3:*Object*"
-              - "s3:*MultipartUpload*"
-            Resource: !Sub "${S3Bucket.Arn}/*"
-          - Sid: DenyIncorrectEncryptionHeader
-            Effect: Deny
-            Principal:
-              AWS: !Ref 'S3UserARNs'
-            Action: s3:PutObject
-            Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
-            Condition:
-              StringNotEquals:
-                s3:x-amz-server-side-encryption: AES256
-          - Sid: DenyUnEncryptedObjectUploads
-            Effect: Deny
-            Principal:
-              AWS: !Ref 'S3UserARNs'
-            Action: s3:PutObject
-            Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
-            Condition:
-              'Null':
-                s3:x-amz-server-side-encryption: 'true'
   S3BucketTagger:
     Type: Custom::S3BucketTagger
     Properties:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-cfn-cr-bucket-tagger-FunctionArn'
       BucketName: !Ref S3Bucket
+  S3BucketPolicy:
+    Type: Custom::SCS3BucketPolicy
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-sc-bucket-policy-FunctionArn'
+      BucketName: !Ref S3Bucket
+      ExtraPrincipalArns: !Ref S3UserARNs
+      RequireEncryption: true
 Outputs:
   BucketName:
     Value: !Ref 'S3Bucket'

@@ -26,6 +26,8 @@ Parameters:
     Type: String
     Description: (Optional) Name of the created bucket.
     Default: ""
+Conditions:
+  HasBucketName: !Not [!Equals [!Ref BucketName, ""]]
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket

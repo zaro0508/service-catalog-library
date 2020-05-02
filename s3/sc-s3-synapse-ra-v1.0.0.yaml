@@ -1,13 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: S3Objects
-Description: 'Synapse S3 Custom Storage (https://docs.synapse.org/articles/custom_storage_location.html)'
+Description: >-
+  Synapse S3 Custom Storage
+  (https://docs.synapse.org/articles/custom_storage_location.html)
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: S3 Bucket Policy Configuration
+          default: S3 Bucket Configuration
         Parameters:
           - BucketName
+      - Label:
+          default: S3 Bucket Policy Configuration
+        Parameters:
           - SynapseUserName
           - S3UserARNs
 Parameters:
@@ -17,9 +22,12 @@ Parameters:
     Default: ""
   S3UserARNs:
     Type: CommaDelimitedList
-    Default: ""
-    Description: User ARNs allowed to access S3 Bucket
-    ConstraintDescription: List of ARNs separated by commas (i.e. arn:aws:iam::011223344556:user/jsmith,arn:aws:iam::544332211006:user/rjones)
+    Description: >-
+      (Optional) User ARNs allowed to access S3 Bucket,
+      in addition to provisioning user
+    ConstraintDescription: >-
+      List of ARNs separated by commas (e.g.
+      arn:aws:iam::011223344556:user/jdoe,arn:aws:iam::544332211006:user/rjones)
   SynapseProdARN:
     Type: String
     Description: Root ARN for the Synapse production AWS account
@@ -29,7 +37,6 @@ Parameters:
     Description: (Optional) Name of the created bucket.
     Default: ""
 Conditions:
-  AllowUserAccess: !Not [!Equals [!Join ['', !Ref S3UserARNs], "[]"]]
   HasBucketName: !Not [!Equals [!Ref BucketName, ""]]
 Resources:
   S3Bucket:
@@ -47,43 +54,17 @@ Resources:
             AllowedOrigins: ['*']
             AllowedMethods: [GET, POST, PUT, HEAD]
             MaxAge: 3000
-      Tags:
-        - Key: Name
-          Value: SC-S3-RA-S3-Bucket
-  BucketPolicy:
-    Type: "AWS::S3::BucketPolicy"
-    Condition: AllowUserAccess
+  S3BucketPolicy:
+    Type: Custom::SCS3BucketPolicy
     Properties:
-      Bucket: !Ref 'S3Bucket'
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          -
-            Sid: "ReadAccess"
-            Effect: "Allow"
-            Principal:
-              AWS: !Split
-                - ","
-                - !Sub
-                  - "${list},${SynapseProdARN}"
-                  - list: !Join [",",!Ref "S3UserARNs"]
-            Action:
-              - "s3:ListBucket*"
-              - "s3:GetBucketLocation"
-            Resource: !GetAtt S3Bucket.Arn
-          -
-            Sid: "WriteAccess"
-            Effect: "Allow"
-            Principal:
-              AWS: !Split
-                - ","
-                - !Sub
-                  - "${list},${SynapseProdARN}" 
-                  - list: !Join [",",!Ref "S3UserARNs"]
-            Action:
-              - "s3:*Object*"
-              - "s3:*MultipartUpload*"
-            Resource: !Sub "${S3Bucket.Arn}/*"
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-sc-bucket-policy-FunctionArn'
+      BucketName: !Ref S3Bucket
+      ExtraPrincipalArns: !Split
+        - ","
+        - !Sub
+          - "${list},${SynapseProdARN}"
+          - list: !Join [",",!Ref "S3UserARNs"]
   # Add owner file to the synapse bucket, requires the cloudformation S3 objects macro
   # https://github.com/Sage-Bionetworks/aws-infra/tree/master/lambdas/cfn-s3objects-macro
   SynapseOwnerFile:
@@ -113,4 +94,3 @@ Outputs:
     Value: !GetAtt 'S3Bucket.Arn'
   BucketUrl:
     Value: !Sub 'https://console.aws.amazon.com/s3/home?region=${AWS::Region}&bucket=${S3Bucket}'
-

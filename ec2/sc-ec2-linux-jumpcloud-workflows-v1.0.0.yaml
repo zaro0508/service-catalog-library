@@ -430,16 +430,10 @@ Resources:
         - Key: "PatchGroup"
           Value: "prod-default"
 Outputs:
-  TemplateID:
-    Value: service-catalog-reference-architectures/sc-ec2-ra
-  AWSRegionName:
-    Value: !Ref 'AWS::Region'
   LinuxInstanceId:
     Value: !Ref 'LinuxInstance'
   LinuxInstancePrivateIpAddress:
     Value: !GetAtt 'LinuxInstance.PrivateIp'
-  LinuxInstanceAvailabilityZone:
-    Value: !GetAtt 'LinuxInstance.AvailabilityZone'
   EC2InstanceType:
     Value: !Ref 'EC2InstanceType'
   IAMInstanceRole:

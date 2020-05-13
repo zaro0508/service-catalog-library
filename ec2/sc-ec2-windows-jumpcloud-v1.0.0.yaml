@@ -258,10 +258,6 @@ Resources:
         - Key: "PatchGroup"
           Value: "prod-default"
 Outputs:
-  TemplateID:
-    Value: service-catalog-reference-architectures/sc-ec2-ra
-  AWSRegionName:
-    Value: !Ref 'AWS::Region'
   WindowsInstancePrivateIpAddress:
     Value: !GetAtt 'WindowsInstance.PrivateIp'
   WindosInstanceAvailabilityZone:

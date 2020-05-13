@@ -213,7 +213,7 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - !ImportValue
-          'Fn::Sub': '${AWS::Region}-ahayden-essentials-TagRootVolumePolicy'
+          'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
         - !ImportValue

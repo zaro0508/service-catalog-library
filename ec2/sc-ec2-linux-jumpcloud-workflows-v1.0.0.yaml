@@ -346,7 +346,7 @@ Resources:
                   -H 'Accept: application/json' \
                   -H 'Content-Type: application/json' \
                   -H x-api-key:$JC_SERVICE_API_KEY)
-                JC_USER=$(echo $JC_SYSTEM_USERS | jq --arg EMAIL "$OWNER_EMAIL" '.results | .[] | select(.email==$EMAIL)')
+                JC_USER_ID=$(echo $JC_SYSTEM_USERS | jq -r --arg EMAIL "$OWNER_EMAIL" '.results | .[] | select(.attributes[].value==$EMAIL) | .id')
                 JC_USER_ID=$(echo $JC_USER | jq -r '.id')
                 JC_USER_NAME=$(echo $JC_USER | jq -r '.username')
                 echo "$JC_USER_NAME" > /opt/sage/jcusername  # save JC user name for later

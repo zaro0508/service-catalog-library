@@ -429,6 +429,10 @@ Resources:
           Value: "yes"
         - Key: "PatchGroup"
           Value: "prod-default"
+          #The session name appended to this roleid becomes the value of the AccessApprovedCaller tag
+        - Key: "AccessApprovedRoleId"
+          Value: !ImportValue 
+            'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
 Outputs:
   TemplateID:
     Value: service-catalog-reference-architectures/sc-ec2-ra
@@ -448,3 +452,5 @@ Outputs:
     Value: !Ref 'InstanceProfile'
   ConnectionInstructions:
     Value: "https://sagebionetworks.jira.com/wiki/spaces/IT/pages/996376579/Connect+to+Provisioned+Instances"
+  ConnectionURI:
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"

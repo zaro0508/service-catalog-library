@@ -1,4 +1,4 @@
-Description: "ServiceCatalog S3 Launch Role. (fdp-1p5s1035s)"
+Description: "ServiceCatalog S3 Launch Role"
 Resources:
   SCS3LaunchRole:
     Type: 'AWS::IAM::Role'

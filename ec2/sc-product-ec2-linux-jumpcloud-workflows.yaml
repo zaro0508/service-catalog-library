@@ -30,7 +30,7 @@ Resources:
     Properties:
       Name: !Ref ProductName
       Description: This product builds one Linux EC2 instance using an Ubuntu AMI
-        with workflows software installed. Maintained by Sage Bionetworks. 
+        with workflows software installed. Maintained by Sage Bionetworks.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:

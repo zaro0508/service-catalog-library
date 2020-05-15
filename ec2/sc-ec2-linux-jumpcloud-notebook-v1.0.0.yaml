@@ -209,7 +209,7 @@ Resources:
           'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
-        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore' #For maintenance tasks 
+        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore' #For maintenance tasks
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -438,16 +438,10 @@ Resources:
           Value: !ImportValue 
             'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
 Outputs:
-  TemplateID:
-    Value: service-catalog-reference-architectures/sc-ec2-ra
-  AWSRegionName:
-    Value: !Ref 'AWS::Region'
   LinuxInstanceId:
     Value: !Ref 'LinuxInstance'
   LinuxInstancePrivateIpAddress:
     Value: !GetAtt 'LinuxInstance.PrivateIp'
-  LinuxInstanceAvailabilityZone:
-    Value: !GetAtt 'LinuxInstance.AvailabilityZone'
   EC2InstanceType:
     Value: !Ref 'EC2InstanceType'
   IAMInstanceRole:

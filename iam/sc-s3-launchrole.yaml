@@ -1,4 +1,5 @@
-Description: "ServiceCatalog S3 Launch Role. (fdp-1p5s1035s)"
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "ServiceCatalog S3 Launch Role"
 Resources:
   SCS3LaunchRole:
     Type: 'AWS::IAM::Role'

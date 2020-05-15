@@ -1,13 +1,13 @@
 # Sage Bionetworks AWS Service Catalog Reference Architecture
 This reference architecture is based on the original [aws-service-catalog-reference-architectures](https://github.com/aws-samples/aws-service-catalog-reference-architectures) from AWS, but has been heavily customized for Sage Bionetworks.
 
-[AWS Service Catalog](https://docs.aws.amazon.com/servicecatalog/latest/adminguide/introduction.html) 
+[AWS Service Catalog](https://docs.aws.amazon.com/servicecatalog/latest/adminguide/introduction.html)
 allows you to centrally manage commonly deployed AWS services, and helps you achieve consistent
 governance which meets your compliance requirements, while enabling users to quickly deploy only
-the approved AWS services they need. 
+the approved AWS services they need.
 
 This guide will help you deploy and manage your AWS ServiceCatalog using Infrastructure as Code (IaC).
- Read the [documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-reference-servicecatalog.html) for more information on ServiceCatalog and CloudFormation.  
+ Read the [documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-reference-servicecatalog.html) for more information on ServiceCatalog and CloudFormation.
 
 Sage Bionetworks uses a second repository, [scipoolprod-infra](https://github.com/Sage-Bionetworks/scipoolprod-infra), to deploy Cloudformation stacks defined by the templates in this library.
 
@@ -20,7 +20,7 @@ Currently there is a manual process for development. The script `dev-deploy-temp
 ### Account and Credentials
 While this library could be used in any AWS account, Sage Bionetworks is currently deploying to the "scipoolprod" account. In order to have permission to run the `dev-deploy-templates.sh` script, use the `AWSIAMCfServiceRole` role or something with similar permissions. Ask for guidance on this point from #sageit Slack channel.
 
-In the second half of the development process, when stacks are deployed from `scipoolprod-infra`, one needs access to the `AWSIAMAdminRole`. 
+In the second half of the development process, when stacks are deployed from `scipoolprod-infra`, one needs access to the `AWSIAMAdminRole`.
 
 ### Example
 ```bash
@@ -52,5 +52,5 @@ hooks:
 
 If the file above were created at `config/dev/sc-portfolio-ec2-development.yaml`, to deploy the stack one runs this sceptre command: `sceptre --var "profile=admin@scipoolprod" --var "region=us-east-1" launch dev/sc-portfolio-ec2-development`. The profile "admin@scipoolprod" would be an AWS profile with administrator credentials as descibed above.
 
-## License  
+## License
 This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details

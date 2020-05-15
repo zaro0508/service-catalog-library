@@ -41,7 +41,7 @@ Resources:
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:
-          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
+          Location: "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associateec2linux:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

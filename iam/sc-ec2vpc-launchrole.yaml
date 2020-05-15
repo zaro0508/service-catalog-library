@@ -1,3 +1,4 @@
+AWSTemplateFormatVersion: '2010-09-09'
 Description: "ServiceCatalog EC2 and VPC Launch Role"
 Resources:
   SCEC2LaunchRole:

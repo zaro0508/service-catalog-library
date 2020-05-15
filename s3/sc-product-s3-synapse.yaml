@@ -41,17 +41,17 @@ Resources:
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:
-          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
+          Location: "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associates3:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:
-      PortfolioId:  !Ref PortfolioId
+      PortfolioId: !Ref PortfolioId
       ProductId: !Ref 'scs3product'
   constraintec2linux:
     Type: AWS::ServiceCatalog::LaunchRoleConstraint
     DependsOn: Associates3
     Properties:
-      PortfolioId:  !Ref PortfolioId
+      PortfolioId: !Ref PortfolioId
       ProductId: !Ref 'scs3product'
       RoleArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-s3-launchrole-LaunchRoleArn'

@@ -218,7 +218,7 @@ Resources:
           'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-get-role-policy-ReadAssumedRoleInformationPolicy'
-        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore" 
+        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -444,7 +444,7 @@ Resources:
           Value: "prod-default"
           #The session name appended to this roleid becomes the value of the AccessApprovedCaller tag
         - Key: "AccessApprovedRoleId"
-          Value: !ImportValue 
+          Value: !ImportValue
             'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
 Outputs:
   LinuxInstanceId:

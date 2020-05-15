@@ -30,7 +30,7 @@ Resources:
     Properties:
       Name: !Ref ProductName
       Description: This product builds one Linux EC2 instance using an Ubuntu AMI
-        with workflows software installed. Maintained by Sage Bionetworks. 
+        with workflows software installed. Maintained by Sage Bionetworks.
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:
@@ -41,7 +41,7 @@ Resources:
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:
-          Location : "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
+          Location: "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
   Associateec2linux:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

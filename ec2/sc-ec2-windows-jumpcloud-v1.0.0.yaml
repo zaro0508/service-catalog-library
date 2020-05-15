@@ -154,10 +154,10 @@ Resources:
         install_jc:
           files:
             'c:\scripts\install-ms-vc.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.3/aws/install-ms-vc.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/install-ms-vc.ps1"
               mode: "0664"
             'c:\\scripts\\install-jc-agent.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.3/aws/install-jc-agent.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.2/aws/install-jc-agent.ps1"
               mode: "0664"
           commands:
             01_install_ms_vc:
@@ -176,7 +176,7 @@ Resources:
         config_jc:
           files:
             'c:\\scripts\\associate-jc-system.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.3/aws/sc/associate-jc-system.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.5/aws/associate-jc-system.ps1"
               mode: "0664"
           commands:
             01_associate_jc_systems:

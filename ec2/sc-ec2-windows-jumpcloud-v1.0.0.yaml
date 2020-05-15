@@ -259,7 +259,7 @@ Resources:
           Value: "prod-default"
           #The session name appended to this roleid becomes the value of the AccessApprovedCaller tag
         - Key: "AccessApprovedRoleId"
-          Value: !ImportValue 
+          Value: !ImportValue
             'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
 Outputs:
   WindowsInstancePrivateIpAddress:

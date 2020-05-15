@@ -257,6 +257,10 @@ Resources:
           Value: "yes"
         - Key: "PatchGroup"
           Value: "prod-default"
+          #The session name appended to this roleid becomes the value of the AccessApprovedCaller tag
+        - Key: "AccessApprovedRoleId"
+          Value: !ImportValue
+            'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
 Outputs:
   WindowsInstancePrivateIpAddress:
     Value: !GetAtt 'WindowsInstance.PrivateIp'

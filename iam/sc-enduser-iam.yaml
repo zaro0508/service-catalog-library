@@ -63,7 +63,7 @@ Resources:
             Resource: !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
             Condition:
               StringLike:
-                "ssm:ResourceTag/AccessApprovedCaller": "${aws:userid}"
+                "ssm:ResourceTag/Protected/AccessApprovedCaller": "${aws:userid}"
           - Effect: Allow
             Action:
               - ssm:DescribeSessions

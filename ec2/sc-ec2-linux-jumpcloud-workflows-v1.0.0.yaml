@@ -452,5 +452,3 @@ Outputs:
     Value: !Ref 'InstanceProfile'
   ConnectionInstructions:
     Value: "https://sagebionetworks.jira.com/wiki/spaces/IT/pages/996376579/Connect+to+Provisioned+Instances"
-  ConnectionURI:
-    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"

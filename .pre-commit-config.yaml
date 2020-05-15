@@ -12,7 +12,7 @@ repos:
     rev: v0.31.1
     hooks:
     -   id: cfn-python-lint
-        files: ec2/.*\.(json|yml|yaml)$
+        files: .*/.*\.(json|yml|yaml)$
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.1.6
     hooks:

@@ -26,7 +26,7 @@ Parameters:
       - t3.medium
       - t3.large
       - t3.xlarge
-    Default: t3.micro
+    Default: t3.small
     Description: Amazon EC2 Instance Type
     Type: String
   VolumeSize:

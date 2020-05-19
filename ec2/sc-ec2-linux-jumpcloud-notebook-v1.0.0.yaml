@@ -275,12 +275,12 @@ Resources:
             - cfn_hup_service
           SetEnv:
             - set_env_vars
-          SetupJumpcloud:
-            - install_jc
-            - config_jc
           SetTags:
             - TagRootVolume
             - TagInstance
+          SetupJumpcloud:
+            - install_jc
+            - config_jc
         cfn_hup_service:
           files:
             /etc/cfn/cfn-hup.conf:

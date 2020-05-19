@@ -142,7 +142,7 @@ Resources:
         set_env_vars:
           files:
             'c:\\scripts\\set_env_vars_file.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.5/aws/set_env_vars_file.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/set_env_vars_file.ps1"
               mode: "0664"
           commands:
             01_set_env_vars:
@@ -154,10 +154,10 @@ Resources:
         install_jc:
           files:
             'c:\scripts\install-ms-vc.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.5/aws/install-ms-vc.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/install-ms-vc.ps1"
               mode: "0664"
             'c:\\scripts\\install-jc-agent.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.5/aws/install-jc-agent.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/install-jc-agent.ps1"
               mode: "0664"
           commands:
             01_install_ms_vc:
@@ -176,7 +176,7 @@ Resources:
         config_jc:
           files:
             'c:\\scripts\\associate-jc-system.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.5/aws/associate-jc-system.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/associate-jc-system.ps1"
               mode: "0664"
           commands:
             01_associate_jc_systems:
@@ -194,7 +194,7 @@ Resources:
         tag_volume:
           files:
             "c:\\scripts\\tag-instance-volume.ps1":
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.5/aws/tag-instance-volume.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/tag-instance-volume.ps1"
               mode: "0664"
           commands:
             01_tag_instance_volume:
@@ -214,7 +214,7 @@ Resources:
         tag_instance:
           files:
             'c:\\scripts\\tag_instance.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.5/aws/tag_instance.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/tag_instance.ps1"
               mode: "0664"
           commands:
             01_tag_instance:

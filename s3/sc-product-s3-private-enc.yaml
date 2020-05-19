@@ -8,10 +8,6 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
-  StackDatetime:
-    Type: String
-    Description: Last updated date and time of portfolio
-    Default: ''
   PortfolioId:
     Type: String
     Description: ID of the portfolio that will contain this product
@@ -34,14 +30,15 @@ Resources:
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:
-        - Description: !Sub 'Baseline version. Last portfolio update occurred at ${StackDatetime}.'
+        - Description: 'Baseline version'
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-encrypted-ra-v1.0.0.yaml'
-          Name: v1.0.0
+          Name: 'v1.0.0'
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:
           Location: "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
+      ReplaceProvisioningArtifacts: true
   Associates3:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

@@ -334,7 +334,7 @@ Resources:
         set_env_vars:
           files:
             /opt/sage/bin/make_env_vars_file.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.1/linux/opt/sage/bin/make_env_vars_file.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.3/linux/opt/sage/bin/make_env_vars_file.sh"
               mode: "00744"
               owner: "root"
               group: "root"
@@ -354,12 +354,18 @@ Resources:
                   - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcConnectKey"}}
                   - "' https://kickstart.jumpcloud.com/Kickstart | sudo bash"
         config_jc:
+          files:
+            /opt/sage/bin/associate_jc_systems.py:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.3/linux/opt/sage/bin/associate_jc_systems.py"
+              mode: "00744"
+              owner: "root"
+              group: "root"
           commands:
             # allow agent time to register with jumpcloud account
             01_wait_registration:
               command: "sleep 10"
             02_associate_jc_systems:
-              command: "source /opt/sage/bin/instance_env_vars.sh && /opt/sage/bin/associate_jc_systems.py"
+              command: "source /opt/sage/bin/instance_env_vars.sh && /usr/bin/python3 /opt/sage/bin/associate_jc_systems.py"
               env:
                 JC_SERVICE_API_KEY:
                   Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
@@ -375,7 +381,7 @@ Resources:
         TagInstance:
           files:
             /opt/sage/bin/apply_name_tag.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.2/linux/opt/sage/bin/apply_name_tag.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.3/linux/opt/sage/bin/apply_name_tag.sh"
               mode: "00744"
               owner: "root"
               group: "root"

@@ -15,6 +15,10 @@ Parameters:
     Type: String
     Description: Name of the product that will be visible to the end user
     Default: 'EC2 Linux with Jumpcloud Integration'
+  StackDatetime:
+    Type: String
+    Description: Last updated date and time of product
+    Default: ''
 Resources:
   scec2linuxproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -30,7 +34,7 @@ Resources:
       Owner: !Ref 'PortfolioProvider'
       Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:
-        - Description: 'Baseline version.'
+        - Description: !Sub 'Baseline version. Last updated at ${StackDatetime}.'
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-v1.0.0.yaml'
           Name: 'v1.0.0'

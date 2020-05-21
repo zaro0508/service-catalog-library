@@ -373,7 +373,7 @@ Resources:
             01_add_jc_user_to_docker_group:
               command: "gpasswd -a $(cat /opt/sage/jcusername) docker"
     Properties:
-      ImageId: "ami-0e42922cf0e599fbc"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.2
+      ImageId: "ami-022e9a10f00f8ab9a"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.5
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !If
         - UsePublicSubnet

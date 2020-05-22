@@ -30,12 +30,13 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
-              # Synapse OIDC identity provider
-              Federated: !Sub 'arn:aws:iam::${AWS::AccountId}:oidc-provider/repo-prod.prod.sagebase.org/auth/v1'
+              AWS: "*"
+            Condition:
+              StringLike:
+                iam:PrincipalArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/synapse-login-scipool*-InstanceRole-*'
             Action:
-              - 'sts:AssumeRoleWithWebIdentity'
               - 'sts:AssumeRole'
+              - 'sts:TagSession'
   SCEnduserExpandedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:

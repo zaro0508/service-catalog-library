@@ -358,7 +358,7 @@ Resources:
             01_wait_registration:
               command: "sleep 10"
             02_associate_jc_systems:
-              command: "source /opt/sage/bin/instance_env_vars.sh && /usr/bin/python3 /opt/sage/bin/associate_jc_systems.py"
+              command: ". /opt/sage/bin/instance_env_vars.sh && /usr/bin/python3 /opt/sage/bin/associate_jc_systems.py"
               env:
                 JC_SERVICE_API_KEY:
                   Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}

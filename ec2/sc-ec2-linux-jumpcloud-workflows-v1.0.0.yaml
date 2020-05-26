@@ -181,8 +181,8 @@ Parameters:
   VolumeSize:
     Description: The EC2 volume size (in GB)
     Type: Number
-    Default: 8
-    MinValue: 8
+    Default: 16
+    MinValue: 16
     MaxValue: 2000
 Conditions:
   UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']

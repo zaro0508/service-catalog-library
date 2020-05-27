@@ -1,10 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Notebook Linux EC2 ServiceCatalog product with Jumpcloud integration.'
 Parameters:
-  PortfolioProvider:
-    Type: String
-    Description: Owner and Distributor Name
-    Default: IT Services
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
@@ -27,12 +23,12 @@ Resources:
         config:
           ignore_checks:
             - E3002
+            - E3003
+            - W2001
     Properties:
       Name: !Ref ProductName
       Description: This product builds one Linux EC2 instance using an Rstudio
         AMI based on Ubuntu and maintained by Sage Bionetworks.
-      Owner: !Ref 'PortfolioProvider'
-      Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:
         - Description: !Sub 'Baseline version. Last updated at ${StackDatetime}.'
           Info:
@@ -41,6 +37,7 @@ Resources:
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:
+          # source: https://github.com/Sage-Bionetworks/admincentral-infra/blob/master/templates/cfn-snippets-bucket.yaml
           Location: "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
       ReplaceProvisioningArtifacts: true
   Associateec2linux:

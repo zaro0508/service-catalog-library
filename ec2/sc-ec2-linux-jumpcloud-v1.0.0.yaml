@@ -433,6 +433,9 @@ Outputs:
     Value: !Ref 'LinuxInstance'
   LinuxInstancePrivateIpAddress:
     Value: !GetAtt 'LinuxInstance.PrivateIp'
+  LinuxInstancePublicIpAddress:
+    Condition: UsePublicSubnet
+    Value: !GetAtt LinuxInstance.PublicIp
   EC2InstanceType:
     Value: !Ref 'EC2InstanceType'
   IAMInstanceRole:

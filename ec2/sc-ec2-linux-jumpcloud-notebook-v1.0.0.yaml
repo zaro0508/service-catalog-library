@@ -437,4 +437,4 @@ Outputs:
   ConnectionURI:
     Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"
   NotebookConnectionURI:
-    Value: !Sub "http://${LinuxInstance}:8787"
+    Value: !Sub "http://${LinuxInstance.PrivateIp}:8787"

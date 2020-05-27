@@ -1,10 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: S3 Synapse ServiceCatalog product.
 Parameters:
-  PortfolioProvider:
-    Type: String
-    Description: Owner and Distributor Name
-    Default: IT Services
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
@@ -27,12 +23,12 @@ Resources:
         config:
           ignore_checks:
             - E3002
+            - E3003
+            - W2001
     Properties:
       Name: !Ref ProductName
       Description: This product builds an AWS S3 bucket with private access
         for Synapse.
-      Owner: !Ref 'PortfolioProvider'
-      Distributor: !Ref 'PortfolioProvider'
       ProvisioningArtifactParameters:
         - Description: !Sub 'Baseline version. Last updated at ${StackDatetime}.'
           Info:
@@ -41,7 +37,7 @@ Resources:
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:
-          Location: "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipoolprod-sc-lib-infra/support.yaml"
+          Location: "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipool/products.yaml"
       ReplaceProvisioningArtifacts: true
   Associates3:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation

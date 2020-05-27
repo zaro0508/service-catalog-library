@@ -4,16 +4,15 @@ Parameters:
   PortfolioProvider:
     Type: String
     Description: Provider Name
-    Default: IT Services
+    Default: Sage Bionetworks
   PorfolioName:
     Type: String
     Description: Portfolio Name
-    Default: Service Catalog S3 Reference Architecture
+    Default: S3 Portfolio
   PorfolioDescription:
     Type: String
     Description: Portfolio Description
-    Default: Service Catalog Portfolio that contains reference architecture products
-      for Amazon Simple Storage Service.
+    Default: Portfolio of S3 products
 Resources:
   SCS3portfolio:
     Type: AWS::ServiceCatalog::Portfolio

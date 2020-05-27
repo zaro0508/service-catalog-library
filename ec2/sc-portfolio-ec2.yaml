@@ -4,16 +4,15 @@ Parameters:
   PortfolioProvider:
     Type: String
     Description: Provider Name
-    Default: IT Services
+    Default: Sage Bionetworks
   PorfolioName:
     Type: String
     Description: Portfolio Name
-    Default: Service Catalog EC2 Reference Architecture
+    Default: EC2 Portfolio
   PorfolioDescription:
     Type: String
     Description: Portfolio Description
-    Default: Service Catalog Portfolio that contains reference architecture products
-      for Amazon Elastic Compute Cloud (EC2).
+    Default: Portfolio of EC2 products
 Resources:
   SCEC2portfolio:
     Type: AWS::ServiceCatalog::Portfolio

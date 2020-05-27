@@ -12,7 +12,7 @@ Resources:
       'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-CreateFunctionArn'
      SsmDocName: "AWS-RestartEC2Instance"
      SsmDocVersion: "1"
-     Name: !Sub '${AWS::StackName}-RestartEC2Instance'
+     Name: "Restart"
      AssumeRole: !Ref AssumeRole
   StopEC2InstanceAction:
     Type: Custom::ScActionsProvider
@@ -21,7 +21,7 @@ Resources:
       'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-CreateFunctionArn'
      SsmDocName: "AWS-StopEC2Instance"
      SsmDocVersion: "1"
-     Name: !Sub '${AWS::StackName}-StopEC2Instance'
+     Name: "Stop"
      AssumeRole: !Ref AssumeRole
   StartEC2InstanceAction:
     Type: Custom::ScActionsProvider
@@ -30,7 +30,7 @@ Resources:
       'Fn::Sub': '${AWS::Region}-cfn-cr-sc-actions-provider-CreateFunctionArn'
      SsmDocName: "AWS-StartEC2Instance"
      SsmDocVersion: "1"
-     Name: !Sub '${AWS::StackName}-StartEC2Instance'
+     Name: "Start"
      AssumeRole: !Ref AssumeRole
 Outputs:
   RestartEC2InstanceActionId:

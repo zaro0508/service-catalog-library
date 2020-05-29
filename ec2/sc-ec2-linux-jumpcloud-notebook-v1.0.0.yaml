@@ -9,7 +9,6 @@ Metadata:
           - EC2InstanceType
           - NotebookType
           - VolumeSize
-          - PrivateNetwork
     ParameterLabels:
       EC2InstanceType:
         default: EC2 Instance Type
@@ -17,8 +16,6 @@ Metadata:
         default: Notebook Type
       VolumeSize:
         default: Disk Size
-      PrivateNetwork:
-        default: Use private network?
 Mappings:
   NotebookTypes:
     Rstudio:
@@ -28,13 +25,6 @@ Parameters:
     Type: String
     Description: The VPC to put resources into
     Default: 'internalpoolvpc'
-  PrivateNetwork:
-    Type: String
-    Description: In the private subnet (recommended) as opposed to a public subnet
-    Default: 'true'
-    AllowedValues:
-      - 'true'
-      - 'false'
   EC2InstanceType:
     AllowedValues:
       - c4.large
@@ -197,8 +187,6 @@ Parameters:
     Default: 16
     MinValue: 16
     MaxValue: 2000
-Conditions:
-  UsePublicSubnet: !Equals [!Ref PrivateNetwork, 'false']
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -247,23 +235,6 @@ Resources:
           FromPort: -1
           ToPort: -1
           IpProtocol: '-1'
-  PublicSubnetSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
-    Condition: UsePublicSubnet
-    Properties:
-      GroupDescription: Allow SSH to port 22
-      VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
-      SecurityGroupIngress:
-        - Description: 'allow SSH'
-          IpProtocol: 'tcp'
-          FromPort: 22
-          ToPort: 22
-          CidrIp: '0.0.0.0/0'
-      SecurityGroupEgress:
-        - Description: 'allow all outgoing'
-          IpProtocol: '-1'
-          CidrIp: '0.0.0.0/0'
   LinuxInstance:
     Type: AWS::EC2::Instance
     Metadata:
@@ -384,16 +355,10 @@ Resources:
     Properties:
       ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
-      SubnetId: !If
-        - UsePublicSubnet
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-${VpcName}-PublicSubnet'
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
-      SecurityGroupIds: !If
-        - UsePublicSubnet
-        - [!Ref PrivateSubnetSecurityGroup, !Ref PublicSubnetSecurityGroup]
-        - [!Ref PrivateSubnetSecurityGroup]
+      SubnetId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
+      SecurityGroupIds:
+        - !Ref PrivateSubnetSecurityGroup
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

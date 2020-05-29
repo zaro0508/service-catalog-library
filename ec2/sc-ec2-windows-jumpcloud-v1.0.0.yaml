@@ -62,23 +62,6 @@ Resources:
       Path: /
       Roles:
         - !Ref 'InstanceRole'
-  WindowsSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enables RDP Access to Windows EC2 Instance
-      VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
-      SecurityGroupIngress:
-        - Description: allow RDP
-          IpProtocol: tcp
-          FromPort: 3389
-          ToPort: 3389
-          CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-${VpcName}-VpnCidr'
-      SecurityGroupEgress:
-        - Description: allow all outgoing
-          IpProtocol: '-1'
-          CidrIp: '0.0.0.0/0'
   WindowsInstance:
     Type: AWS::EC2::Instance
     Metadata:
@@ -230,7 +213,7 @@ Resources:
       SubnetId: !ImportValue
         'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet1'
       SecurityGroupIds:
-        - !Ref 'WindowsSecurityGroup'
+        - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
       KeyName: 'scipool'
       IamInstanceProfile: !Ref 'InstanceProfile'
       BlockDeviceMappings:

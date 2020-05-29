@@ -203,25 +203,6 @@ Resources:
       Path: /
       Roles:
         - !Ref 'InstanceRole'
-  PrivateSubnetSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
-    Properties:
-      GroupDescription: >-
-        Allow all traffic to an instance originating from the VPN
-      VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
-      SecurityGroupIngress:
-        - CidrIp: !ImportValue
-            'Fn::Sub': '${AWS::Region}-${VpcName}-VpnCidr'
-          FromPort: -1
-          ToPort: -1
-          IpProtocol: '-1'
-          Description: 'Allow all VPN traffic'
-      SecurityGroupEgress:
-        - CidrIp: 0.0.0.0/0
-          FromPort: -1
-          ToPort: -1
-          IpProtocol: '-1'
   LinuxInstance:
     Type: AWS::EC2::Instance
     Metadata:
@@ -351,7 +332,7 @@ Resources:
       SubnetId: !ImportValue
         'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
       SecurityGroupIds:
-        - !Ref PrivateSubnetSecurityGroup
+        - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

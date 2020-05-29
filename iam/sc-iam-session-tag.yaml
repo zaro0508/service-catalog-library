@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: session tag test template
+Conditions:
+  HasPrincipalTag: !Equals ['${aws:PrincipalTag/sts_foo}', sts_bar]
+  HasRequestTag: !Equals ['${aws:RequestTag/sts_foo}', sts_bar]
+Resources:
+  touchNothing:
+    Type: AWS::CloudFormation::WaitConditionHandle
+Outputs:
+  HasPrincipalTagOutputKey:
+    Condition: HasPrincipalTag
+    Value: PrincipalTag was detected!
+  HasRequestTagOutputKey:
+    Condition: HasRequestTag
+    Value: RequestTag was detected!

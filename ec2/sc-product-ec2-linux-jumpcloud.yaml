@@ -15,6 +15,10 @@ Parameters:
     Type: String
     Description: Last updated date and time of product
     Default: ''
+  ReplaceProvisioningArtifacts:
+    Type: String
+    Description: "Whether to keep or replace the provisioning artifact identifier on update"
+    Default: 'false'
 Resources:
   scec2linuxproduct:
     Type: AWS::ServiceCatalog::CloudFormationProduct
@@ -39,7 +43,7 @@ Resources:
         Parameters:
           # source: https://github.com/Sage-Bionetworks/admincentral-infra/blob/master/templates/cfn-snippets-bucket.yaml
           Location: "s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipool/products.yaml"
-      ReplaceProvisioningArtifacts: true
+      ReplaceProvisioningArtifacts: !Ref ReplaceProvisioningArtifacts
   Associateec2linux:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:

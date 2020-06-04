@@ -10,7 +10,7 @@ Parameters:
   ProductName:
     Type: String
     Description: Name of the product that will be visible to the end user
-    Default: 'Notebook Linux EC2 Instance with Jumpcloud Integration'
+    Default: 'EC2: Ubuntu Linux with Notebook Software'
   StackDatetime:
     Type: String
     Description: Last updated date and time of product

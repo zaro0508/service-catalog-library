@@ -362,16 +362,17 @@ Resources:
             'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
 Outputs:
   LinuxInstanceId:
+    Description: 'The ID of the EC2 instance'
     Value: !Ref 'LinuxInstance'
   LinuxInstancePrivateIpAddress:
+    Description: 'The IP Address of the EC2 instance'
     Value: !GetAtt 'LinuxInstance.PrivateIp'
   EC2InstanceType:
+    Description: 'The EC2 instance type'
     Value: !Ref 'EC2InstanceType'
-  IAMInstanceRole:
-    Value: !Ref 'InstanceRole'
-  IAMInstanceProfile:
-    Value: !Ref 'InstanceProfile'
-  ConnectionInstructions:
-    Value: "https://sagebionetworks.jira.com/wiki/spaces/IT/pages/996376579/Connect+to+Provisioned+Instances"
   ConnectionURI:
+    Description: 'Starts a shell session in the AWS Console'
     Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"
+  EC2ConsoleURI:
+    Description: 'Check your instance status with this link to the AWS Console'
+    Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${LinuxInstance}"

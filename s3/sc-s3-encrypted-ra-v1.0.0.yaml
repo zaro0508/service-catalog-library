@@ -52,8 +52,11 @@ Resources:
       ExtraPrincipalArns: !Ref S3UserARNs
 Outputs:
   BucketName:
+    Description: 'The name of the S3 Bucket'
     Value: !Ref 'S3Bucket'
   BucketARN:
+    Description: 'The ARN of the S3 Bucket'
     Value: !GetAtt 'S3Bucket.Arn'
   BucketUrl:
+    Description: 'View the S3 Bucket in the AWS Console'
     Value: !Sub 'https://console.aws.amazon.com/s3/home?region=${AWS::Region}&bucket=${S3Bucket}'

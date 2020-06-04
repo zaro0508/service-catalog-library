@@ -244,16 +244,17 @@ Resources:
             'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
 Outputs:
   WindowsInstancePrivateIpAddress:
+    Description: 'The IP Address of the EC2 instance'
     Value: !GetAtt 'WindowsInstance.PrivateIp'
-  WindosInstanceAvailabilityZone:
-    Value: !GetAtt 'WindowsInstance.AvailabilityZone'
   WindowsInstanceId:
+    Description: 'The ID of the EC2 instance'
     Value: !Ref 'WindowsInstance'
   WindowsInstanceType:
+    Description: 'The EC2 instance type'
     Value: !Ref 'WindowsInstanceType'
-  IAMInstanceRole:
-    Value: !Ref 'InstanceRole'
-  IAMInstanceProfile:
-    Value: !Ref 'InstanceProfile'
   ConnectionInstructions:
+    Description: 'Guidelines on connecting to instances'
     Value: "https://sagebionetworks.jira.com/wiki/spaces/IT/pages/996376579/Connect+to+Provisioned+Instances"
+  EC2ConsoleURI:
+    Description: 'Check your instance status with this link to the AWS Console'
+    Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${WindowsInstance}"

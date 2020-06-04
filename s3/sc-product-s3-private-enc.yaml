@@ -10,7 +10,7 @@ Parameters:
   ProductName:
     Type: String
     Description: Name of the product that will be visible to the end user
-    Default: 'S3 Private Encrypted Bucket'
+    Default: 'S3: Private Encrypted Bucket'
   StackDatetime:
     Type: String
     Description: Last updated date and time of product

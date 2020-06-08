@@ -34,6 +34,10 @@ Resources:
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-synapse-ra-v1.0.0.yaml'
           Name: 'v1.0.0'
+        - Description: !Sub 'Remove SynapseProdARN parameter. Last updated at ${StackDatetime}.'
+          Info:
+            LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-synapse-ra-v1.0.1.yaml'
+          Name: 'v1.0.1'
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Linux EC2 ServiceCatalog product with Jumpcloud integration.
+Description: Linux EC2 ServiceCatalog product
 Parameters:
   RepoRootURL:
     Type: String
@@ -38,6 +38,10 @@ Resources:
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-v1.0.0.yaml'
           Name: 'v1.0.0'
+        - Description: !Sub 'Remove Jumpcloud integration. Last updated at ${StackDatetime}.'
+          Info:
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-v1.0.1.yaml'
+          Name: 'v1.0.1'
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:

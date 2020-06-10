@@ -6,9 +6,6 @@ Resources:
       GroupName: ServiceCatalogEndusers
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
-        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
-        - arn:aws:iam::aws:policy/AWSCloudTrailReadOnlyAccess
-        - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
         - !Ref SCEnduserExpandedPolicy
         - !Ref CFNDenyGetTemplateSummaryPolicy
         - !Ref SCEnduserRemoteAccessPolicy

@@ -219,6 +219,8 @@ Resources:
           SetTags:
             - TagRootVolume
             - TagInstance
+          SetupDocker:
+            - add_docker_user
         cfn_hup_service:
           files:
             /etc/cfn/cfn-hup.conf:
@@ -236,7 +238,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupDocker --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -293,6 +295,10 @@ Resources:
           commands:
             01_name_tag:
               command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
+        add_docker_user:
+          commands:
+            01_add_jc_user_to_docker_group:
+              command: "gpasswd -M ssm-user,ubuntu docker"    # Note: -M flag overwrites existing group members
     Properties:
       ImageId: "ami-04e9c4e5c4e40ec12"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.4
       InstanceType: !Ref 'EC2InstanceType'
@@ -312,7 +318,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupDocker --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Name

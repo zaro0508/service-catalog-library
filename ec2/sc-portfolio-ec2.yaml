@@ -27,13 +27,6 @@ Resources:
         'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleArn'
       PortfolioId: !Ref 'SCEC2portfolio'
       PrincipalType: IAM
-  LinkEndusersGroup:
-    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
-    Properties:
-      PrincipalARN: !ImportValue
-        'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-GroupArn'
-      PortfolioId: !Ref 'SCEC2portfolio'
-      PrincipalType: IAM
 Outputs:
   SCEC2portfolioId:
     Value: !Ref SCEC2portfolio

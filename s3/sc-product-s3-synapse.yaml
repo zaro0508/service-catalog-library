@@ -30,14 +30,18 @@ Resources:
       Description: This product builds an AWS S3 bucket with private access
         for Synapse.
       ProvisioningArtifactParameters:
-        - Description: !Sub 'Baseline version. Last updated at ${StackDatetime}.'
+        - Description: !Sub 'Baseline version.'
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-synapse-ra-v1.0.0.yaml'
           Name: 'v1.0.0'
-        - Description: !Sub 'Remove SynapseProdARN parameter. Last updated at ${StackDatetime}.'
+        - Description: !Sub 'Remove SynapseProdARN parameter.'
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-synapse-ra-v1.0.1.yaml'
           Name: 'v1.0.1'
+        - Description: !Sub 'Fix resource contention bug with S3 custom resources. Last updated at ${StackDatetime}.'
+          Info:
+            LoadTemplateFromURL: !Sub '${RepoRootURL}s3/sc-s3-synapse-ra-v1.0.2.yaml'
+          Name: 'v1.0.2'
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:

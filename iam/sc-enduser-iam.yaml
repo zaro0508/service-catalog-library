@@ -1,20 +1,5 @@
 Description: "ServiceCatalog End User policy and group (fdp-1p4dlgcp7)"
 Resources:
-  SCEnduserGroup:
-    Type: AWS::IAM::Group
-    Properties:
-      GroupName: ServiceCatalogEndusers
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
-        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
-        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
-        - arn:aws:iam::aws:policy/IAMReadOnlyAccess
-        - arn:aws:iam::aws:policy/AWSCloudTrailReadOnlyAccess
-        - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
-        - !Ref SCEnduserExpandedPolicy
-        - !Ref CFNDenyGetTemplateSummaryPolicy
-        - !Ref SCEnduserRemoteAccessPolicy
-      Path: /
   SCEnduserRole:
     Type: AWS::IAM::Role
     Properties:
@@ -92,14 +77,6 @@ Resources:
               - cloudformation:GetTemplateSummary
             Resource: "*"
 Outputs:
-  EndUserGroupArn:
-    Value: !GetAtt SCEnduserGroup.Arn
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogEndusers-GroupArn'
-  EndUserGroupName:
-    Value: !Ref SCEnduserGroup
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogEndusers-GroupName'
   EndUserRoleId:
     Value: !GetAtt SCEnduserRole.RoleId
     Export:

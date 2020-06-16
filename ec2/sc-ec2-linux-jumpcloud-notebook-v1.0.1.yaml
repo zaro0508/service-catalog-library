@@ -1,0 +1,391 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Service Catalog: Notebook Linux EC2 with Jumpcloud integration.'
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Linux Instance Configuration
+        Parameters:
+          - EC2InstanceType
+          - NotebookType
+          - VolumeSize
+    ParameterLabels:
+      EC2InstanceType:
+        default: EC2 Instance Type
+      NotebookType:
+        default: Notebook Type
+      VolumeSize:
+        default: Disk Size
+Mappings:
+  NotebookTypes:
+    Rstudio:
+      AMIID: "ami-0ed2999f7cff2e3e3"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v1.0.7
+Parameters:
+  VpcName:
+    Type: String
+    Description: The VPC to put resources into
+    Default: 'internalpoolvpc'
+  EC2InstanceType:
+    AllowedValues:
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+      - c5.12xlarge
+      - c5.18xlarge
+      - c5.24xlarge
+      - c5d.large
+      - c5d.xlarge
+      - c5d.2xlarge
+      - c5d.4xlarge
+      - c5d.9xlarge
+      - c5d.12xlarge
+      - c5d.18xlarge
+      - c5d.24xlarge
+      - c5n.large
+      - c5n.xlarge
+      - c5n.2xlarge
+      - c5n.4xlarge
+      - c5n.9xlarge
+      - c5n.18xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - m5a.large
+      - m5a.xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+      - m5a.8xlarge
+      - m5a.12xlarge
+      - m5a.16xlarge
+      - m5a.24xlarge
+      - m5ad.large
+      - m5ad.xlarge
+      - m5ad.2xlarge
+      - m5ad.4xlarge
+      - m5ad.12xlarge
+      - m5ad.24xlarge
+      - m5d.large
+      - m5d.xlarge
+      - m5d.2xlarge
+      - m5d.4xlarge
+      - m5d.8xlarge
+      - m5d.12xlarge
+      - m5d.16xlarge
+      - m5d.24xlarge
+      - m5dn.large
+      - m5dn.xlarge
+      - m5dn.2xlarge
+      - m5dn.4xlarge
+      - m5dn.8xlarge
+      - m5dn.12xlarge
+      - m5dn.16xlarge
+      - m5dn.24xlarge
+      - m5n.large
+      - m5n.xlarge
+      - m5n.2xlarge
+      - m5n.4xlarge
+      - m5n.8xlarge
+      - m5n.12xlarge
+      - m5n.16xlarge
+      - m5n.24xlarge
+      - r4.large
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+      - r5.large
+      - r5.xlarge
+      - r5.2xlarge
+      - r5.4xlarge
+      - r5.8xlarge
+      - r5.12xlarge
+      - r5.16xlarge
+      - r5.24xlarge
+      - r5a.large
+      - r5a.xlarge
+      - r5a.2xlarge
+      - r5a.4xlarge
+      - r5a.8xlarge
+      - r5a.12xlarge
+      - r5a.16xlarge
+      - r5a.24xlarge
+      - r5ad.large
+      - r5ad.xlarge
+      - r5ad.2xlarge
+      - r5ad.4xlarge
+      - r5ad.12xlarge
+      - r5ad.24xlarge
+      - r5d.large
+      - r5d.xlarge
+      - r5d.2xlarge
+      - r5d.4xlarge
+      - r5d.8xlarge
+      - r5d.12xlarge
+      - r5d.16xlarge
+      - r5d.24xlarge
+      - r5dn.large
+      - r5dn.xlarge
+      - r5dn.2xlarge
+      - r5dn.4xlarge
+      - r5dn.8xlarge
+      - r5dn.12xlarge
+      - r5dn.16xlarge
+      - r5dn.24xlarge
+      - r5n.large
+      - r5n.xlarge
+      - r5n.2xlarge
+      - r5n.4xlarge
+      - r5n.8xlarge
+      - r5n.12xlarge
+      - r5n.16xlarge
+      - r5n.24xlarge
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+      - t3a.nano
+      - t3a.micro
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - t3a.2xlarge
+    Default: t3.micro
+    Description: Amazon EC2 Instance Type
+    Type: String
+  NotebookType:
+    Type: String
+    Description: Type of notebook software to install
+    Default: Rstudio
+    AllowedValues:
+      - Rstudio
+  VolumeSize:
+    Description: The EC2 volume size (in GB)
+    Type: Number
+    Default: 16
+    MinValue: 16
+    MaxValue: 2000
+Resources:
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-get-role-policy-ReadAssumedRoleInformationPolicy'
+        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore' #For maintenance tasks
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - ssm.amazonaws.com #For maintenance service
+            Action:
+              - sts:AssumeRole
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'InstanceRole'
+  LinuxInstance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E1022
+      'AWS::CloudFormation::Init':
+        configSets:
+          SetupCfn:
+            - cfn_hup_service
+          SetEnv:
+            - set_env_vars
+          SetTags:
+            - TagRootVolume
+            - TagInstance
+          SetupJumpcloud:
+            - install_jc
+            - config_jc
+        cfn_hup_service:
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+                verbose=true
+                interval=5
+              mode: "000400"
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupJumpcloud --region ${AWS::Region}
+              mode: "000400"
+              owner: root
+              group: root
+            /lib/systemd/system/cfn-hup.service:
+              content: |
+                [Unit]
+                Description=cfn-hup daemon
+
+                [Service]
+                Type=simple
+                ExecStart=/opt/aws/bin/cfn-hup
+                Restart=always
+
+                [Install]
+                WantedBy=multi-user.target
+              mode: "000400"
+              owner: root
+              group: root
+          commands:
+            01_enable_cfn-hup:
+              command: "/bin/systemctl enable cfn-hup.service"
+            02_start_cfn-hup:
+              command: "/bin/systemctl start cfn-hup.service"
+        set_env_vars:
+          files:
+            /opt/sage/bin/make_env_vars_file.sh:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.4/linux/opt/sage/bin/make_env_vars_file.sh"
+              mode: "00744"
+              owner: "root"
+              group: "root"
+          commands:
+            01_make_env_vars_file:
+              command: "/bin/bash /opt/sage/bin/make_env_vars_file.sh"
+              env:
+                AWS_REGION: !Ref AWS::Region
+                STACK_NAME: !Ref AWS::StackName
+                STACK_ID: !Ref AWS::StackId
+        install_jc:
+          commands:
+            01_jumpcloud_agent:
+              command: !Join
+                - ''
+                - - "/usr/bin/curl --silent --show-error --header 'x-connect-key: "
+                  - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcConnectKey"}}
+                  - "' https://kickstart.jumpcloud.com/Kickstart | sudo bash"
+        config_jc:
+          files:
+            /opt/sage/bin/associate_jc_systems.py:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.4/linux/opt/sage/bin/associate_jc_systems.py"
+              mode: "00744"
+              owner: "root"
+              group: "root"
+          commands:
+            # allow agent time to register with jumpcloud account
+            01_wait_registration:
+              command: "sleep 10"
+            02_associate_jc_systems:
+              command: ". /opt/sage/bin/instance_env_vars.sh && /usr/bin/python3 /opt/sage/bin/associate_jc_systems.py"
+              env:
+                JC_SERVICE_API_KEY:
+                  Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
+        TagRootVolume:
+          commands:
+            01_tag_root_disk:
+              command: !Join
+                - ''
+                - - ". /opt/sage/bin/instance_env_vars.sh;"
+                  - "/usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID "
+                  - "--tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME "
+                  - "Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL"
+        TagInstance:
+          files:
+            /opt/sage/bin/apply_name_tag.sh:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.4/linux/opt/sage/bin/apply_name_tag.sh"
+              mode: "00744"
+              owner: "root"
+              group: "root"
+          commands:
+            01_name_tag:
+              command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
+    Properties:
+      ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
+      InstanceType: !Ref 'EC2InstanceType'
+      SubnetId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
+      SecurityGroupIds:
+        - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
+      KeyName: 'scipool'
+      BlockDeviceMappings:
+        -
+          DeviceName: "/dev/sda1"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: !Ref VolumeSize
+            Encrypted: true
+      IamInstanceProfile: !Ref 'InstanceProfile'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupJumpcloud --region ${AWS::Region}
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+        - Key: Description
+          Value: !Sub "Service Catalog instance created by ${AWS::StackName}"
+        - Key: "ManagedInstanceMaintenanceTarget"
+          Value: "yes"
+        - Key: "PatchGroup"
+          Value: "prod-default"
+          #The session name appended to this roleid becomes the value of the AccessApprovedCaller tag
+        - Key: "AccessApprovedRoleId"
+          Value: !ImportValue
+            'Fn::Sub': '${AWS::Region}-sc-enduser-iam-ServiceCatalogEndusers-RoleId'
+Outputs:
+  LinuxInstanceId:
+    Description: 'The ID of the EC2 instance'
+    Value: !Ref 'LinuxInstance'
+  LinuxInstancePrivateIpAddress:
+    Description: 'The IP Address of the EC2 instance'
+    Value: !GetAtt 'LinuxInstance.PrivateIp'
+  EC2InstanceType:
+    Description: 'The EC2 instance type'
+    Value: !Ref 'EC2InstanceType'
+  ConnectionInstructions:
+    Description: 'Guidelines on connecting to instances'
+    Value: "https://sagebionetworks.jira.com/wiki/spaces/IT/pages/996376579/Connect+to+Provisioned+Instances"
+  ConnectionURI:
+    Description: 'Starts a shell session in the AWS Console'
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"
+  NotebookConnectionURI:
+    Description: 'Notebook server login page'
+    Value: !Sub "http://${LinuxInstance.PrivateIp}:8787"
+  EC2ConsoleURI:
+    Description: 'Check your instance status with this link to the AWS Console'
+    Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${LinuxInstance}"

@@ -34,10 +34,14 @@ Resources:
       Description: This product builds one Linux EC2 instance using an Rstudio
         AMI based on Ubuntu and maintained by Sage Bionetworks.
       ProvisioningArtifactParameters:
-        - Description: !Sub 'Baseline version. Last updated at ${StackDatetime}.'
+        - Description: !Sub 'Baseline version.'
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-notebook-v1.0.0.yaml'
           Name: 'v1.0.0'
+        - Description: !Sub 'Includes fix for a linux relocation error. Last updated at ${StackDatetime}.'
+          Info:
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-notebook-v1.0.1.yaml'
+          Name: 'v1.0.1'
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:

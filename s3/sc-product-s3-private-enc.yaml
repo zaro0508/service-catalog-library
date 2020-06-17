@@ -4,9 +4,6 @@ Parameters:
   RepoRootURL:
     Type: String
     Description: Root url for the repo containing the product templates.
-  PortfolioId:
-    Type: String
-    Description: ID of the portfolio that will contain this product
   ProductName:
     Type: String
     Description: Name of the product that will be visible to the end user
@@ -46,13 +43,30 @@ Resources:
   Associates3:
     Type: AWS::ServiceCatalog::PortfolioProductAssociation
     Properties:
-      PortfolioId: !Ref PortfolioId
-      ProductId: !Ref 'scs3product'
+      PortfolioId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-SCS3portfolioId'
+      ProductId: !Ref scs3product
   constraintec2linux:
     Type: AWS::ServiceCatalog::LaunchRoleConstraint
     DependsOn: Associates3
     Properties:
-      PortfolioId: !Ref PortfolioId
+      PortfolioId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-SCS3portfolioId'
+      ProductId: !Ref 'scs3product'
+      RoleArn: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-s3-launchrole-LaunchRoleArn'
+  AssociatesExternalPortfolio:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      PortfolioId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-external-SCS3portfolioId'
+      ProductId: !Ref scs3product
+  ConstraintExternalPortfolio:
+    Type: AWS::ServiceCatalog::LaunchRoleConstraint
+    DependsOn: AssociatesExternalPortfolio
+    Properties:
+      PortfolioId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-sc-portfolio-s3-basic-external-SCS3portfolioId'
       ProductId: !Ref 'scs3product'
       RoleArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-sc-s3-launchrole-LaunchRoleArn'

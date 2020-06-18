@@ -22,6 +22,28 @@ Resources:
             Action:
               - 'sts:AssumeRole'
               - 'sts:TagSession'
+  SCExternalEnduserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ServiceCatalogExternalEndusers
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess
+        - !Ref SCEnduserExpandedPolicy
+        - !Ref CFNDenyGetTemplateSummaryPolicy
+        - !Ref SCEnduserRemoteAccessPolicy
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: "*"
+            Condition:
+              StringLike:
+                aws:PrincipalArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/synapse-login-scipool*-InstanceRole-*'
+            Action:
+              - 'sts:AssumeRole'
+              - 'sts:TagSession'
   SCEnduserExpandedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -97,3 +119,15 @@ Outputs:
     Value: !Ref SCEnduserRemoteAccessPolicy
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SCEnduserRemoteAccessPolicy'
+  ExternalEndUserRoleId:
+    Value: !GetAtt SCExternalEnduserRole.RoleId
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogExternalEndusers-RoleId'
+  ExternalEndUserRoleArn:
+    Value: !GetAtt SCExternalEnduserRole.Arn
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogExternalEndusers-RoleArn'
+  ExternalEndUserRoleName:
+    Value: !Ref SCExternalEnduserRole
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-ServiceCatalogExternalEndusers-RoleName'

@@ -35,10 +35,14 @@ Resources:
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-v1.0.0.yaml'
           Name: 'v1.0.0'
-        - Description: !Sub 'Includes fix for a linux relocation error. Last updated at ${StackDatetime}.'
+        - Description: !Sub 'Includes fix for a linux relocation error.'
           Info:
             LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-v1.0.1.yaml'
           Name: 'v1.0.1'
+        - Description: !Sub 'Fix to support multiple portfolios. Last updated at ${StackDatetime}.'
+          Info:
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-v1.0.1.yaml'
+          Name: 'v1.0.2'
       'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:

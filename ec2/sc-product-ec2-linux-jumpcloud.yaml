@@ -41,7 +41,7 @@ Resources:
           Name: 'v1.0.1'
         - Description: !Sub 'Fix to support multiple portfolios. Last updated at ${StackDatetime}.'
           Info:
-            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-v1.0.1.yaml'
+            LoadTemplateFromURL: !Sub '${RepoRootURL}ec2/sc-ec2-linux-jumpcloud-v1.0.2.yaml'
           Name: 'v1.0.2'
       'Fn::Transform':
         Name: 'AWS::Include'

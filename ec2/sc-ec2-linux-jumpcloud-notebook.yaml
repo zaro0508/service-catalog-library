@@ -340,6 +340,7 @@ Resources:
         'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
       SecurityGroupIds:
         - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
+        - 'Fn::ImportValue': !Sub '${AWS::Region}-alb-notebook-access-EC2SecurityGroup'
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

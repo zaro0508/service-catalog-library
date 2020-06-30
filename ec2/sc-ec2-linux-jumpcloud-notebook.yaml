@@ -279,7 +279,7 @@ Resources:
         set_env_vars:
           files:
             /opt/sage/bin/make_env_vars_file.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.5/linux/opt/sage/bin/make_env_vars_file.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/make_env_vars_file.sh"
               mode: "00744"
               owner: "root"
               group: "root"
@@ -301,7 +301,7 @@ Resources:
         config_jc:
           files:
             /opt/sage/bin/associate_jc_systems.py:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.5/linux/opt/sage/bin/associate_jc_systems.py"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/associate_jc_systems.py"
               mode: "00744"
               owner: "root"
               group: "root"
@@ -326,13 +326,23 @@ Resources:
         TagInstance:
           files:
             /opt/sage/bin/apply_name_tag.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.5/linux/opt/sage/bin/apply_name_tag.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/apply_name_tag.sh"
               mode: "00744"
               owner: "root"
               group: "root"
           commands:
             01_name_tag:
               command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
+        WriteApacheConf:
+          files:
+            /opt/sage/bin/apache_conf_rewrite.sh:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/apache_conf_rewrite.sh"
+              mode: "00744"
+              owner: "root"
+              group: "root"
+          commands:
+            01_rewrite_apache_conf:
+              command: "/bin/bash /opt/sage/bin/apache_conf_rewrite.sh"
     Properties:
       ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'

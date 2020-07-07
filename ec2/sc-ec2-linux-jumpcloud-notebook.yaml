@@ -247,7 +247,7 @@ Resources:
           SetupJumpcloud:
             - install_jc
             - config_jc
-          WriteApacheConf:
+          SetupApacheProxy:
             - WriteApacheConf
         cfn_hup_service:
           files:

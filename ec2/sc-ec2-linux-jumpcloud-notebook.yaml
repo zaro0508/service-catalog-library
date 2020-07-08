@@ -19,7 +19,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: "ami-0ed2999f7cff2e3e3"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v1.0.7
+      AMIID: "ami-051310d409a32a5aa"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v2.0.0
 Parameters:
   VpcName:
     Type: String
@@ -210,6 +210,18 @@ Resources:
                 - ssm.amazonaws.com #For maintenance service
             Action:
               - sts:AssumeRole
+  NotebookConnectSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Add ingress to 443 from notebook connection ALB'
+      VpcId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !ImportValue
+            'Fn::Sub': '${AWS::Region}-alb-notebook-access-ALBSecurityGroup'
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -235,6 +247,8 @@ Resources:
           SetupJumpcloud:
             - install_jc
             - config_jc
+          SetupApacheProxy:
+            - WriteApacheConf
         cfn_hup_service:
           files:
             /etc/cfn/cfn-hup.conf:
@@ -252,7 +266,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupJumpcloud --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupApacheProxy,SetupJumpcloud --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -279,7 +293,7 @@ Resources:
         set_env_vars:
           files:
             /opt/sage/bin/make_env_vars_file.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.5/linux/opt/sage/bin/make_env_vars_file.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/make_env_vars_file.sh"
               mode: "00744"
               owner: "root"
               group: "root"
@@ -301,7 +315,7 @@ Resources:
         config_jc:
           files:
             /opt/sage/bin/associate_jc_systems.py:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.5/linux/opt/sage/bin/associate_jc_systems.py"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/associate_jc_systems.py"
               mode: "00744"
               owner: "root"
               group: "root"
@@ -326,13 +340,23 @@ Resources:
         TagInstance:
           files:
             /opt/sage/bin/apply_name_tag.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.5/linux/opt/sage/bin/apply_name_tag.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/apply_name_tag.sh"
               mode: "00744"
               owner: "root"
               group: "root"
           commands:
             01_name_tag:
               command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
+        WriteApacheConf:
+          files:
+            /opt/sage/bin/apache_conf_rewrite.sh:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/apache_conf_rewrite.sh"
+              mode: "00744"
+              owner: "root"
+              group: "root"
+          commands:
+            01_rewrite_apache_conf:
+              command: "/bin/bash /opt/sage/bin/apache_conf_rewrite.sh"
     Properties:
       ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
@@ -340,6 +364,7 @@ Resources:
         'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
       SecurityGroupIds:
         - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
+        - !Ref NotebookConnectSecurityGroup
       KeyName: 'scipool'
       BlockDeviceMappings:
         -
@@ -352,7 +377,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupJumpcloud --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupApacheConf,SetupJumpcloud --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Name

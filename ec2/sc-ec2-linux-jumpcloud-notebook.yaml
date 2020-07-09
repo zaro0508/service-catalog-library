@@ -406,7 +406,7 @@ Resources:
     Properties:
       Name: !Sub 'TargetGroup-${LinuxInstance}'
       HealthCheckIntervalSeconds: 30
-      HealthCheckProtocol: HTTP
+      HealthCheckProtocol: HTTPS
       HealthCheckTimeoutSeconds: 15
       HealthyThresholdCount: 5
       Matcher:

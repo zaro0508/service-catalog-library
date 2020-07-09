@@ -456,4 +456,8 @@ Outputs:
     Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${LinuxInstance}"
   NotebookConnectionURI:
     Description: 'Test link for ALB routing'
-    Value: !Sub 'https://connect.scipooldev.org/${LinuxInstance}/'
+    Value: !Sub
+      - '${ALBConnectionURI}/${Path}/'
+      - ALBConnectionURI: !ImportValue
+          'Fn::Sub': '${AWS::Region}-alb-notebook-access-ConnectionURI'
+        Path: !Ref LinuxInstance

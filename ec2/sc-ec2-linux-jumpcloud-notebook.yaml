@@ -404,7 +404,6 @@ Resources:
   EC2TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub 'TargetGroup-${LinuxInstance}'
       HealthCheckIntervalSeconds: 30
       HealthCheckProtocol: HTTPS
       HealthCheckTimeoutSeconds: 15

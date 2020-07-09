@@ -455,7 +455,7 @@ Outputs:
     Description: 'Check your instance status with this link to the AWS Console'
     Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${LinuxInstance}"
   NotebookConnectionURI:
-    Description: 'Test link for ALB routing'
+    Description: 'Notebook server login page'
     Value: !Sub
       - '${ALBConnectionURI}/${Path}/'
       - ALBConnectionURI: !ImportValue

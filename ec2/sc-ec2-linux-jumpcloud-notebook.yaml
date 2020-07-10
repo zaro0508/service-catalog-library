@@ -16,15 +16,20 @@ Metadata:
         default: Notebook Type
       VolumeSize:
         default: Disk Size
+
 Mappings:
+
   NotebookTypes:
     Rstudio:
       AMIID: "ami-051310d409a32a5aa"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v2.0.0
+
 Parameters:
+
   VpcName:
     Type: String
     Description: The VPC to put resources into
     Default: 'internalpoolvpc'
+
   EC2InstanceType:
     AllowedValues:
       - c4.large
@@ -175,19 +180,23 @@ Parameters:
     Default: t3.micro
     Description: Amazon EC2 Instance Type
     Type: String
+
   NotebookType:
     Type: String
     Description: Type of notebook software to install
     Default: Rstudio
     AllowedValues:
       - Rstudio
+
   VolumeSize:
     Description: The EC2 volume size (in GB)
     Type: Number
     Default: 16
     MinValue: 16
     MaxValue: 2000
+
 Resources:
+
   InstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -210,6 +219,7 @@ Resources:
                 - ssm.amazonaws.com #For maintenance service
             Action:
               - sts:AssumeRole
+
   NotebookConnectSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -222,12 +232,14 @@ Resources:
           ToPort: 443
           SourceSecurityGroupId: !ImportValue
             'Fn::Sub': '${AWS::Region}-alb-notebook-access-ALBSecurityGroup'
+
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
       Roles:
         - !Ref 'InstanceRole'
+
   LinuxInstance:
     Type: AWS::EC2::Instance
     Metadata:
@@ -388,6 +400,41 @@ Resources:
           Value: "yes"
         - Key: "PatchGroup"
           Value: "prod-default"
+
+  EC2TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckProtocol: HTTPS
+      HealthCheckTimeoutSeconds: 15
+      HealthyThresholdCount: 5
+      Matcher:
+        HttpCode: '200'
+      Port: 443
+      Protocol: HTTPS
+      TargetGroupAttributes:
+      - Key: deregistration_delay.timeout_seconds
+        Value: '20'
+      Targets:
+      - Id: !Ref LinuxInstance
+        Port: 443
+      UnhealthyThresholdCount: 3
+      VpcId: !ImportValue
+        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
+      Tags:
+      - Key: Name
+        Value: !Sub 'TargetGroup-${LinuxInstance}'
+
+  AlbListenerRule:
+    Type: Custom::ALBListenerRule
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-alb-rule-FunctionArn'
+      InstanceId: !Ref LinuxInstance
+      TargetGroupArn: !Ref EC2TargetGroup
+      ListenerArn: !ImportValue
+        'Fn::Sub': '${AWS::Region}-alb-notebook-access-ALBListenerARN'
+
 Outputs:
   LinuxInstanceId:
     Description: 'The ID of the EC2 instance'
@@ -404,9 +451,13 @@ Outputs:
   ConnectionURI:
     Description: 'Starts a shell session in the AWS Console'
     Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"
-  NotebookConnectionURI:
-    Description: 'Notebook server login page'
-    Value: !Sub "http://${LinuxInstance.PrivateIp}:8787"
   EC2ConsoleURI:
     Description: 'Check your instance status with this link to the AWS Console'
     Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${LinuxInstance}"
+  NotebookConnectionURI:
+    Description: 'Notebook server login page'
+    Value: !Sub
+      - '${ALBConnectionURI}/${Path}/'
+      - ALBConnectionURI: !ImportValue
+          'Fn::Sub': '${AWS::Region}-alb-notebook-access-ConnectionURI'
+        Path: !Ref LinuxInstance

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Service Catalog: Workflows Linux EC2 with Jumpcloud integration.'
+Description: 'Service Catalog: Workflows Linux EC2'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -219,9 +219,6 @@ Resources:
           SetTags:
             - TagRootVolume
             - TagInstance
-          SetupJumpcloud:
-            - install_jc
-            - config_jc
           SetupDocker:
             - add_docker_user
         cfn_hup_service:
@@ -241,7 +238,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupJumpcloud,SetupDocker --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupDocker --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -279,30 +276,6 @@ Resources:
                 AWS_REGION: !Ref AWS::Region
                 STACK_NAME: !Ref AWS::StackName
                 STACK_ID: !Ref AWS::StackId
-        install_jc:
-          commands:
-            01_jumpcloud_agent:
-              command: !Join
-                - ''
-                - - "/usr/bin/curl --silent --show-error --header 'x-connect-key: "
-                  - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcConnectKey"}}
-                  - "' https://kickstart.jumpcloud.com/Kickstart | sudo bash"
-        config_jc:
-          files:
-            /opt/sage/bin/associate_jc_systems.py:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.5/linux/opt/sage/bin/associate_jc_systems.py"
-              mode: "00744"
-              owner: "root"
-              group: "root"
-          commands:
-            # allow agent time to register with jumpcloud account
-            01_wait_registration:
-              command: "sleep 10"
-            02_associate_jc_systems:
-              command: ". /opt/sage/bin/instance_env_vars.sh && /usr/bin/python3 /opt/sage/bin/associate_jc_systems.py"
-              env:
-                JC_SERVICE_API_KEY:
-                  Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcServiceApiKey"}}
         TagRootVolume:
           commands:
             01_tag_root_disk:
@@ -345,7 +318,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupJumpcloud,SetupDocker --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupDocker --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Name

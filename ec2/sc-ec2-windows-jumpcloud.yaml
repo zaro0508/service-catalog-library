@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Service Catalog: Windows EC2'
+Description: 'Service Catalog: Windows EC2 with Jumpcloud integration.'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

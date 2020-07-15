@@ -76,7 +76,10 @@ Resources:
           SetTags:
             - tag_volume
             - tag_instance
-        # Cfn-hup setting, it is to monitor the change of metadata.
+          SetupJumpcloud:
+            - install_jc
+            - config_jc
+                # Cfn-hup setting, it is to monitor the change of metadata.
         # When there is change in the contents of json file in the metadata section, cfn-hup will call cfn-init.
         cfn_hup_service:
           files:

@@ -44,10 +44,8 @@ parameters:
   PrincipalGroupName1: "ServiceCatalogDevelopmentEndusers"
   StackDatetime: !date
 hooks:
-  before_create:
-    - !cmd "curl https://s3.amazonaws.com/{{stack_group_config.admincentral_cf_bucket}}/scipoolprod-sc-lib-infra/master/ec2/development/sc-portfolio-ec2-development.yaml --create-dirs -o templates/remote/sc-portfolio-ec2-development.yaml"
-  before_update:
-    - !cmd "curl https://s3.amazonaws.com/{{stack_group_config.admincentral_cf_bucket}}/scipoolprod-sc-lib-infra/master/ec2/development/sc-portfolio-ec2-development.yaml --create-dirs -o templates/remote/sc-portfolio-ec2-development.yaml"
+  before_launch:
+    - !cmd "curl https://{{stack_group_config.admincentral_cf_bucket}}.s3.amazonaws.com/scipoolprod-sc-lib-infra/master/ec2/development/sc-portfolio-ec2-development.yaml --create-dirs -o templates/remote/sc-portfolio-ec2-development.yaml"
 ```
 
 If the file above were created at `config/dev/sc-portfolio-ec2-development.yaml`, to deploy the stack one runs this sceptre command: `sceptre --var "profile=admin@scipoolprod" --var "region=us-east-1" launch dev/sc-portfolio-ec2-development`. The profile "admin@scipoolprod" would be an AWS profile with administrator credentials as descibed above.

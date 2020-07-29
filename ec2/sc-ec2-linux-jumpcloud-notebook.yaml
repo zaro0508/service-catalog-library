@@ -296,9 +296,13 @@ Resources:
               group: root
           commands:
             01_enable_cfn-hup:
-              command: "/bin/systemctl enable cfn-hup.service"
+              command: !Sub |
+                /bin/systemctl enable cfn-hup.service ;\
+                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}'
             02_start_cfn-hup:
-              command: "/bin/systemctl start cfn-hup.service"
+              command: !Sub |
+                /bin/systemctl start cfn-hup.service ;\
+                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}'
         set_env_vars:
           files:
             /opt/sage/bin/make_env_vars_file.sh:
@@ -308,7 +312,9 @@ Resources:
               group: "root"
           commands:
             01_make_env_vars_file:
-              command: "/bin/bash /opt/sage/bin/make_env_vars_file.sh"
+              command: !Sub |
+                /bin/bash /opt/sage/bin/make_env_vars_file.sh ;\
+                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}'
               env:
                 AWS_REGION: !Ref AWS::Region
                 STACK_NAME: !Ref AWS::StackName
@@ -316,12 +322,12 @@ Resources:
         TagRootVolume:
           commands:
             01_tag_root_disk:
-              command: !Join
-                - ''
-                - - ". /opt/sage/bin/instance_env_vars.sh;"
-                  - "/usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID "
-                  - "--tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME "
-                  - "Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL"
+              command: !Sub |
+                . /opt/sage/bin/instance_env_vars.sh ;\
+                /usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID \
+                  --tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME \
+                  Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL ;\
+                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}'
         TagInstance:
           files:
             /opt/sage/bin/apply_name_tag.sh:
@@ -331,7 +337,9 @@ Resources:
               group: "root"
           commands:
             01_name_tag:
-              command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
+              command: !Sub |
+                /bin/bash /opt/sage/bin/apply_name_tag.sh ;\
+                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
         WriteApacheConf:
           files:
             /opt/sage/bin/apache_conf_rewrite.sh:
@@ -341,7 +349,9 @@ Resources:
               group: "root"
           commands:
             01_rewrite_apache_conf:
-              command: "/bin/bash /opt/sage/bin/apache_conf_rewrite.sh"
+              command: !Sub |
+                /bin/bash /opt/sage/bin/apache_conf_rewrite.sh ;\
+                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
     Properties:
       ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
@@ -373,6 +383,10 @@ Resources:
           Value: "yes"
         - Key: "PatchGroup"
           Value: "prod-default"
+    CreationPolicy:
+      ResourceSignal:
+        Count: 7 #Must equal the number of calls to cfn-signal during provisioning
+        Timeout: PT10M
 
   EC2TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup

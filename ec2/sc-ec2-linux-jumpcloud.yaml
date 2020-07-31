@@ -275,13 +275,9 @@ Resources:
               group: root
           commands:
             01_enable_cfn-hup:
-              command: !Sub |
-                /bin/systemctl enable cfn-hup.service ;\
-                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
+              command: "/bin/systemctl enable cfn-hup.service"
             02_start_cfn-hup:
-              command: !Sub |
-                /bin/systemctl start cfn-hup.service ;\
-                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
+              command: "/bin/systemctl start cfn-hup.service"
         set_env_vars:
           files:
             /opt/sage/bin/make_env_vars_file.sh:
@@ -291,9 +287,7 @@ Resources:
               group: "root"
           commands:
             01_make_env_vars_file:
-              command: !Sub |
-                /bin/bash /opt/sage/bin/make_env_vars_file.sh ;\
-                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
+              command: "/bin/bash /opt/sage/bin/make_env_vars_file.sh"
               env:
                 AWS_REGION: !Ref AWS::Region
                 STACK_NAME: !Ref AWS::StackName
@@ -305,8 +299,7 @@ Resources:
                 . /opt/sage/bin/instance_env_vars.sh ;\
                 /usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID \
                   --tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME \
-                  Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL ;\
-                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}'
+                  Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL 
         TagInstance:
           files:
             /opt/sage/bin/apply_name_tag.sh:
@@ -316,9 +309,7 @@ Resources:
               group: "root"
           commands:
             01_name_tag:
-              command: !Sub |
-                /bin/bash /opt/sage/bin/apply_name_tag.sh ;\
-                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
+              command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
     Properties:
       ImageId: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
@@ -351,7 +342,6 @@ Resources:
           Value: "prod-default"
     CreationPolicy:
       ResourceSignal:
-        Count: 6 #Must equal the number of calls to cfn-signal during provisioning
         Timeout: PT10M
 Outputs:
   LinuxInstanceId:

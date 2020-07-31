@@ -238,6 +238,9 @@ Resources:
           Value: "yes"
         - Key: "PatchGroup"
           Value: "prod-default"
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT10M
 Outputs:
   WindowsInstancePrivateIpAddress:
     Description: 'The IP Address of the EC2 instance'

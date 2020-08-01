@@ -340,7 +340,7 @@ Resources:
               group: "root"
           commands:
             01_rewrite_apache_conf:
-              command: "/bin/bash /opt/sage/bin/apache_conf_rewrite.sh "
+              command: "/bin/bash /opt/sage/bin/apache_conf_rewrite.sh"
     Properties:
       ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
@@ -374,7 +374,7 @@ Resources:
           Value: "prod-default"
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT10M
+        Timeout: PT20M
 
   EC2TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup

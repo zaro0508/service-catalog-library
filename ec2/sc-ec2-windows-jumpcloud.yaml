@@ -240,7 +240,7 @@ Resources:
           Value: "prod-default"
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT10M
+        Timeout: PT20M
 Outputs:
   WindowsInstancePrivateIpAddress:
     Description: 'The IP Address of the EC2 instance'

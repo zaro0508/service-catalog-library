@@ -279,12 +279,11 @@ Resources:
         TagRootVolume:
           commands:
             01_tag_root_disk:
-              command: !Join
-                - ''
-                - - ". /opt/sage/bin/instance_env_vars.sh;"
-                  - "/usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID "
-                  - "--tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME "
-                  - "Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL"
+              command: !Sub |
+                . /opt/sage/bin/instance_env_vars.sh ;\
+                /usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID \
+                  --tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME \
+                  Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL
         TagInstance:
           files:
             /opt/sage/bin/apply_name_tag.sh:

@@ -208,7 +208,7 @@ Resources:
                   - 'Powershell.exe C:\scripts\tag_instance.ps1 '
                   - ' > C:\scripts\tag-instance.log'
     Properties:
-      ImageId: 'ami-0c278895328cddfdd'         # amazon/Windows_Server-2019-English-Full-Base-2020.04.15
+      ImageId: 'ami-0f38562b9d4de0dfe'         # Microsoft Windows Server 2019 Base
       InstanceType: !Ref 'WindowsInstanceType'
       SubnetId: !ImportValue
         'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet1'

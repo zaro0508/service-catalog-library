@@ -297,7 +297,7 @@ Resources:
         add_docker_user:
           commands:
             01_add_jc_user_to_docker_group:
-              command: "gpasswd -a $(cat /opt/sage/jcusername) docker"
+              command: "gpasswd -a ssm-user docker"
     Properties:
       ImageId: "ami-0aa07b115676a7bb0"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.5
       InstanceType: !Ref 'EC2InstanceType'

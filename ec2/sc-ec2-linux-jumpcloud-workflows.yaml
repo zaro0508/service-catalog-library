@@ -219,8 +219,6 @@ Resources:
           SetTags:
             - TagRootVolume
             - TagInstance
-          SetupDocker:
-            - add_docker_user
         cfn_hup_service:
           files:
             /etc/cfn/cfn-hup.conf:
@@ -238,7 +236,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupDocker --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -294,10 +292,6 @@ Resources:
           commands:
             01_name_tag:
               command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
-        add_docker_user:
-          commands:
-            01_add_jc_user_to_docker_group:
-              command: "gpasswd -a ssm-user docker"
     Properties:
       ImageId: "ami-0aa07b115676a7bb0"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.5
       InstanceType: !Ref 'EC2InstanceType'
@@ -317,7 +311,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupDocker --region ${AWS::Region}
+          # This temporary fix adds the ssm-user here -- adding in init config
+          # isn't working.
+          /usr/sbin/useradd -m ssm-user -G docker
+          /bin/echo "ssm-user ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/ssm-user
+          /bin/chmod 0440 /etc/sudoers.d/ssm-user
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Name

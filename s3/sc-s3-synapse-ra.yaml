@@ -19,8 +19,7 @@ Parameters:
   SynapseIDs:
     Type: CommaDelimitedList
     Description: >-
-      (Optional) List of Synapse bucket user or team owners
-    Default: ""
+      List of Synapse bucket user or team owners
     ConstraintDescription: >-
       List of Synapse user or team IDs separated by commas
       (i.e. 1111111, 2222222)

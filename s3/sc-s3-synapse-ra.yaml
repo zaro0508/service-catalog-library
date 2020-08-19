@@ -13,13 +13,17 @@ Metadata:
       - Label:
           default: S3 Bucket Policy Configuration
         Parameters:
-          - SynapseUserName
+          - SynapseIDs
           - S3UserARNs
 Parameters:
-  SynapseUserName:
-    Type: String
-    Description: Synapse user for bucket
+  SynapseIDs:
+    Type: CommaDelimitedList
+    Description: >-
+      (Optional) List of Synapse bucket user or team owners
     Default: ""
+    ConstraintDescription: >-
+      List of Synapse user or team IDs separated by commas
+      (i.e. 1111111, 2222222)
   S3UserARNs:
     Type: CommaDelimitedList
     Description: >-
@@ -79,7 +83,7 @@ Resources:
         Key: owner.txt
         ContentType: text
         ACL: authenticated-read
-      Body: !Ref SynapseUserName
+      Body: !Join [ ",", !Ref SynapseIDs ]
   S3BucketTagger:
     DependsOn: S3BucketPolicy
     Type: Custom::S3BucketTagger

@@ -68,7 +68,7 @@ Resources:
                   - ","
                   - !Ref "S3UserARNs"
   # Add owner file to the synapse bucket, requires the cloudformation S3 objects macro
-  # https://github.com/Sage-Bionetworks/aws-infra/tree/master/lambdas/cfn-s3objects-macro
+  # https://github.com/Sage-Bionetworks-IT/cfn-s3objects-macro
   SynapseOwnerFile:
     Type: AWS::S3::Object
     Metadata:

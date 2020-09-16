@@ -85,10 +85,10 @@ Resources:
       Body: !Join [ ",", !Ref SynapseIDs ]
   S3BucketTagger:
     DependsOn: S3BucketPolicy
-    Type: Custom::S3BucketTagger
+    Type: Custom::SynapseTagger
     Properties:
       ServiceToken: !ImportValue
-        'Fn::Sub': '${AWS::Region}-cfn-cr-bucket-tagger-FunctionArn'
+        'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetBucketTagsFunctionArn'
       BucketName: !Ref S3Bucket
 Outputs:
   BucketName:

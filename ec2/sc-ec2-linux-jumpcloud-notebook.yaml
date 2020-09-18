@@ -409,7 +409,13 @@ Resources:
       TargetGroupArn: !Ref EC2TargetGroup
       ListenerArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-alb-notebook-access-ALBListenerARN'
-
+  TagInstance:
+    DependsOn: "InstanceProfile"
+    Type: Custom::SynapseTagger
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetInstanceTagsFunctionArn'
+      InstanceId: !Ref LinuxInstance
 Outputs:
   LinuxInstanceId:
     Description: 'The ID of the EC2 instance'

@@ -343,6 +343,13 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Timeout: PT10M
+  TagInstance:
+    DependsOn: "InstanceProfile"
+    Type: Custom::SynapseTagger
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetInstanceTagsFunctionArn'
+      InstanceId: !Ref LinuxInstance
 Outputs:
   LinuxInstanceId:
     Description: 'The ID of the EC2 instance'

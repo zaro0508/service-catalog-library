@@ -409,7 +409,7 @@ Resources:
       TargetGroupArn: !Ref EC2TargetGroup
       ListenerArn: !ImportValue
         'Fn::Sub': '${AWS::Region}-alb-notebook-access-ALBListenerARN'
-  TagInsance:
+  TagInstance:
     DependsOn: "InstanceProfile"
     Type: Custom::SynapseTagger
     Properties:

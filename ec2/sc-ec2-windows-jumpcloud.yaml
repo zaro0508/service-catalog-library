@@ -241,7 +241,7 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Timeout: PT20M
-  TagInsance:
+  TagInstance:
     DependsOn: "InstanceProfile"
     Type: Custom::SynapseTagger
     Properties:

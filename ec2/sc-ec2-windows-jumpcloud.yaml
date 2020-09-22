@@ -241,6 +241,13 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Timeout: PT20M
+  TagInstance:
+    DependsOn: "InstanceProfile"
+    Type: Custom::SynapseTagger
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-khai-cfn-cr-synapse-tagger-SetInstanceTagsFunctionArn'
+      InstanceId: !Ref WindowsInstance
 Outputs:
   WindowsInstancePrivateIpAddress:
     Description: 'The IP Address of the EC2 instance'

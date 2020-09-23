@@ -332,15 +332,12 @@ Resources:
             01_name_tag:
               command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
         WriteApacheConf:
-          files:
-            /opt/sage/bin/apache_conf_rewrite.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/apache_conf_rewrite.sh"
-              mode: "00744"
-              owner: "root"
-              group: "root"
           commands:
             01_rewrite_apache_conf:
-              command: "/bin/bash /opt/sage/bin/apache_conf_rewrite.sh"
+              command: !Sub |
+                . /opt/sage/bin/instance_env_vars.sh ;\
+                /bin/sed -i "s/^.*<LocationMatch.*\/.*\/>.*$/<LocationMatch \/$EC2_INSTANCE_ID\/>/g" /etc/apache2/sites-available/proxy.conf ;\
+                systemctl restart apache2
     Properties:
       ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'

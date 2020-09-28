@@ -14,10 +14,6 @@ Metadata:
       VolumeSize:
         default: Disk Size
 Parameters:
-  VpcName:
-    Type: String
-    Description: The VPC to put resources into
-    Default: 'internalpoolvpc'
   WindowsInstanceType:
     AllowedValues:
       - t3.nano
@@ -35,6 +31,14 @@ Parameters:
     Default: 30
     MinValue: 10
     MaxValue: 2000
+Mappings:
+  AccountToImportParams:
+    "465877038949":   # org-sagebase-scipooldev
+      PrivateSubnet1: "us-east-1-cesspoolvpc-PrivateSubnet1"
+      VpnSecurityGroup: "us-east-1-cesspoolvpc-VpnSecurityGroup"
+    "237179673806":   # org-sagebase-scipoolprod
+      PrivateSubnet1: "us-east-1-internalpoolvpc-PrivateSubnet1"
+      VpnSecurityGroup: "us-east-1-internalpoolvpc-VpnSecurityGroup"
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -211,9 +215,10 @@ Resources:
       ImageId: 'ami-0f38562b9d4de0dfe'         # amazon/Windows_Server-2019-English-Full-Base-2020.07.15
       InstanceType: !Ref 'WindowsInstanceType'
       SubnetId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet1'
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet1]
       SecurityGroupIds:
-        - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
+        - !ImportValue
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
       KeyName: 'scipool'
       IamInstanceProfile: !Ref 'InstanceProfile'
       BlockDeviceMappings:

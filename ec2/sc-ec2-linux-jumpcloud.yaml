@@ -22,11 +22,14 @@ Mappings:
       AMIID: "ami-0b7906ab614596e7e"  # https://github.com/Sage-Bionetworks-IT/packer-base-ubuntu-bionic/tree/v1.0.9
     AmazonLinux:
       AMIID: "ami-0810a318c4b1243c5"  # https://github.com/Sage-Bionetworks-IT/packer-base-amazonlinux2/tree/v1.0.2
+  AccountToImportParams:
+    "465877038949":   # org-sagebase-scipooldev
+      PrivateSubnet: "us-east-1-cesspoolvpc-PrivateSubnet"
+      VpnSecurityGroup: "us-east-1-cesspoolvpc-VpnSecurityGroup"
+    "237179673806":   # org-sagebase-scipoolprod
+      PrivateSubnet: "us-east-1-internalpoolvpc-PrivateSubnet"
+      VpnSecurityGroup: "us-east-1-internalpoolvpc-VpnSecurityGroup"
 Parameters:
-  VpcName:
-    Type: String
-    Description: The VPC to put resources into
-    Default: 'internalpoolvpc'
   EC2InstanceType:
     AllowedValues:
       - c4.large
@@ -314,9 +317,10 @@ Resources:
       ImageId: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]
       SecurityGroupIds:
-        - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
+        - !ImportValue
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

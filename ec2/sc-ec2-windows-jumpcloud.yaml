@@ -212,7 +212,7 @@ Resources:
                   - 'Powershell.exe C:\scripts\tag_instance.ps1 '
                   - ' > C:\scripts\tag-instance.log'
     Properties:
-      ImageId: 'ami-085ad2978eea00cab'         # amazon/Windows_Server-2019-English-Full-Base-2020.07.15
+      ImageId: 'ami-0dbdf36ae5f30d8d1'    # https://github.com/Sage-Bionetworks-IT/packer-base-winserver2019/releases/tag/v0.0.1
       InstanceType: !Ref 'WindowsInstanceType'
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet1]

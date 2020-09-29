@@ -245,7 +245,7 @@ Resources:
           Value: "prod-default"
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT20M
+        Timeout: PT30M
   TagInstance:
     DependsOn: "InstanceProfile"
     Type: Custom::SynapseTagger

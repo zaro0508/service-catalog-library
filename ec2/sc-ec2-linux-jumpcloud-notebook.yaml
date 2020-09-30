@@ -258,6 +258,7 @@ Resources:
             - set_env_vars
           SetTags:
             - TagRootVolume
+            - TagInstance
           SetupApacheProxy:
             - WriteApacheConf
         cfn_hup_service:
@@ -323,6 +324,16 @@ Resources:
                 /usr/bin/aws ec2 create-tags --region $AWS_REGION --resources $ROOT_DISK_ID \
                   --tags Key=Name,Value=$EC2_INSTANCE_ID-root Key=cloudformation:stack-name,Value=$STACK_NAME \
                   Key=Department,Value=$DEPARTMENT Key=Project,Value=$PROJECT Key=OwnerEmail,Value=$OWNER_EMAIL
+        TagInstance:
+          files:
+            /opt/sage/bin/apply_name_tag.sh:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/apply_name_tag.sh"
+              mode: "00744"
+              owner: "root"
+              group: "root"
+          commands:
+            01_name_tag:
+              command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
         WriteApacheConf:
           files:
             /opt/sage/bin/apache_conf_rewrite.sh:

@@ -352,7 +352,7 @@ Resources:
     Type: Custom::SynapseTagger
     Properties:
       ServiceToken: !ImportValue
-        'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetInstanceTagsFunctionArn'
+        'Fn::Sub': '${AWS::Region}-khai-cfn-cr-synapse-tagger-SetInstanceTagsFunctionArn'
       InstanceId: !Ref LinuxInstance
 Outputs:
   LinuxInstanceId:

@@ -14,10 +14,6 @@ Metadata:
       VolumeSize:
         default: Disk Size
 Parameters:
-  VpcName:
-    Type: String
-    Description: The VPC to put resources into
-    Default: 'internalpoolvpc'
   EC2InstanceType:
     AllowedValues:
       - c4.large
@@ -174,6 +170,14 @@ Parameters:
     Default: 16
     MinValue: 16
     MaxValue: 2000
+Mappings:
+  AccountToImportParams:
+    "465877038949":   # org-sagebase-scipooldev
+      PrivateSubnet: "us-east-1-cesspoolvpc-PrivateSubnet"
+      VpnSecurityGroup: "us-east-1-cesspoolvpc-VpnSecurityGroup"
+    "237179673806":   # org-sagebase-scipoolprod
+      PrivateSubnet: "us-east-1-internalpoolvpc-PrivateSubnet"
+      VpnSecurityGroup: "us-east-1-internalpoolvpc-VpnSecurityGroup"
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -296,9 +300,10 @@ Resources:
       ImageId: "ami-0aa07b115676a7bb0"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.5
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]
       SecurityGroupIds:
-        - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
+        - !ImportValue
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

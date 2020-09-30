@@ -18,17 +18,20 @@ Metadata:
         default: Disk Size
 
 Mappings:
-
   NotebookTypes:
     Rstudio:
       AMIID: "ami-051310d409a32a5aa"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v2.0.0
+  AccountToImportParams:
+    "465877038949":   # org-sagebase-scipooldev
+      PrivateSubnet: "us-east-1-cesspoolvpc-PrivateSubnet"
+      VpnSecurityGroup: "us-east-1-cesspoolvpc-VpnSecurityGroup"
+      VPCId: "us-east-1-cesspoolvpc-VPCId"
+    "237179673806":   # org-sagebase-scipoolprod
+      PrivateSubnet: "us-east-1-internalpoolvpc-PrivateSubnet"
+      VpnSecurityGroup: "us-east-1-internalpoolvpc-VpnSecurityGroup"
+      VPCId: "us-east-1-internalpoolvpc-VPCId"
 
 Parameters:
-
-  VpcName:
-    Type: String
-    Description: The VPC to put resources into
-    Default: 'internalpoolvpc'
 
   EC2InstanceType:
     AllowedValues:
@@ -225,7 +228,7 @@ Resources:
     Properties:
       GroupDescription: 'Add ingress to 443 from notebook connection ALB'
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VPCId]
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 443
@@ -345,9 +348,10 @@ Resources:
       ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-PrivateSubnet'
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]
       SecurityGroupIds:
-        - 'Fn::ImportValue': !Sub '${AWS::Region}-${VpcName}-VpnSecurityGroup'
+        - !ImportValue
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
         - !Ref NotebookConnectSecurityGroup
       KeyName: 'scipool'
       BlockDeviceMappings:
@@ -395,7 +399,7 @@ Resources:
         Port: 443
       UnhealthyThresholdCount: 3
       VpcId: !ImportValue
-        'Fn::Sub': '${AWS::Region}-${VpcName}-VPCId'
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VPCId]
       Tags:
       - Key: Name
         Value: !Sub 'TargetGroup-${LinuxInstance}'

@@ -220,8 +220,6 @@ Resources:
             - cfn_hup_service
           SetEnv:
             - set_env_vars
-          SetTags:
-            - TagInstance
         cfn_hup_service:
           files:
             /etc/cfn/cfn-hup.conf:
@@ -239,7 +237,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -302,7 +300,7 @@ Resources:
           /usr/sbin/useradd -m ssm-user -G docker
           /bin/echo "ssm-user ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/ssm-user
           /bin/chmod 0440 /etc/sudoers.d/ssm-user
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Name

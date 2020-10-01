@@ -77,8 +77,6 @@ Resources:
             - install_apps
           SetEnv:
             - set_env_vars
-          SetTags:
-            - tag_instance
           SetupJumpcloud:
             - install_jc
             - config_jc
@@ -97,7 +95,7 @@ Resources:
                  [cfn-auto-reloader-hook]
                  triggers=post.update
                  path=Resources.WindowsInstance.Metadata.AWS::CloudFormation::Init
-                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetTags,SetupJumpcloud
+                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud
           services:
             windows:
               cfn-hup:
@@ -177,19 +175,6 @@ Resources:
                   - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcSystemsGroupId"}}
                   - ' -OwnerEmail $env:OWNER_EMAIL'
                   - ' > C:\scripts\associate-jc-system.log'
-        tag_instance:
-          files:
-            'c:\\scripts\\tag_instance.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/tag_instance.ps1"
-              mode: "0664"
-          commands:
-            01_tag_instance:
-              command: !Join
-                - ''
-                - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
-                  - '. C:\scripts\instance_env_vars.ps1;'
-                  - 'Powershell.exe C:\scripts\tag_instance.ps1 '
-                  - ' > C:\scripts\tag-instance.log'
     Properties:
       ImageId: 'ami-0dbdf36ae5f30d8d1'    # https://github.com/Sage-Bionetworks-IT/packer-base-winserver2019/releases/tag/v0.0.1
       InstanceType: !Ref 'WindowsInstanceType'
@@ -210,7 +195,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           <script>
-          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetTags,SetupJumpcloud
+          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud
           cfn-signal.exe -e %errorlevel% --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region}
           </script>
       Tags:

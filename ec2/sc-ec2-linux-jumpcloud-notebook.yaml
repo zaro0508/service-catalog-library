@@ -256,8 +256,6 @@ Resources:
             - cfn_hup_service
           SetEnv:
             - set_env_vars
-          SetTags:
-            - TagInstance
           SetupApacheProxy:
             - WriteApacheConf
         cfn_hup_service:
@@ -277,7 +275,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupApacheProxy --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -315,16 +313,6 @@ Resources:
                 AWS_REGION: !Ref AWS::Region
                 STACK_NAME: !Ref AWS::StackName
                 STACK_ID: !Ref AWS::StackId
-        TagInstance:
-          files:
-            /opt/sage/bin/apply_name_tag.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/apply_name_tag.sh"
-              mode: "00744"
-              owner: "root"
-              group: "root"
-          commands:
-            01_name_tag:
-              command: "/bin/bash /opt/sage/bin/apply_name_tag.sh"
         WriteApacheConf:
           files:
             /opt/sage/bin/apache_conf_rewrite.sh:
@@ -356,7 +344,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetTags,SetupApacheProxy --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Name

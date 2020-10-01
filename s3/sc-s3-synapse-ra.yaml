@@ -88,7 +88,7 @@ Resources:
     Type: Custom::SynapseTagger
     Properties:
       ServiceToken: !ImportValue
-        'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetBucketTagsFunctionArn'
+        'Fn::Sub': '${AWS::Region}-khai-cfn-cr-synapse-tagger-SetBucketTagsFunctionArn'
       BucketName: !Ref S3Bucket
 Outputs:
   BucketName:

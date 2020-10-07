@@ -29,6 +29,9 @@ Mappings:
     "237179673806":   # org-sagebase-scipoolprod
       PrivateSubnet: "us-east-1-internalpoolvpc-PrivateSubnet"
       VpnSecurityGroup: "us-east-1-internalpoolvpc-VpnSecurityGroup"
+    "423819316185":   # org-sagebase-strides
+      PrivateSubnet: "us-east-1-stridespoolvpc-PrivateSubnet"
+      VpnSecurityGroup: "us-east-1-stridespoolvpc-VpnSecurityGroup"
 Parameters:
   EC2InstanceType:
     AllowedValues:

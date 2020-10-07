@@ -30,6 +30,10 @@ Mappings:
       PrivateSubnet: "us-east-1-internalpoolvpc-PrivateSubnet"
       VpnSecurityGroup: "us-east-1-internalpoolvpc-VpnSecurityGroup"
       VPCId: "us-east-1-internalpoolvpc-VPCId"
+    "423819316185":   # org-sagebase-strides
+      PrivateSubnet: "us-east-1-stridespoolvpc-PrivateSubnet"
+      VpnSecurityGroup: "us-east-1-stridespoolvpc-VpnSecurityGroup"
+      VPCId: "us-east-1-stridespoolvpc-VPCId"
 
 Parameters:
 

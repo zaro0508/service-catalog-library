@@ -39,6 +39,9 @@ Mappings:
     "237179673806":   # org-sagebase-scipoolprod
       PrivateSubnet1: "us-east-1-internalpoolvpc-PrivateSubnet1"
       VpnSecurityGroup: "us-east-1-internalpoolvpc-VpnSecurityGroup"
+    "423819316185":   # org-sagebase-strides
+      PrivateSubnet1: "us-east-1-stridespoolvpc-PrivateSubnet1"
+      VpnSecurityGroup: "us-east-1-stridespoolvpc-VpnSecurityGroup"
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role

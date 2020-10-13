@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Service Catalog: Linux EC2'
 Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E7001
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -230,6 +234,7 @@ Resources:
         config:
           ignore_checks:
             - E1022
+            - W1011
       'AWS::CloudFormation::Init':
         configSets:
           SetupCfn:

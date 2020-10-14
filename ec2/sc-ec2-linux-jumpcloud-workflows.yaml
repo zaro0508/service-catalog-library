@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Service Catalog: Workflows Linux EC2'
 Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E7001
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -172,15 +176,11 @@ Parameters:
     MaxValue: 2000
 Mappings:
   AccountToImportParams:
-    "465877038949":   # org-sagebase-scipooldev
-      PrivateSubnet: "us-east-1-cesspoolvpc-PrivateSubnet"
-      VpnSecurityGroup: "us-east-1-cesspoolvpc-VpnSecurityGroup"
-    "237179673806":   # org-sagebase-scipoolprod
-      PrivateSubnet: "us-east-1-internalpoolvpc-PrivateSubnet"
-      VpnSecurityGroup: "us-east-1-internalpoolvpc-VpnSecurityGroup"
-    "423819316185":   # org-sagebase-strides
-      PrivateSubnet: "us-east-1-stridespoolvpc-PrivateSubnet"
-      VpnSecurityGroup: "us-east-1-stridespoolvpc-VpnSecurityGroup"
+    'Fn::Transform':
+      Name: 'AWS::Include'
+      Parameters:
+        # include is @ https://github.com/Sage-Bionetworks/admincentral-infra/blob/master/templates/cfn-service-catalog-snippets.yaml
+        Location: s3://cfn-snippets-bucket-cloudformationsnippetsbucket-elu83sv8ocdz/scipool-sc-lib-infra/ScAccountToExportMappping.yaml
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -217,6 +217,7 @@ Resources:
         config:
           ignore_checks:
             - E1022
+            - W1011
       'AWS::CloudFormation::Init':
         configSets:
           SetupCfn:

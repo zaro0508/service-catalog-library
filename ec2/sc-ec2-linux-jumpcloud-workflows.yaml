@@ -280,7 +280,7 @@ Resources:
                 STACK_NAME: !Ref AWS::StackName
                 STACK_ID: !Ref AWS::StackId
     Properties:
-      ImageId: "ami-0aa07b115676a7bb0"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.5
+      ImageId: "ami-02fb1df88e77ef400"  # https://github.com/Sage-Bionetworks-IT/packer-workflows/releases/tag/v1.0.6
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]

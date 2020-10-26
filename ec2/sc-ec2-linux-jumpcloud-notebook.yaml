@@ -323,7 +323,7 @@ Resources:
         WriteApacheConf:
           files:
             /opt/sage/bin/apache_conf_rewrite.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/apache_conf_rewrite.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.7/linux/opt/sage/bin/apache_conf_rewrite.sh"
               mode: "00744"
               owner: "root"
               group: "root"

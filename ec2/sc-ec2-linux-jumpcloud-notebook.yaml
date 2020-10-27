@@ -206,12 +206,6 @@ Resources:
     Properties:
       Path: /
       ManagedPolicyArns:
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-get-role-policy-ReadAssumedRoleInformationPolicy'
         - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore' #For maintenance tasks
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -261,8 +255,6 @@ Resources:
         configSets:
           SetupCfn:
             - cfn_hup_service
-          SetEnv:
-            - set_env_vars
           SetupApacheProxy:
             - WriteApacheConf
         cfn_hup_service:
@@ -282,7 +274,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetupApacheProxy --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -306,20 +298,6 @@ Resources:
               command: "/bin/systemctl enable cfn-hup.service"
             02_start_cfn-hup:
               command: "/bin/systemctl start cfn-hup.service"
-        set_env_vars:
-          files:
-            /opt/sage/bin/make_env_vars_file.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/make_env_vars_file.sh"
-              mode: "00744"
-              owner: "root"
-              group: "root"
-          commands:
-            01_make_env_vars_file:
-              command: "/bin/bash /opt/sage/bin/make_env_vars_file.sh"
-              env:
-                AWS_REGION: !Ref AWS::Region
-                STACK_NAME: !Ref AWS::StackName
-                STACK_ID: !Ref AWS::StackId
         WriteApacheConf:
           files:
             /opt/sage/bin/apache_conf_rewrite.sh:
@@ -351,7 +329,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetupApacheProxy --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Name

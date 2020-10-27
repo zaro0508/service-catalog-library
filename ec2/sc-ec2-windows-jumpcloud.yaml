@@ -48,10 +48,6 @@ Resources:
     Properties:
       Path: /
       ManagedPolicyArns:
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-essentials-TagRootVolumePolicy'
-        - !ImportValue
-          'Fn::Sub': '${AWS::Region}-cfn-tag-instance-policy-TagInstancePolicy'
         - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore' #For maintenance tasks
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -83,8 +79,6 @@ Resources:
             - cfn_hup_service
           SetupApps:
             - install_apps
-          SetEnv:
-            - set_env_vars
           SetupJumpcloud:
             - install_jc
             - config_jc
@@ -103,7 +97,7 @@ Resources:
                  [cfn-auto-reloader-hook]
                  triggers=post.update
                  path=Resources.WindowsInstance.Metadata.AWS::CloudFormation::Init
-                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud
+                 action=cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetupJumpcloud
           services:
             windows:
               cfn-hup:
@@ -131,18 +125,6 @@ Resources:
               command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install awscli --yes --no-progress --ignore-checksums'
             05_install_googlechrome:
               command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install googlechrome --yes --no-progress --ignore-checksums'
-        set_env_vars:
-          files:
-            'c:\\scripts\\set_env_vars_file.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/set_env_vars_file.ps1"
-              mode: "0664"
-          commands:
-            01_set_env_vars:
-              command: !Join
-                - ''
-                - - 'Powershell.exe C:\scripts\set_env_vars_file.ps1 '
-                  - '-StackId '
-                  - !Ref AWS::StackId
         install_jc:
           files:
             'c:\scripts\install-ms-vc.ps1':
@@ -203,7 +185,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           <script>
-          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud
+          cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetupJumpcloud
           cfn-signal.exe -e %errorlevel% --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region}
           </script>
       Tags:

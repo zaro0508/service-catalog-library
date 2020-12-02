@@ -287,6 +287,8 @@ Resources:
       SecurityGroupIds:
         - !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
+        - !ImportValue
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", TgwSecurityGroupId]
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

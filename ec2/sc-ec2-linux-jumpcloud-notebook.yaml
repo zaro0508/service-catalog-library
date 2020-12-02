@@ -338,6 +338,8 @@ Resources:
       SecurityGroupIds:
         - !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
+        - !ImportValue
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", TgwSecurityGroupId]
         - !Ref NotebookConnectSecurityGroup
       KeyName: 'scipool'
       BlockDeviceMappings:

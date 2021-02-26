@@ -15,6 +15,7 @@ Metadata:
         Parameters:
           - SynapseIDs
           - S3UserARNs
+          - RestrictSameRegionDownload
 Parameters:
   SynapseIDs:
     Type: CommaDelimitedList
@@ -35,8 +36,19 @@ Parameters:
     Type: String
     Description: (Optional) Name of the created bucket.
     Default: ""
+  RestrictSameRegionDownload:
+    Type: String
+    Description: >
+      (Optional) Data transfers within the same region between AWS resources are free.
+      true to restrict downloading files from this bucket to only AWS resources (e.g. EC2 , Lambda) within the same region as this bucket.
+      This will not allow even the owner of the bucket to download objects in this bucket when not using an AWS resource in the same region!
+    AllowedValues:
+      - true
+      - false
+    Default: false
 Conditions:
   HasBucketName: !Not [!Equals [!Ref BucketName, ""]]
+  CreateSameRegionDownloadRestriction: !Equals [!Ref RestrictSameRegionDownload, true]
 Resources:
   S3Bucket:
     Type: "AWS::S3::Bucket"
@@ -90,6 +102,15 @@ Resources:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetBucketTagsFunctionArn'
       BucketName: !Ref S3Bucket
+  SameRegionDownloadRestriction:
+    DependsOn: S3BucketPolicy
+    Type: 'AWS::CloudFormation::Stack'
+    Condition: CreateSameRegionDownloadRestriction
+    Properties:
+      TemplateURL: 'https://bootstrap-awss3cloudformationbucket-19qromfd235z9.s3.amazonaws.com/cfn-cr-same-region-bucket-download/master/cfn-cr-same-region-bucket-download.yaml'
+      Parameters:
+        BucketName: !Ref 'S3Bucket'
+
 Outputs:
   BucketName:
     Description: 'The name of the S3 Bucket'

@@ -1,9 +1,7 @@
-# This template depends on having an AWS EFS in place which can be deployed with
-# https://github.com/Sage-Bionetworks/aws-infra/blob/master/templates/EFS/efs.yaml
+# Based off of https://github.com/aws-samples/aws-lambda-efs-samples
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: S3Objects
-Description: >-
-  Docker runner product
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda to run a docker container
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -11,42 +9,65 @@ Metadata:
           default: Container Image
         Parameters:
           - ImageUri
-          - EntryPoint
+          - EntryPoints
           - Command
           - WorkingDirectory
           - MemorySize
       - Label:
           default: Synapse
         Parameters:
-          - SynapseUser
-          - SynapsePassword
+          - SynapsePAT
       - Label:
           default: Execution Trigger
         Parameters:
           - EnableSchedule
           - Schedule
+      - Label:
+          default: EFS
+        Parameters:
+          - PerformanceMode
+          - Encrypted
+          - EfsPath
 Parameters:
+  PerformanceMode:
+    Type: String
+    Default: "generalPurpose"
+    Description: The EFS disk performance mode
+    AllowedValues:
+      - generalPurpose
+      - maxIO
+  Encrypted:
+    Type: String
+    Default: true
+    Description: True to enable EFS encryption, false to disable.
+    AllowedValues:
+      - true
+      - false
+  EfsPath:
+    Type: String
+    Description: Path to access EFS file store.
+    Default: /mnt/efs
   MemorySize:
     Type: Number
     MinValue: 128
     MaxValue: 10240
     Default: 128
     Description: >
-      The amount of memory available to the function at runtime. Increasing the function's
-      memory also increases its CPU allocation.
+      The amount of memory (in MB) available to the function at runtime.
+      Increasing the function's memory also increases its CPU allocation.
   ImageUri:
     Type: String
     Description: >
       The URI of the Amazon ECR) repository for the Lambda function's container image.
       Example: 111111111.dkr.ecr.us-east-1.amazonaws.com/MY-DOCKER:latest
-  EntryPoint:
-    Type: String
+  EntryPoints:
+    Type: CommaDelimitedList
     Default: ""
-    Description: (Optional) The entry point to the application in the docker container
+    Description: (Optional) Comma separated list of entry points to docker container
   Command:
     Type: CommaDelimitedList
     Default: ""
-    Description: (Optional) Command separated list of parameters to pass in with docker ENTRYPOINT
+    Description: (Optional) Comma separated list of parameters to pass in with docker ENTRYPOINT
   WorkingDirectory:
     Type: String
     Default: ""
@@ -66,46 +87,116 @@ Parameters:
     Type: String
     Default: cron(0 09 ? * MON *)  # Run every Monday at 9am
     ConstraintDescription: "Use schedule format: https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html"
-  SynapseUser:
-    Type: String
-    Default: ""
-    Description: (Optional) The synapse user name
-  SynapsePassword:
+  SynapsePAT:
     Type: String
     NoEcho: true
     Default: ""
-    Description: (Optional) The synapse password
+    Description: >
+      (Optional) The Synapse personal access token (PAT).
+      https://docs.synapse.org/rest/POST/personalAccessToken.html
 Conditions:
-  HasEntryPoint: !Not [!Equals [!Ref EntryPoint, ""]]
+  HasEntryPoints: !Not
+    - !Equals
+      - !Join [ "", !Ref EntryPoints ]
+      - ''
   HasCommand: !Not
     - !Equals
       - !Join ["", !Ref Command]
       - ''
   HasWorkingDirectory: !Not [!Equals [!Ref WorkingDirectory, ""]]
+  HasSynapsePAT: !Not [!Equals [!Ref SynapsePAT, ""]]
 Resources:
-  Lambda:
-    Type: 'AWS::CloudFormation::Stack'
+  FileSystemResource:
+    Type: 'AWS::EFS::FileSystem'
     Properties:
-      TemplateURL: 'https://bootstrap-awss3cloudformationbucket-19qromfd235z9.s3.amazonaws.com/lambda-docker-runner/master/lambda-docker-runner.yaml'
-      Parameters:
-        SecurityGroupIds: !ImportValue
-          'Fn::Sub': '${AWS::Region}-docker-runner-efs-VpcDefaultSecurityGroup'
-        SubnetIds: !ImportValue
-          'Fn::Sub': '${AWS::Region}-docker-runner-efs-SubnetIds'
-        EfsPath: !ImportValue
-          'Fn::Sub': '${AWS::Region}-docker-runner-efs-EfsPath'
-        AccessPointArn: !ImportValue
-          'Fn::Sub': '${AWS::Region}-docker-runner-efs-AccessPointArn'
-        MemorySize: !Ref MemorySize
-        ImageUri: !Ref ImageUri
+      PerformanceMode: !Ref PerformanceMode
+      Encrypted: !Ref Encrypted
+      FileSystemPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "elasticfilesystem:ClientMount"
+            Principal:
+              AWS: "*"
+  MountTarget:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref FileSystemResource
+      SubnetId: !ImportValue {'Fn::Sub': '${AWS::Region}-docker-runner-vpc-MountTargetSubnet'}
+      SecurityGroups: [!ImportValue {'Fn::Sub': '${AWS::Region}-docker-runner-vpc-DefaultSecurityGroup'}]
+  AccessPoint:
+    DependsOn: [MountTarget]
+    Type: 'AWS::EFS::AccessPoint'
+    Properties:
+      FileSystemId: !Ref FileSystemResource
+      PosixUser:
+        Uid: "1000"
+        Gid: "1000"
+      RootDirectory:
+        CreationInfo:
+          OwnerGid: "1000"
+          OwnerUid: "1000"
+          Permissions: "0777"
+        Path: !Ref EfsPath
+  EfsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AmazonElasticFileSystemClientFullAccess
+            Effect: Allow
+            Action:
+              - elasticfilesystem:ClientMount
+              - elasticfilesystem:ClientRootAccess
+              - elasticfilesystem:ClientWrite
+              - elasticfilesystem:DescribeMountTargets
+            Resource: !GetAtt FileSystemResource.Arn
+  DockerRunnerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 900
+      PackageType: Image
+      ImageUri: !Ref ImageUri
+      ImageConfig:
         Command: !If [HasCommand, !Ref Command, !Ref 'AWS::NoValue']
-        EntryPoint: !If [HasEntryPoint, !Ref EntryPoint, !Ref 'AWS::NoValue']
+        EntryPoint: !If [HasEntryPoints, !Ref EntryPoints, !Ref 'AWS::NoValue']
         WorkingDirectory: !If [HasWorkingDirectory, !Ref WorkingDirectory, !Ref 'AWS::NoValue']
-        EnableSchedule: !Ref EnableSchedule
-        Schedule: !Ref Schedule
-        SynapseUser: !Ref SynapseUser
-        SynapsePassword: !Ref SynapsePassword
+      MemorySize: !Ref MemorySize
+      Environment:
+        Variables:
+          EFS_PATH: !Ref EfsPath
+          SYNAPSE_PAT: !If [HasSynapsePAT, !Ref SynapsePAT, !Ref 'AWS::NoValue']
+      Events:
+        RecurringSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: !Ref Schedule
+            Enabled: !Ref EnableSchedule
+        DockerRunner:
+          Type: Api
+          Properties:
+            Path: /run
+            Method: get
+      VpcConfig:
+        SecurityGroupIds: [!ImportValue {'Fn::Sub': '${AWS::Region}-docker-runner-vpc-DefaultSecurityGroup'}]
+        SubnetIds: [!ImportValue {'Fn::Sub': '${AWS::Region}-docker-runner-vpc-MountTargetSubnet'}]
+      FileSystemConfigs:
+        - Arn: !GetAtt AccessPoint.Arn
+          LocalMountPath: !Ref EfsPath
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Ref EfsPolicy
 Outputs:
-  RunApi:
-    Description: "REST API endpoint to run docker image"
-    Value: !GetAtt Lambda.Outputs.DockerRunnerApi
+  DockerRunnerApi:
+    Description: "API Gateway endpoint URL for Prod stage for Docker Runner function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/run/"
+  DockerRunnerFunction:
+    Description: "Docker Runner Lambda Function ARN"
+    Value: !GetAtt DockerRunnerFunction.Arn
+  DockerRunnerFunctionIamRole:
+    Description: "Implicit IAM Role created for Docker Runner function"
+    Value: !GetAtt DockerRunnerFunctionRole.Arn
+  EfsPath:
+    Value: !Ref EfsPath

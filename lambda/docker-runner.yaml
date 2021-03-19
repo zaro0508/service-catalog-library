@@ -58,7 +58,7 @@ Parameters:
   ImageUri:
     Type: String
     Description: >
-      The URI of the Amazon ECR) repository for the Lambda function's container image.
+      The URI of the Amazon ECR repository for the Lambda function's container image.
       Example: 111111111.dkr.ecr.us-east-1.amazonaws.com/MY-DOCKER:latest
   EntryPoints:
     Type: CommaDelimitedList

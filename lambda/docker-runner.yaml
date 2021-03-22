@@ -49,9 +49,9 @@ Parameters:
     Default: /mnt/efs
   MemorySize:
     Type: Number
-    MinValue: 128
+    MinValue: 1024
     MaxValue: 10240
-    Default: 128
+    Default: 1024
     Description: >
       The amount of memory (in MB) available to the function at runtime.
       Increasing the function's memory also increases its CPU allocation.

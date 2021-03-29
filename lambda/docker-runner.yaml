@@ -111,14 +111,6 @@ Resources:
     Properties:
       PerformanceMode: !Ref PerformanceMode
       Encrypted: !Ref Encrypted
-      FileSystemPolicy:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Action:
-              - "elasticfilesystem:ClientMount"
-            Principal:
-              AWS: "*"
   MountTarget:
     Type: AWS::EFS::MountTarget
     Properties:

@@ -156,6 +156,7 @@ Resources:
         EntryPoint: !If [HasEntryPoints, !Ref EntryPoints, !Ref 'AWS::NoValue']
         WorkingDirectory: !If [HasWorkingDirectory, !Ref WorkingDirectory, !Ref 'AWS::NoValue']
       MemorySize: !Ref MemorySize
+      KmsKeyArn: !ImportValue {'Fn::Sub': '${AWS::Region}-docker-runner-kms-key-KmsKeyArn'}
       Environment:
         Variables:
           EFS_PATH: !Ref EfsPath

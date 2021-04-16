@@ -24,7 +24,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: "ami-051310d409a32a5aa"  # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v2.0.0
+      AMIID: "ami-0c0f49c0711209967" # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v2.1.1
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'
@@ -200,7 +200,6 @@ Parameters:
     MaxValue: 2000
 
 Resources:
-
   InstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -213,6 +212,8 @@ Resources:
         - !ImportValue
           'Fn::Sub': '${AWS::Region}-get-role-policy-ReadAssumedRoleInformationPolicy'
         - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore' #For maintenance tasks
+        - !ImportValue
+          'Fn::Sub': '${AWS::Region}-sc-product-ec2-linux-jumpcloud-notebook-write-to-ssm-policy-WriteToSSMPolicy'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -234,7 +235,7 @@ Resources:
     Properties:
       GroupDescription: 'Add ingress to 443 from notebook connection ALB'
       VpcId: !ImportValue
-          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VPCId]
+        'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VPCId]
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 443
@@ -248,6 +249,81 @@ Resources:
       Path: /
       Roles:
         - !Ref 'InstanceRole'
+
+  # The EC2 instance writes to it, but this is introduced for the cleanup of the parameter
+  InstanceSSMParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      # This will need to be synced with the `packer-rstudio` project
+      Name: !Sub "/service-catalog/synapse/cred/${LinuxInstance}/oidc-accesstoken"
+      Type: String
+      Value: to be replaced by EC2
+
+  SSMParameterEncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: key used to encrypt SSM Parameters for a EC2 instance
+      # number of days to wait before key gets deleted
+      PendingWindowInDays: 7
+      KeyPolicy:
+        Version: "2012-10-17"
+        Statement:
+        # https://dev.to/jansonsa/aws-how-to-deny-access-to-resources-while-allowing-a-specific-role-547b
+        - Sid: "Deny decrypt to all Principals that shouldn't require access"
+          Effect: 'Deny'
+          Principal: "*"
+          Condition:
+            StringNotEquals:
+              "aws:PrincipalArn": !Sub "${InstanceRole.Arn}"
+          Action:
+            - kms:Decrypt
+          Resource: '*'
+        - Sid: Allow use of the key
+          Effect: Allow
+          Principal:
+            AWS: !Sub "${InstanceRole.Arn}"
+          Action:
+          - kms:DescribeKey
+          - kms:Encrypt
+          - kms:Decrypt
+          - kms:ReEncrypt*
+          - kms:GenerateDataKey
+          - kms:GenerateDataKeyWithoutPlaintext
+          Resource: '*'
+        - Sid: 'Default KMS Policy that enables IAM permissions'  # https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html#key-policy-default
+          Effect: 'Allow'
+          Principal:
+            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+          Action:
+            - 'kms:*'
+          Resource: '*'
+        - Sid: "Allow administration of the key to CFN service role"
+          Effect: "Allow"
+          Principal:
+            AWS:
+              - !ImportValue
+                'Fn::Sub': '${AWS::Region}-sc-ec2vpc-launchrole-LaunchRoleArn'
+          Action:
+            - "kms:Create*"
+            - "kms:Describe*"
+            - "kms:Enable*"
+            - "kms:List*"
+            - "kms:Put*"
+            - "kms:Update*"
+            - "kms:Revoke*"
+            - "kms:Disable*"
+            - "kms:Get*"
+            - "kms:Delete*"
+            - "kms:ScheduleKeyDeletion"
+            - "kms:CancelKeyDeletion"
+          Resource: "*"
+
+  SSMParameterEncryptionKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      # This will need to be synced with the `packer-rstudio` project
+      AliasName: !Sub 'alias/service-catalog/synapse/cred/${LinuxInstance}'
+      TargetKeyId: !Ref SSMParameterEncryptionKey
 
   LinuxInstance:
     Type: AWS::EC2::Instance
@@ -264,7 +340,9 @@ Resources:
           SetEnv:
             - set_env_vars
           SetupApacheProxy:
-            - WriteApacheConf
+            - write_apache_conf
+          SetupSynapseCredEnv:
+            - write_synapse_env
         cfn_hup_service:
           files:
             /etc/cfn/cfn-hup.conf:
@@ -282,7 +360,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy --region ${AWS::Region}
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy,SetupSynapseCredEnv --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -309,7 +387,7 @@ Resources:
         set_env_vars:
           files:
             /opt/sage/bin/make_env_vars_file.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.6/linux/opt/sage/bin/make_env_vars_file.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.9/linux/opt/sage/bin/make_env_vars_file.sh"
               mode: "00744"
               owner: "root"
               group: "root"
@@ -320,16 +398,42 @@ Resources:
                 AWS_REGION: !Ref AWS::Region
                 STACK_NAME: !Ref AWS::StackName
                 STACK_ID: !Ref AWS::StackId
-        WriteApacheConf:
+        write_apache_conf:
           files:
             /opt/sage/bin/apache_conf_rewrite.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.7/linux/opt/sage/bin/apache_conf_rewrite.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.9/linux/opt/sage/bin/apache_conf_rewrite.sh"
               mode: "00744"
               owner: "root"
               group: "root"
           commands:
             01_rewrite_apache_conf:
               command: "/bin/bash /opt/sage/bin/apache_conf_rewrite.sh"
+        write_synapse_env:
+          files:
+            /opt/sage/bin/apache_synapse_cred_env.sh:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.9/linux/opt/sage/bin/apache_synapse_cred_env.sh"
+              mode: "00744"
+              owner: "root"
+              group: "root"
+            /opt/sage/bin/rstudio_synapse_cred_env.sh:
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v1.0.9/linux/opt/sage/bin/rstudio_synapse_cred_env.sh"
+              mode: "00744"
+              owner: "root"
+              group: "root"
+          commands:
+            01_write_apache_env:
+              command: "/bin/bash /opt/sage/bin/apache_synapse_cred_env.sh"
+              env:
+                # Sync w/ InstanceSSMParameter and SSMParameterEncryptionKey
+                SERVICE_CATALOG_PREFIX: "service-catalog/synapse/cred"
+                SSM_PARAMETER_SUFFIX: "oidc-accesstoken"
+            02_write_rstudio_env:
+              command: "/bin/bash /opt/sage/bin/rstudio_synapse_cred_env.sh"
+              env:
+                # Sync w/ InstanceSSMParameter and SSMParameterEncryptionKey
+                SERVICE_CATALOG_PREFIX: "service-catalog/synapse/cred"
+                SSM_PARAMETER_SUFFIX: "oidc-accesstoken"
+
     Properties:
       ImageId: !FindInMap [NotebookTypes, !Ref NotebookType, AMIID]
       InstanceType: !Ref 'EC2InstanceType'
@@ -351,7 +455,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy,SetupSynapseCredEnv --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       Tags:
         - Key: Name

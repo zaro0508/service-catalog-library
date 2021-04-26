@@ -51,5 +51,5 @@ hooks:
 If the file above were created at `config/dev/sc-portfolio-ec2-development.yaml`, to deploy the stack one runs this sceptre command: `sceptre --var "profile=admin@scipoolprod" --var "region=us-east-1" launch dev/sc-portfolio-ec2-development`. The profile "admin@scipoolprod" would be an AWS profile with administrator credentials as descibed above.
 
 ## License
-This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details
+This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details.
 

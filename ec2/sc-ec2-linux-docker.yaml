@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Service Catalog: Linux EC2 Docker'
+Description: 'Service Catalog: EC2 Docker'
 Metadata:
   cfn-lint:
     config:
@@ -8,24 +8,24 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Linux Instance Configuration
+          default: EC2 Instance Configuration
         Parameters:
           - EC2InstanceType
-          - LinuxDistribution
+          - AMI
           - VolumeSize
     ParameterLabels:
       EC2InstanceType:
         default: EC2 Instance Type
-      LinuxDistribution:
-        default: Linux Distribution
+      AMI:
+        default: Base Image
       VolumeSize:
         default: Disk Size
 Mappings:
-  LinuxDistributions:
-    Ubuntu:
-      AMIID: "ami-0b7906ab614596e7e"  # https://github.com/Sage-Bionetworks-IT/packer-base-ubuntu-bionic/tree/v1.0.9
-    AmazonLinux:
-      AMIID: "ami-0d029704654345ff4"  # test ami
+  AMIs:
+    AmzonLinuxDocker:
+      AmiId: "ami-00976e4febdaf36c0"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/v1.0.0
+    UbuntuDocker:
+      AmiId: "ami-0b7906ab614596e7e"  # https://github.com/Sage-Bionetworks-IT/packer-base-ubuntu-bionic/tree/v1.0.9
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'
@@ -183,21 +183,21 @@ Parameters:
     Default: t3.micro
     Description: Amazon EC2 Instance Type
     Type: String
-  LinuxDistribution:
+  AMI:
     Type: String
-    Description: Linux distribution to use for instance operation system
-    Default: AmazonLinux
+    Description: The base AMI for the instance
+    Default: AmzonLinuxDocker
     AllowedValues:
-      - AmazonLinux
-      - Ubuntu
+      - AmzonLinuxDocker
+      - UbuntuDocker
   VolumeSize:
     Description: The EC2 volume size (in GB)
     Type: Number
-    Default: 8
-    MinValue: 8
+    Default: 16
+    MinValue: 16
     MaxValue: 2000
 Conditions:
-  IsUbuntu: !Equals [!Ref LinuxDistribution, 'Ubuntu']
+  IsUbuntu: !Equals [!Ref AMI, 'UbuntuDocker']
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -227,7 +227,7 @@ Resources:
       Path: /
       Roles:
         - !Ref 'InstanceRole'
-  LinuxInstance:
+  EC2Instance:
     Type: AWS::EC2::Instance
     Metadata:
       cfn-lint:
@@ -257,8 +257,8 @@ Resources:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
-                path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv --region ${AWS::Region}
+                path=Resources.EC2Instance.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EC2Instance --configsets SetupCfn,SetEnv --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -297,17 +297,12 @@ Resources:
                 STACK_NAME: !Ref AWS::StackName
                 STACK_ID: !Ref AWS::StackId
     Properties:
-      ImageId: !FindInMap [LinuxDistributions, !Ref LinuxDistribution, AMIID]
+      ImageId: !FindInMap [AMIs, !Ref AMI, AmiId]
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]
-      SecurityGroupIds:
-        - !ImportValue
-          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
-      KeyName: 'scipool'
       BlockDeviceMappings:
-        -
-          DeviceName: !If [IsUbuntu, "/dev/sda1", "/dev/xvda"]
+        - DeviceName: !If [IsUbuntu, "/dev/sda1", "/dev/xvda"]
           Ebs:
             DeleteOnTermination: true
             VolumeSize: !Ref VolumeSize
@@ -316,8 +311,8 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv --region ${AWS::Region}
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EC2Instance --configsets SetupCfn,SetEnv --region ${AWS::Region}
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource EC2Instance --region ${AWS::Region}
       Tags:
         - Key: Name
           Value: !Ref 'AWS::StackName'
@@ -336,20 +331,20 @@ Resources:
     Properties:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetInstanceTagsFunctionArn'
-      InstanceId: !Ref LinuxInstance
+      InstanceId: !Ref EC2Instance
 Outputs:
-  LinuxInstanceId:
+  EC2InstanceId:
     Description: 'The ID of the EC2 instance'
-    Value: !Ref 'LinuxInstance'
-  LinuxInstancePrivateIpAddress:
+    Value: !Ref 'EC2Instance'
+  EC2InstancePrivateIpAddress:
     Description: 'The IP Address of the EC2 instance'
-    Value: !GetAtt 'LinuxInstance.PrivateIp'
+    Value: !GetAtt 'EC2Instance.PrivateIp'
   EC2InstanceType:
     Description: 'The EC2 instance type'
     Value: !Ref 'EC2InstanceType'
   ConnectionURI:
     Description: 'Starts a shell session in the AWS Console'
-    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${LinuxInstance}?region=${AWS::Region}"
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/systems-manager/session-manager/${EC2Instance}?region=${AWS::Region}"
   EC2ConsoleURI:
     Description: 'Check your instance status with this link to the AWS Console'
-    Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${LinuxInstance}"
+    Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${EC2Instance}"

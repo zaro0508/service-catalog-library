@@ -23,9 +23,7 @@ Metadata:
 Mappings:
   AMIs:
     AmzonLinuxDocker:
-      AmiId: "ami-00976e4febdaf36c0"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/v1.0.0
-    UbuntuDocker:
-      AmiId: "ami-0b7906ab614596e7e"  # https://github.com/Sage-Bionetworks-IT/packer-base-ubuntu-bionic/tree/v1.0.9
+      AmiId: "ami-0559a96a9284c1223"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/v1.0.0
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'
@@ -189,15 +187,12 @@ Parameters:
     Default: AmzonLinuxDocker
     AllowedValues:
       - AmzonLinuxDocker
-      - UbuntuDocker
   VolumeSize:
     Description: The EC2 volume size (in GB)
     Type: Number
     Default: 16
     MinValue: 16
     MaxValue: 2000
-Conditions:
-  IsUbuntu: !Equals [!Ref AMI, 'UbuntuDocker']
 Resources:
   InstanceRole:
     Type: AWS::IAM::Role
@@ -302,7 +297,7 @@ Resources:
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]
       BlockDeviceMappings:
-        - DeviceName: !If [IsUbuntu, "/dev/sda1", "/dev/xvda"]
+        - DeviceName: "/dev/xvda"
           Ebs:
             DeleteOnTermination: true
             VolumeSize: !Ref VolumeSize

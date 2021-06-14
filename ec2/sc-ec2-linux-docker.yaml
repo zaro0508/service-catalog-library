@@ -22,7 +22,7 @@ Metadata:
         default: Disk Size
 Mappings:
   AMIs:
-    AmzonLinuxDocker:
+    AmazonLinuxDocker:
       AmiId: "ami-0559a96a9284c1223"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/v1.0.0
   AccountToImportParams:
     'Fn::Transform':
@@ -184,9 +184,9 @@ Parameters:
   AMI:
     Type: String
     Description: The base AMI for the instance
-    Default: AmzonLinuxDocker
+    Default: AmazonLinuxDocker
     AllowedValues:
-      - AmzonLinuxDocker
+      - AmazonLinuxDocker
   VolumeSize:
     Description: The EC2 volume size (in GB)
     Type: Number

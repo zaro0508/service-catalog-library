@@ -173,7 +173,7 @@ Parameters:
     Type: Number
     Default: 16
     MinValue: 16
-    MaxValue: 2000
+    MaxValue: 5000
 Mappings:
   AccountToImportParams:
     'Fn::Transform':

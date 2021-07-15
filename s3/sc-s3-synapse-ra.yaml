@@ -65,6 +65,9 @@ Resources:
             AllowedOrigins: ['*']
             AllowedMethods: [GET, POST, PUT, HEAD]
             MaxAge: 3000
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
   S3BucketPolicy:
     Type: Custom::SCS3BucketPolicy
     Properties:

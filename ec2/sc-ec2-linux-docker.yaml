@@ -343,3 +343,6 @@ Outputs:
   EC2ConsoleURI:
     Description: 'Check your instance status with this link to the AWS Console'
     Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${EC2Instance}"
+  Documentation:
+    Description: 'Service Catalog Documentation'
+    Value: "https://sagebionetworks.jira.com/wiki/spaces/SC/pages/938836322/Service+Catalog+Provisioning"

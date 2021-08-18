@@ -541,3 +541,6 @@ Outputs:
       - ALBConnectionURI: !ImportValue
           'Fn::Sub': '${AWS::Region}-alb-notebook-access-ConnectionURI'
         Path: !Ref LinuxInstance
+  Documentation:
+    Description: 'Service Catalog Documentation'
+    Value: "https://sagebionetworks.jira.com/wiki/spaces/SC/pages/938836322/Service+Catalog+Provisioning"

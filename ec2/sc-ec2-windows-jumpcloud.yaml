@@ -235,9 +235,9 @@ Outputs:
   WindowsInstanceType:
     Description: 'The EC2 instance type'
     Value: !Ref 'WindowsInstanceType'
-  ConnectionInstructions:
-    Description: 'Guidelines on connecting to instances'
-    Value: "https://sagebionetworks.jira.com/wiki/spaces/IT/pages/996376579/Connect+to+Provisioned+Instances"
   EC2ConsoleURI:
     Description: 'Check your instance status with this link to the AWS Console'
     Value: !Sub "https://console.aws.amazon.com/ec2/v2/home?region=${AWS::Region}#Instances:search=${WindowsInstance}"
+  Documentation:
+    Description: 'Service Catalog Documentation'
+    Value: "https://sagebionetworks.jira.com/wiki/spaces/SC/pages/938836322/Service+Catalog+Provisioning"

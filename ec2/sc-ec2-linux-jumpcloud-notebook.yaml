@@ -541,3 +541,6 @@ Outputs:
       - ALBConnectionURI: !ImportValue
           'Fn::Sub': '${AWS::Region}-alb-notebook-access-ConnectionURI'
         Path: !Ref LinuxInstance
+  Documentation:
+    Description: 'Service Catalog Documentation'
+    Value: "https://help.sc.sageit.org/sc/Service-Catalog-Provisioning.938836322.html"

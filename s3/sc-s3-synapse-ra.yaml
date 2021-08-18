@@ -124,3 +124,6 @@ Outputs:
   BucketUrl:
     Description: 'View the S3 Bucket in the AWS Console'
     Value: !Sub 'https://console.aws.amazon.com/s3/home?region=${AWS::Region}&bucket=${S3Bucket}'
+  Documentation:
+    Description: 'Service Catalog Documentation'
+    Value: "https://help.sc.sageit.org/sc/Service-Catalog-Provisioning.938836322.html"

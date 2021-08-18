@@ -543,4 +543,4 @@ Outputs:
         Path: !Ref LinuxInstance
   Documentation:
     Description: 'Service Catalog Documentation'
-    Value: "https://sagebionetworks.jira.com/wiki/spaces/SC/pages/938836322/Service+Catalog+Provisioning"
+    Value: "https://help.sc.sageit.org/sc/Service-Catalog-Provisioning.938836322.html"

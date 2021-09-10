@@ -32,6 +32,11 @@ Parameters:
       - c5n.xlarge
       - c5n.2xlarge
       - c5n.4xlarge
+      - i3en.large
+      - i3en.xlarge
+      - i3en.2xlarge
+      - g4dn.xlarge
+      - g4dn.2xlarge
       - m4.large
       - m4.xlarge
       - m4.2xlarge
@@ -97,6 +102,10 @@ Parameters:
       - t3a.large
       - t3a.xlarge
       - t3a.2xlarge
+      - x2gd.medium
+      - x2gd.large
+      - x2gd.xlarge
+      - x2gd.2xlarge
     Default: t3.micro
     Description: Amazon EC2 Instance Type
     Type: String

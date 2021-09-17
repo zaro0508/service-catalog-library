@@ -1,3 +1,4 @@
 ignore_checks:
 - W1020
+- W3005
 - E1022

@@ -69,6 +69,7 @@ Resources:
         Rules:
           - ObjectOwnership: BucketOwnerPreferred
   S3BucketPolicy:
+    DependsOn: S3Bucket
     Type: Custom::SCS3BucketPolicy
     Properties:
       ServiceToken: !ImportValue

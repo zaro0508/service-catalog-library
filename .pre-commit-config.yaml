@@ -12,11 +12,11 @@ repos:
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/adrienverge/yamllint
-    rev: v1.26.1
+    rev: v1.26.3
     hooks:
     -   id: yamllint
 -   repo: https://github.com/aws-cloudformation/cfn-python-lint
-    rev: v0.51.0
+    rev: v0.54.1
     hooks:
     -   id: cfn-python-lint
         files: .*/.*\.(json|yml|yaml)$

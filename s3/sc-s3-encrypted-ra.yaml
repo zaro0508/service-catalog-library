@@ -51,6 +51,14 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: IntelligentTieringRule
+            Prefix: IntTier
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 1
+                StorageClass: INTELLIGENT_TIERING
   S3BucketTagger:
     DependsOn: S3BucketPolicy
     Type: Custom::SynapseTagger

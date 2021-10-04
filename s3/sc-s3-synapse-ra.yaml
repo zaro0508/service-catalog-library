@@ -70,6 +70,14 @@ Resources:
       OwnershipControls:
         Rules:
           - ObjectOwnership: BucketOwnerPreferred
+      LifecycleConfiguration:
+        Rules:
+          - Id: IntelligentTieringRule
+            Prefix: IntTier
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 1
+                StorageClass: INTELLIGENT_TIERING
   S3BucketPolicy:
     Type: Custom::SCS3BucketPolicy
     Properties:

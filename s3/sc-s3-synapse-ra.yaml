@@ -72,8 +72,7 @@ Resources:
           - ObjectOwnership: BucketOwnerPreferred
       LifecycleConfiguration:
         Rules:
-          - Id: IntelligentTieringRule
-            Prefix: IntTier
+          - Id: IntelligentTieringClassTransitionRule
             Status: Enabled
             Transitions:
               - TransitionInDays: 1

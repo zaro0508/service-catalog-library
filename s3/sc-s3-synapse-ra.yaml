@@ -14,7 +14,6 @@ Metadata:
           default: S3 Bucket Policy Configuration
         Parameters:
           - SynapseIDs
-          - S3UserARNs
           - RestrictSameRegionDownload
 Parameters:
   SynapseIDs:
@@ -24,14 +23,6 @@ Parameters:
     ConstraintDescription: >-
       List of Synapse user or team IDs separated by commas
       (i.e. 1111111, 2222222)
-  S3UserARNs:
-    Type: CommaDelimitedList
-    Description: >-
-      (Optional) User ARNs allowed to access S3 Bucket,
-      in addition to provisioning user
-    ConstraintDescription: >-
-      List of ARNs separated by commas (e.g.
-      arn:aws:iam::011223344556:user/jdoe,arn:aws:iam::544332211006:user/rjones)
   BucketName:
     Type: String
     Description: (Optional) Name of the created bucket.
@@ -83,14 +74,7 @@ Resources:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-cfn-cr-sc-bucket-policy-FunctionArn'
       BucketName: !Ref S3Bucket
-      ExtraPrincipalArns: !Split
-        - ","
-        - !Join
-            - ","
-            - - "arn:aws:iam::325565585839:root"
-              - !Join
-                  - ","
-                  - !Ref "S3UserARNs"
+      ExtraPrincipalArns: "arn:aws:iam::325565585839:root"
   # Add owner file to the synapse bucket, requires the cloudformation S3 objects macro
   # https://github.com/Sage-Bionetworks-IT/cfn-s3objects-macro
   SynapseOwnerFile:

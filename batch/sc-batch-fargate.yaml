@@ -1,0 +1,190 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'AWS Batch with Fargate'
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Container Image
+        Parameters:
+          - Image
+          - Command
+      - Label:
+          default: Synapse
+        Parameters:
+          - SynapsePAT
+      - Label:
+          default: Schedule Job
+        Parameters:
+          - EnableSchedule
+          - Schedule
+Parameters:
+  Image:
+    Type: String
+    Description: >
+      The container image to run, can be from dockerhub or from AWS ECR repository.
+    Default: "debian:latest"
+    ConstraintDescription: >
+      Must be a valid dockerhub or AWS ECR container image
+      Example: debian:latest or 111111111.dkr.ecr.us-east-1.amazonaws.com/MY-IMAGE:latest
+  Command:
+    Type: List<String>
+    Description: >
+      The list of commands to pass to the container image
+    ConstraintDescription: >
+      Must be a list of commands (i.e. ["echo", "hello", "world"])
+  EnableSchedule:
+    Description: >
+      true to run on a schedule, false to disable. If enabled a valid Schedule must be provided
+    Type: String
+    Default: false
+    AllowedValues:
+      - true
+      - false
+  Schedule:
+    Description: >
+      Schedule to execute the docker, can be a rate or a cron schedule. Format at
+      https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
+    Type: String
+    Default: cron(0 09 ? * MON *)  # Run every Monday at 9am
+    ConstraintDescription: "Use schedule format: https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html"
+  SynapsePAT:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: >
+      (Optional) The Synapse personal access token (PAT).
+      https://docs.synapse.org/rest/POST/personalAccessToken.html
+Resources:
+  ComputeEnvironment:
+    Type: AWS::Batch::ComputeEnvironment
+    Properties:
+      Type: MANAGED
+      State: ENABLED
+      ServiceRole: !Ref ServiceRole
+      ComputeResources:
+        Type: FARGATE
+        MaxvCpus: 1
+        Subnets:
+          - !ImportValue us-east-1-scriptrunnervpc-PrivateSubnet
+          - !ImportValue us-east-1-scriptrunnervpc-PrivateSubnet1
+          - !ImportValue us-east-1-scriptrunnervpc-PrivateSubnet2
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+  ServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'batch.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole'
+  JobQueue:
+    Type: AWS::Batch::JobQueue
+    Properties:
+      ComputeEnvironmentOrder:
+        - ComputeEnvironment: !Ref ComputeEnvironment
+          Order: 1
+      Priority: 1
+      State: ENABLED
+  SchedulingPolicy:
+    Type: AWS::Batch::SchedulingPolicy
+    Properties:
+      FairsharePolicy:
+        ShareDecaySeconds: 5
+        ComputeReservation: 2
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !ImportValue us-east-1-scriptrunnervpc-VPCId
+      GroupDescription: !Sub 'SC for ${AWS::StackName}}'
+  JobDefinition:
+    Type: AWS::Batch::JobDefinition
+    Properties:
+      Type: container
+      JobDefinitionName: { Ref: "AWS::StackName" }
+      PropagateTags: True
+      PlatformCapabilities:
+        - FARGATE
+      Timeout:
+        AttemptDurationSeconds: 600
+      RetryStrategy:
+        Attempts: 1
+      ContainerProperties:
+        Command: !Ref Command
+        Image: !Ref Image
+        Environment:
+          - Name: SynapsePAT
+            Value: !Ref SynapsePAT
+        NetworkConfiguration:
+          AssignPublicIp: ENABLED
+        ResourceRequirements:
+          - Type: VCPU
+            Value: 0.5
+          - Type: MEMORY
+            Value: 1024
+        JobRoleArn: !GetAtt JobRole.Arn
+        ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            "awslogs-group": !Ref LogGroup
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+     AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'ecs-tasks.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+     ManagedPolicyArns:
+       - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+  JobRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'ecs-tasks.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ '', [ '/', { Ref: 'AWS::StackName' }, '/log' ] ]
+      RetentionInDays: 14
+  BatchTrigger:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: 'https://bootstrap-awss3cloudformationbucket-19qromfd235z9.s3.amazonaws.com/lambda-batch-trigger/0.1.0/lambda-batch-trigger.yaml'
+      Parameters:
+        JobName: !Ref AWS::StackName
+        JobQueue: !Ref JobQueue
+        JobDefinition: !Ref JobDefinition
+        EnableSchedule: !Ref EnableSchedule
+        Schedule: !Ref Schedule
+Outputs:
+  SubmitJobApi:
+    Value: !GetAtt [BatchTrigger, Outputs.SubmitJobApi]
+  Jobs:
+    Value: !Sub 'https://console.aws.amazon.com/batch/home?region=${AWS::Region}#jobs'
+  JobQueue:
+    Value: !Sub 'https://console.aws.amazon.com/batch/home?region=${AWS::Region}#queues/detail/${JobQueue}'
+  JobDefinitions:
+    Value: !Sub 'https://console.aws.amazon.com/batch/home?region=${AWS::Region}#job-definition'
+  ComputeEnvironment:
+    Value: !Sub 'https://console.aws.amazon.com/batch/home?region=${AWS::Region}#compute-environments/detail/${ComputeEnvironment}'
+  Logs:
+    Value: !Sub 'https://console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#logsV2:log-groups/log-group/$252F${AWS::StackName}$252Flog'

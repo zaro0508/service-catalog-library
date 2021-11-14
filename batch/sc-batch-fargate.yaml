@@ -57,6 +57,11 @@ Parameters:
 Resources:
   ComputeEnvironment:
     Type: AWS::Batch::ComputeEnvironment
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3008
     Properties:
       Type: MANAGED
       State: ENABLED
@@ -94,6 +99,11 @@ Resources:
       State: ENABLED
   SchedulingPolicy:
     Type: AWS::Batch::SchedulingPolicy
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3001
     Properties:
       FairsharePolicy:
         ShareDecaySeconds: 5

@@ -11,7 +11,7 @@ Metadata:
       - Label:
           default: Synapse
         Parameters:
-          - SynapsePAT
+          - SynapseAuthToken
       - Label:
           default: Schedule Job
         Parameters:
@@ -21,7 +21,7 @@ Parameters:
   Image:
     Type: String
     Description: >
-      The container image to run, can be from dockerhub or from AWS ECR repository.
+      The container image to run, must be from a public dockerhub or AWS ECR repository.
     Default: "debian:latest"
     ConstraintDescription: >
       Must be a valid dockerhub or AWS ECR container image
@@ -47,7 +47,7 @@ Parameters:
     Type: String
     Default: cron(0 09 ? * MON *)  # Run every Monday at 9am
     ConstraintDescription: "Use schedule format: https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html"
-  SynapsePAT:
+  SynapseAuthToken:
     Type: String
     NoEcho: true
     Default: ""
@@ -129,10 +129,8 @@ Resources:
         Command: !Ref Command
         Image: !Ref Image
         Environment:
-          - Name: SynapsePAT
-            Value: !Ref SynapsePAT
-        NetworkConfiguration:
-          AssignPublicIp: ENABLED
+          - Name: SYNAPSE_AUTH_TOKEN
+            Value: !Ref SynapseAuthToken
         ResourceRequirements:
           - Type: VCPU
             Value: 0.5

@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: 'AWS Batch with Fargate'
 Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:  # Ignore cfn-lint errors for PyPlate.
+        - W2001
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -9,9 +13,10 @@ Metadata:
           - Image
           - Command
       - Label:
-          default: Synapse
+          default: Environment
         Parameters:
-          - SynapseAuthToken
+          - Secrets
+          - EnvVars
       - Label:
           default: Schedule Job
         Parameters:
@@ -47,13 +52,20 @@ Parameters:
     Type: String
     Default: cron(0 09 ? * MON *)  # Run every Monday at 9am
     ConstraintDescription: "Use schedule format: https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html"
-  SynapseAuthToken:
+  Secrets:
     Type: String
     NoEcho: true
     Default: ""
     Description: >
-      (Optional) The Synapse personal access token (PAT).
-      https://docs.synapse.org/rest/POST/personalAccessToken.html
+      (Optional) The secrets passed to the docker container.
+    ConstraintDescription: 'Must be in "Key"="Value" form (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")'
+  EnvVars:
+    Type: CommaDelimitedList
+    Default: ""
+    Description: >
+      (Optional) The environment variables passed to the docker container.
+    ConstraintDescription: Must be in Key=Value form (i.e. VAR1=One,VAR2=Two)
+Transform: [PyPlate]
 Resources:
   ComputeEnvironment:
     Type: AWS::Batch::ComputeEnvironment
@@ -113,7 +125,35 @@ Resources:
     Properties:
       VpcId: !ImportValue us-east-1-scriptrunnervpc-VPCId
       GroupDescription: !Sub 'SC for ${AWS::StackName}}'
+  ScriptRunnerSecrets:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      SecretString: !Sub '{ ${Secrets} }'
+  # Allow read access to ScriptRunnerSecrets
+  # https://docs.aws.amazon.com/mediaconnect/latest/ug/iam-policy-examples-asm-secrets.html
+  SecretsAccessPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetResourcePolicy
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DescribeSecret
+              - secretsmanager:ListSecretVersionIds
+            Resource:
+              - !Ref ScriptRunnerSecrets
+          - Effect: Allow
+            Action: secretsmanager:ListSecrets
+            Resource: '*'
   JobDefinition:
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:  # Ignore cfn-lint errors for PyPlate.
+            - E3002
     Type: AWS::Batch::JobDefinition
     Properties:
       Type: container
@@ -128,9 +168,14 @@ Resources:
       ContainerProperties:
         Command: !Ref Command
         Image: !Ref Image
-        Environment:
-          - Name: SYNAPSE_AUTH_TOKEN
-            Value: !Ref SynapseAuthToken
+        Environment: |
+          #!PyPlate
+          output = []
+          for tag in params['EnvVars']:
+             key, value = tag.split('=')
+             output.append({"Name": key, "Value": value})
+        Secrets:
+          - {"Name":"ScriptRunnerSecrets", "ValueFrom":!Ref ScriptRunnerSecrets}
         ResourceRequirements:
           - Type: VCPU
             Value: 0.5
@@ -156,6 +201,7 @@ Resources:
               - 'sts:AssumeRole'
      ManagedPolicyArns:
        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+       - !Ref SecretsAccessPolicy
   JobRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -186,6 +232,8 @@ Resources:
 Outputs:
   SubmitJobApi:
     Value: !GetAtt [BatchTrigger, Outputs.SubmitJobApi]
+  ScriptRunnerSecretsArn:
+    Value: !Ref ScriptRunnerSecrets
   Jobs:
     Value: !Sub 'https://console.aws.amazon.com/batch/home?region=${AWS::Region}#jobs'
   JobQueue:

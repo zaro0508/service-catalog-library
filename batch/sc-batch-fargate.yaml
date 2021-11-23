@@ -58,7 +58,7 @@ Parameters:
     Default: ""
     Description: >
       (Optional) The secrets passed to the docker container.
-    ConstraintDescription: 'Must be in "Key"="Value" form (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")'
+    ConstraintDescription: 'Must be in "Key":"Value" form (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")'
   EnvVars:
     Type: CommaDelimitedList
     Default: ""

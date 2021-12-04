@@ -11,6 +11,7 @@ Metadata:
           default: Container Image
         Parameters:
           - Image
+          - Memory
           - Command
       - Label:
           default: Environment
@@ -31,12 +32,18 @@ Parameters:
     ConstraintDescription: >
       Must be a valid dockerhub or AWS ECR container image
       Example: debian:latest or 111111111.dkr.ecr.us-east-1.amazonaws.com/MY-IMAGE:latest
-  Command:
-    Type: List<String>
+  Memory:
     Description: >
-      The list of commands to pass to the container image
-    ConstraintDescription: >
-      Must be a list of commands (i.e. ["echo", "hello", "world"])
+      The amount (in MiB) of memory for the container. Mapping of memory to CpuShares for the
+      container is 1024: 0.25, 2048: 0.5, 4096: 1, 10240: 2, 18432: 4
+    Type: String
+    Default: "1024"
+    AllowedValues:
+      - "1024"
+      - "2048"
+      - "4096"
+      - "10240"
+      - "18432"
   EnableSchedule:
     Description: >
       true to run on a schedule, false to disable. If enabled a valid Schedule must be provided
@@ -45,6 +52,12 @@ Parameters:
     AllowedValues:
       - true
       - false
+  Command:
+    Type: List<String>
+    Description: >
+      The list of commands to pass to the container image
+    ConstraintDescription: >
+      Must be a list of commands (i.e. ["echo", "hello", "world"])
   Schedule:
     Description: >
       Schedule to execute the docker, can be a rate or a cron schedule. Format at
@@ -66,6 +79,18 @@ Parameters:
       (Optional) The environment variables passed to the docker container.
     ConstraintDescription: Must be in Key=Value form (i.e. VAR1=One,VAR2=Two)
 Transform: [PyPlate]
+Mappings:
+  VpcuMemoryMap:
+    "1024":
+      CpuShares: 0.25
+    "2048":
+      CpuShares: 0.50
+    "4096":
+      CpuShares: 1
+    "10240":
+      CpuShares: 2
+    "18432":
+      CpuShares: 4
 Resources:
   ComputeEnvironment:
     Type: AWS::Batch::ComputeEnvironment
@@ -177,10 +202,10 @@ Resources:
         Secrets:
           - {"Name":"ScriptRunnerSecrets", "ValueFrom":!Ref ScriptRunnerSecrets}
         ResourceRequirements:
-          - Type: VCPU
-            Value: 0.5
           - Type: MEMORY
-            Value: 1024
+            Value: !Ref Memory
+          - Type: VCPU
+            Value: !FindInMap [VpcuMemoryMap, !Ref Memory, CpuShares]
         JobRoleArn: !GetAtt JobRole.Arn
         ExecutionRoleArn: !GetAtt ExecutionRole.Arn
         LogConfiguration:

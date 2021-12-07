@@ -35,7 +35,7 @@ Parameters:
   Memory:
     Description: >
       The amount (in MiB) of memory for the container. Mapping of memory to CpuShares for the
-      container is 1024: 0.25, 2048: 0.5, 4096: 1, 10240: 2, 18432: 4
+      container is 1024:0.25, 2048:0.5, 4096:1, 10240:2, 18432:4
     Type: String
     Default: "1024"
     AllowedValues:
@@ -44,6 +44,9 @@ Parameters:
       - "4096"
       - "10240"
       - "18432"
+    ConstraintDescription: >
+      Memory and CPU shares must be a matched set, the relationship can be found at
+      https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-batch-jobdefinition-resourcerequirement.html
   EnableSchedule:
     Description: >
       true to run on a schedule, false to disable. If enabled a valid Schedule must be provided

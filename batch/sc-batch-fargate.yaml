@@ -57,30 +57,30 @@ Parameters:
       - true
       - false
   Command:
-    Type: List<String>
+    Type: String
     Description: >
-      The list of commands to pass to the container image (i.e. ["echo", "hello", "world"])
+      A pipe seperated list of commands to pass to the container image (i.e. echo|hello|world)
     ConstraintDescription: >
-      Must be a list of commands
+      Must be a pipe delimited string of commands
   Schedule:
     Description: >
       Schedule to execute the docker, can be a rate or a cron schedule. Format at
       https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
     Type: String
-    Default: cron(0 09 ? * MON *)  # Run every Monday at 9am
+    Default: rate(7 days)  # Run once a week
     ConstraintDescription: "Use schedule format: https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html"
   Secrets:
     Type: String
     NoEcho: true
-    Default: ""
+    Default: '"SECRET1":"Shh1"'
     Description: >
-      (Optional) The secrets passed to the docker container (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")
+      The secrets passed to the docker container (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")
     ConstraintDescription: 'Must be in "Key":"Value" form'
   EnvVars:
     Type: CommaDelimitedList
-    Default: ""
+    Default: 'SCHEDULED_JOB_VAR1=one'
     Description: >
-      (Optional) The environment variables passed to the docker container (i.e. VAR1=One,VAR2=Two)
+      The environment variables passed to the docker container (i.e. VAR1=One,VAR2=Two)
     ConstraintDescription: 'Must be in Key=Value form'
 Transform: [PyPlate]
 Mappings:
@@ -195,7 +195,7 @@ Resources:
       RetryStrategy:
         Attempts: 1
       ContainerProperties:
-        Command: !Ref Command
+        Command: !Split [ "|" , !Ref Command ]
         Image: !Ref Image
         Environment: |
           #!PyPlate
@@ -204,7 +204,7 @@ Resources:
              key, value = tag.split('=')
              output.append({"Name": key, "Value": value})
         Secrets:
-          - {"Name":"JobSecrets", "ValueFrom":!Ref JobSecrets}
+          - {"Name":"SCHEDULED_JOB_SECRETS", "ValueFrom":!Ref JobSecrets}
         ResourceRequirements:
           - Type: MEMORY
             Value: !Ref Memory

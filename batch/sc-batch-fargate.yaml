@@ -35,7 +35,8 @@ Parameters:
   Memory:
     Description: >
       The amount (in MiB) of memory for the container. Mapping of memory to CpuShares for the
-      container is 1024:0.25, 2048:0.5, 4096:1, 10240:2, 18432:4
+      container is 1024:0.25, 2048:0.5, 4096:1, 10240:2, 18432:4  More info at
+      https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-batch-jobdefinition-resourcerequirement.html
     Type: String
     Default: "1024"
     AllowedValues:
@@ -56,31 +57,31 @@ Parameters:
       - true
       - false
   Command:
-    Type: List<String>
+    Type: String
     Description: >
-      The list of commands to pass to the container image
+      A pipe seperated list of commands to pass to the container image (i.e. echo|hello|world)
     ConstraintDescription: >
-      Must be a list of commands (i.e. ["echo", "hello", "world"])
+      Must be a pipe delimited string of commands
   Schedule:
     Description: >
       Schedule to execute the docker, can be a rate or a cron schedule. Format at
       https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
     Type: String
-    Default: cron(0 09 ? * MON *)  # Run every Monday at 9am
+    Default: rate(7 days)  # Run once a week
     ConstraintDescription: "Use schedule format: https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html"
   Secrets:
     Type: String
     NoEcho: true
-    Default: ""
+    Default: '"SECRET1":"Shh1"'
     Description: >
-      (Optional) The secrets passed to the docker container.
-    ConstraintDescription: 'Must be in "Key":"Value" form (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")'
+      The secrets passed to the docker container (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")
+    ConstraintDescription: 'Must be in "Key":"Value" form'
   EnvVars:
     Type: CommaDelimitedList
-    Default: ""
+    Default: 'SCHEDULED_JOB_VAR1=one'
     Description: >
-      (Optional) The environment variables passed to the docker container.
-    ConstraintDescription: Must be in Key=Value form (i.e. VAR1=One,VAR2=Two)
+      The environment variables passed to the docker container (i.e. VAR1=One,VAR2=Two)
+    ConstraintDescription: 'Must be in Key=Value form'
 Transform: [PyPlate]
 Mappings:
   VpcuMemoryMap:
@@ -110,9 +111,9 @@ Resources:
         Type: FARGATE
         MaxvCpus: 1
         Subnets:
-          - !ImportValue us-east-1-scriptrunnervpc-PrivateSubnet
-          - !ImportValue us-east-1-scriptrunnervpc-PrivateSubnet1
-          - !ImportValue us-east-1-scriptrunnervpc-PrivateSubnet2
+          - !ImportValue us-east-1-scheduledjobsvpc-PrivateSubnet
+          - !ImportValue us-east-1-scheduledjobsvpc-PrivateSubnet1
+          - !ImportValue us-east-1-scheduledjobsvpc-PrivateSubnet2
         SecurityGroupIds:
           - !Ref SecurityGroup
   ServiceRole:
@@ -151,13 +152,13 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      VpcId: !ImportValue us-east-1-scriptrunnervpc-VPCId
+      VpcId: !ImportValue us-east-1-scheduledjobsvpc-VPCId
       GroupDescription: !Sub 'SC for ${AWS::StackName}}'
-  ScriptRunnerSecrets:
+  JobSecrets:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
       SecretString: !Sub '{ ${Secrets} }'
-  # Allow read access to ScriptRunnerSecrets
+  # Allow read access to JobSecrets
   # https://docs.aws.amazon.com/mediaconnect/latest/ug/iam-policy-examples-asm-secrets.html
   SecretsAccessPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
@@ -172,7 +173,7 @@ Resources:
               - secretsmanager:DescribeSecret
               - secretsmanager:ListSecretVersionIds
             Resource:
-              - !Ref ScriptRunnerSecrets
+              - !Ref JobSecrets
           - Effect: Allow
             Action: secretsmanager:ListSecrets
             Resource: '*'
@@ -194,7 +195,7 @@ Resources:
       RetryStrategy:
         Attempts: 1
       ContainerProperties:
-        Command: !Ref Command
+        Command: !Split [ "|" , !Ref Command ]
         Image: !Ref Image
         Environment: |
           #!PyPlate
@@ -203,7 +204,7 @@ Resources:
              key, value = tag.split('=')
              output.append({"Name": key, "Value": value})
         Secrets:
-          - {"Name":"ScriptRunnerSecrets", "ValueFrom":!Ref ScriptRunnerSecrets}
+          - {"Name":"SCHEDULED_JOB_SECRETS", "ValueFrom":!Ref JobSecrets}
         ResourceRequirements:
           - Type: MEMORY
             Value: !Ref Memory
@@ -260,8 +261,8 @@ Resources:
 Outputs:
   SubmitJobApi:
     Value: !GetAtt [BatchTrigger, Outputs.SubmitJobApi]
-  ScriptRunnerSecretsArn:
-    Value: !Ref ScriptRunnerSecrets
+  JobSecretsArn:
+    Value: !Ref JobSecrets
   Jobs:
     Value: !Sub 'https://console.aws.amazon.com/batch/home?region=${AWS::Region}#jobs'
   JobQueue:

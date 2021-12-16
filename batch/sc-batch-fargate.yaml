@@ -59,9 +59,9 @@ Parameters:
   Command:
     Type: String
     Description: >
-      A pipe seperated list of commands to pass to the container image (i.e. echo|hello|world)
+      A pipe separated list which is the command to pass to the container (i.e. echo|hello|world)
     ConstraintDescription: >
-      Must be a pipe delimited string of commands
+      Must be a pipe delimited list of strings
   Schedule:
     Description: >
       Schedule to execute the docker, can be a rate or a cron schedule. Format at
@@ -75,13 +75,13 @@ Parameters:
     Default: '"SECRET1":"Shh1"'
     Description: >
       The secrets passed to the docker container (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")
-    ConstraintDescription: 'Must be in "Key":"Value" form'
+    ConstraintDescription: 'Must be in "Key":"Value" form, and cannot be omitted'
   EnvVars:
     Type: CommaDelimitedList
     Default: 'SCHEDULED_JOB_VAR1=one'
     Description: >
       The environment variables passed to the docker container (i.e. VAR1=One,VAR2=Two)
-    ConstraintDescription: 'Must be in Key=Value form'
+    ConstraintDescription: 'Must be in Key=Value form, and cannot be omitted'
 Transform: [PyPlate]
 Mappings:
   VpcuMemoryMap:

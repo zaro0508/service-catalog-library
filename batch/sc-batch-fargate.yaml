@@ -26,13 +26,13 @@ Metadata:
 Parameters:
   Image:
     Type: String
+    AllowedPattern: ^(?!s*$).+
     Description: >
       The container image to run, must be from a public dockerhub or AWS ECR repository.
     Default: "debian:latest"
     ConstraintDescription: >
       Must be a valid dockerhub or AWS ECR container image
       Example: debian:latest or 111111111.dkr.ecr.us-east-1.amazonaws.com/MY-IMAGE:latest
-    AllowedPattern: "^(?!s*$).+"
   Memory:
     Description: >
       The amount (in MiB) of memory for the container. Mapping of memory to CpuShares for the
@@ -59,34 +59,34 @@ Parameters:
       - false
   Command:
     Type: String
+    AllowedPattern: ^(?!s*$).+
     Description: >
       A pipe separated list which is the command to pass to the container (i.e. echo|hello|world)
     ConstraintDescription: >
       Must be a pipe delimited list of strings
-    AllowedPattern: "^(?!s*$).+"
   Schedule:
+    AllowedPattern: ^(?!s*$).+
     Description: >
       Schedule to execute the docker, can be a rate or a cron schedule. Format at
       https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
     Type: String
     Default: rate(7 days)  # Run once a week
     ConstraintDescription: "Use schedule format: https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html"
-    AllowedPattern: "^(?!s*$).+"
   Secrets:
     Type: String
+    AllowedPattern: ^(?!s*$).+
     NoEcho: true
     Default: '"SECRET1":"Shh1"'
     Description: >
       The secrets passed to the docker container (i.e. "SECRET1":"Shh1","SECRET2":"Shh2")
     ConstraintDescription: 'Must be in "Key":"Value" form, and cannot be omitted'
-    AllowedPattern: "^(?!s*$).+"
   EnvVars:
     Type: CommaDelimitedList
+    AllowedPattern: ^(?!s*$).+
     Default: 'SCHEDULED_JOB_VAR1=one'
     Description: >
       The environment variables passed to the docker container (i.e. VAR1=One,VAR2=Two)
     ConstraintDescription: 'Must be in Key=Value form, and cannot be omitted'
-    AllowedPattern: "^(?!s*$).+"
 Transform: [PyPlate]
 Mappings:
   VpcuMemoryMap:

@@ -82,7 +82,6 @@ Parameters:
     ConstraintDescription: 'Must be in "Key":"Value" form, and cannot be omitted'
   EnvVars:
     Type: CommaDelimitedList
-    AllowedPattern: ^(?!s*$).+
     Default: 'SCHEDULED_JOB_VAR1=one'
     Description: >
       The environment variables passed to the docker container (i.e. VAR1=One,VAR2=Two)

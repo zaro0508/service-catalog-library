@@ -60,9 +60,7 @@ Parameters:
   Command:
     Type: String
     Description: >
-      (Optional) A comma separated list which is the command to pass to the container (i.e. echo,hello,world).
-    ConstraintDescription: >
-      Must be either empty or a comma delimited list of strings.
+      (Optional) The command that's passed to the docker container (i.e. echo hello world).
     Default: ""
   Schedule:
     Description: >
@@ -201,7 +199,7 @@ Resources:
       RetryStrategy:
         Attempts: 1
       ContainerProperties:
-        Command: !If [HasCommand, !Split [ "," , !Ref Command ], !Ref 'AWS::NoValue']
+        Command: !If [HasCommand, !Ref Command, !Ref 'AWS::NoValue']
         Image: !Ref Image
         Environment: |
           #!PyPlate

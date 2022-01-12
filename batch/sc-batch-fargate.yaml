@@ -60,7 +60,7 @@ Parameters:
   Command:
     Type: String
     Description: >
-      (Optional) The command that's passed to the docker container (i.e. echo hello world).
+      (Optional) The command that's passed to the docker container (e.g. echo hello world).
     Default: ""
   Schedule:
     Description: >

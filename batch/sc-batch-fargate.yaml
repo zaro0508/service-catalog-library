@@ -60,11 +60,8 @@ Parameters:
   Command:
     Type: String
     Description: >
-      A pipe separated list which is the command to pass to the container (i.e. echo|hello|world)
-    ConstraintDescription: >
-      Must be a pipe delimited list of strings
-    Default: "echo|hello|world"
-    AllowedPattern: "^(?!s*$).+"
+      (Optional) The command that's passed to the docker container (e.g. echo hello world).
+    Default: ""
   Schedule:
     Description: >
       Schedule to execute the docker, can be a rate or a cron schedule. Format at
@@ -87,6 +84,8 @@ Parameters:
     Description: >
       The environment variables passed to the docker container (i.e. VAR1=One,VAR2=Two)
     ConstraintDescription: 'Must be in Key=Value form, and cannot be omitted'
+Conditions:
+  HasCommand: !Not [!Equals [!Ref Command, ""]]
 Transform: [PyPlate]
 Mappings:
   VpcuMemoryMap:
@@ -200,7 +199,7 @@ Resources:
       RetryStrategy:
         Attempts: 1
       ContainerProperties:
-        Command: !Split [ "|" , !Ref Command ]
+        Command: !If [HasCommand, !Ref Command, !Ref 'AWS::NoValue']
         Image: !Ref Image
         Environment: |
           #!PyPlate

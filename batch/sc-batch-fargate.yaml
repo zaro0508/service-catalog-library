@@ -191,7 +191,7 @@ Resources:
     Properties:
       Type: container
       JobDefinitionName: { Ref: "AWS::StackName" }
-      PropagateTags: True
+      PropagateTags: true
       PlatformCapabilities:
         - FARGATE
       Timeout:

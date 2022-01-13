@@ -191,7 +191,7 @@ Resources:
     Properties:
       Type: container
       JobDefinitionName: { Ref: "AWS::StackName" }
-      PropagateTags: True
+      PropagateTags: true
       PlatformCapabilities:
         - FARGATE
       Timeout:
@@ -199,7 +199,7 @@ Resources:
       RetryStrategy:
         Attempts: 1
       ContainerProperties:
-        Command: !If [HasCommand, !Ref Command, !Ref 'AWS::NoValue']
+        Command: !If [HasCommand, !Split [ " " , !Ref Command ], !Ref 'AWS::NoValue']
         Image: !Ref Image
         Environment: |
           #!PyPlate

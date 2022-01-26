@@ -68,7 +68,7 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     Condition: CreateSameRegionDownloadRestriction
     Properties:
-      TemplateURL: 'https://bootstrap-awss3cloudformationbucket-19qromfd235z9.s3.amazonaws.com/cfn-cr-same-region-bucket-download/master/cfn-cr-same-region-bucket-download.yaml'
+      TemplateURL: 'https://bootstrap-awss3cloudformationbucket-19qromfd235z9.s3.amazonaws.com/cfn-cr-same-region-bucket-download/1.0.0/cfn-cr-same-region-bucket-download.yaml'
       Parameters:
         BucketName: !Ref 'S3Bucket'
 

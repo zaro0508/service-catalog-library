@@ -262,6 +262,16 @@ Resources:
         JobDefinition: !Ref JobDefinition
         EnableSchedule: !Ref EnableSchedule
         Schedule: !Ref Schedule
+  BatchTagger:
+    Type: Custom::SynapseTagger
+    Properties:
+      ServiceToken: !ImportValue
+        'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetBatchTagsFunctionArn'
+      BatchResources:
+        JobDefinitionArn: !Ref JobDefinition
+        JobQueueArn: !Ref JobQueue
+        ComputeEnvironmentArn: !Ref ComputeEnvironment
+        SchedulingPolicyArn: !Ref SchedulingPolicy
 Outputs:
   SubmitJobApi:
     Value: !GetAtt [BatchTrigger, Outputs.SubmitJobApi]

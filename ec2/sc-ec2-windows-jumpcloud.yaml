@@ -188,9 +188,6 @@ Resources:
       InstanceType: !Ref 'WindowsInstanceType'
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet1]
-      SecurityGroupIds:
-        - !ImportValue
-          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
       KeyName: 'scipool'
       IamInstanceProfile: !Ref 'InstanceProfile'
       BlockDeviceMappings:

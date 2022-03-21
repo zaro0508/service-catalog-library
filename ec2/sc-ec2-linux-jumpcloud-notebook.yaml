@@ -381,8 +381,6 @@ Resources:
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]
       SecurityGroupIds:
-        - !ImportValue
-          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
         - !Ref NotebookConnectSecurityGroup
       KeyName: 'scipool'
       BlockDeviceMappings:

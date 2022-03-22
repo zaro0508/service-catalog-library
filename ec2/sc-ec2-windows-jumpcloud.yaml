@@ -191,6 +191,7 @@ Resources:
       SecurityGroupIds:
         - !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
+        - !Ref AwsVpnSecurityGroup
       KeyName: 'scipool'
       IamInstanceProfile: !Ref 'InstanceProfile'
       BlockDeviceMappings:
@@ -225,6 +226,22 @@ Resources:
       ServiceToken: !ImportValue
         'Fn::Sub': '${AWS::Region}-cfn-cr-synapse-tagger-SetInstanceTagsFunctionArn'
       InstanceId: !Ref WindowsInstance
+  AwsVpnSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W1011
+    Properties:
+      GroupDescription: 'Allow network access from TGW Hub'
+      VpcId: !ImportValue
+        'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VPCId]
+      SecurityGroupIngress:
+        - CidrIp: "10.50.0.0/16"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "-1"
 Outputs:
   WindowsInstancePrivateIpAddress:
     Description: 'The IP Address of the EC2 instance'

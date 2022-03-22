@@ -184,7 +184,7 @@ Resources:
           SourceSecurityGroupId: !ImportValue
             'Fn::Sub': '${AWS::Region}-alb-notebook-access-ALBSecurityGroup'
 
-  AwsVpnSecurityGroup:
+  TgwHubSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Metadata:
       cfn-lint:
@@ -401,7 +401,7 @@ Resources:
         - !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
         - !Ref NotebookConnectSecurityGroup
-        - !Ref AwsVpnSecurityGroup
+        - !Ref TgwHubSecurityGroup
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

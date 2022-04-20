@@ -184,6 +184,23 @@ Resources:
           SourceSecurityGroupId: !ImportValue
             'Fn::Sub': '${AWS::Region}-alb-notebook-access-ALBSecurityGroup'
 
+  TgwHubSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W1011
+    Properties:
+      GroupDescription: 'Allow network access from TGW Hub'
+      VpcId: !ImportValue
+        'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VPCId]
+      SecurityGroupIngress:
+        - CidrIp: "10.50.0.0/16"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "-1"
+
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -384,6 +401,7 @@ Resources:
         - !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
         - !Ref NotebookConnectSecurityGroup
+        - !Ref TgwHubSecurityGroup
       KeyName: 'scipool'
       BlockDeviceMappings:
         -

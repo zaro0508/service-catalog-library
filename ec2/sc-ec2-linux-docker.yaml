@@ -135,6 +135,22 @@ Parameters:
     MinValue: 16
     MaxValue: 5000
 Resources:
+  TgwHubSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W1011
+    Properties:
+      GroupDescription: 'Allow network access from TGW Hub'
+      VpcId: !ImportValue
+        'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VPCId]
+      SecurityGroupIngress:
+        - CidrIp: "10.50.0.0/16"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "-1"
   InstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -237,6 +253,10 @@ Resources:
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]
+      SecurityGroupIds:
+        - !ImportValue
+          'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", VpnSecurityGroup]
+        - !Ref TgwHubSecurityGroup
       BlockDeviceMappings:
         - DeviceName: "/dev/xvda"
           Ebs:

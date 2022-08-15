@@ -60,7 +60,7 @@ Resources:
             MaxAge: 3000
       OwnershipControls:
         Rules:
-          - ObjectOwnership: BucketOwnerPreferred
+          - ObjectOwnership: BucketOwnerEnforced
       LifecycleConfiguration:
         Rules:
           - Id: IntelligentTieringClassTransitionRule

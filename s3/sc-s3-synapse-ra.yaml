@@ -89,7 +89,6 @@ Resources:
         Bucket: !Ref S3Bucket
         Key: owner.txt
         ContentType: text
-        ACL: authenticated-read
       Body: !Join [ ",", !Ref SynapseIDs ]
   S3BucketTagger:
     DependsOn: S3BucketPolicy

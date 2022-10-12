@@ -207,6 +207,7 @@ Resources:
           cfn-init.exe -v --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region} --configsets SetupCfn,SetupApps,SetEnv,SetupJumpcloud
           cfn-signal.exe -e %errorlevel% --stack ${AWS::StackId} --resource WindowsInstance --region ${AWS::Region}
           </script>
+      PropagateTagsToVolumeOnCreation: true
       Tags:
         - Key: Name
           Value: !Ref 'AWS::StackName'

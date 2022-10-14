@@ -416,6 +416,7 @@ Resources:
           #!/bin/bash
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy,SetupSynapseCredEnv --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
+      PropagateTagsToVolumeOnCreation: true
       Tags:
         - Key: Name
           Value: !Ref 'AWS::StackName'

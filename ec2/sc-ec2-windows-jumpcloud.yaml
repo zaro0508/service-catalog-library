@@ -134,7 +134,7 @@ Resources:
         set_env_vars:
           files:
             'c:\\scripts\\set_env_vars_file.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/set_env_vars_file.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.7/aws/set_env_vars_file.ps1"
               mode: "0664"
           commands:
             01_set_env_vars:
@@ -146,10 +146,10 @@ Resources:
         install_jc:
           files:
             'c:\scripts\install-ms-vc.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/install-ms-vc.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.7/aws/install-ms-vc.ps1"
               mode: "0664"
             'c:\\scripts\\install-jc-agent.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/install-jc-agent.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.7/aws/install-jc-agent.ps1"
               mode: "0664"
           commands:
             01_install_ms_vc:
@@ -168,7 +168,7 @@ Resources:
         config_jc:
           files:
             'c:\\scripts\\associate-jc-system.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.6/aws/associate-jc-system.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.7/aws/associate-jc-system.ps1"
               mode: "0664"
           commands:
             01_associate_jc_systems:

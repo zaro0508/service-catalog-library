@@ -223,6 +223,7 @@ Resources:
       Description: key used to encrypt SSM Parameters for a EC2 instance
       # number of days to wait before key gets deleted
       PendingWindowInDays: 7
+      EnableKeyRotation: "true"
       KeyPolicy:
         Version: "2012-10-17"
         Statement:

@@ -19,6 +19,11 @@ Metadata:
           - Secrets
           - EnvVars
       - Label:
+          default: Job Options
+        Parameters:
+          - JobDurationSeconds
+          - JobRetries
+      - Label:
           default: Schedule Job
         Parameters:
           - EnableSchedule
@@ -84,6 +89,20 @@ Parameters:
     Description: >
       The environment variables passed to the docker container (i.e. VAR1=One,VAR2=Two)
     ConstraintDescription: 'Must be in Key=Value form, and cannot be omitted'
+  JobDurationSeconds:
+    Description: The job will timeout once duration (in seconds) is reached
+    Type: Number
+    Default: 600
+    MinValue: 60
+    MaxValue: 3600
+    ConstraintDescription: 'Must be a number between 60 and 3600'
+  JobRetries:
+    Description: The number of times failed jobs will re-run
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 5
+    ConstraintDescription: 'Must be a number between 1 and 5'
 Conditions:
   HasCommand: !Not [!Equals [!Ref Command, ""]]
 Transform: [PyPlate]
@@ -195,9 +214,9 @@ Resources:
       PlatformCapabilities:
         - FARGATE
       Timeout:
-        AttemptDurationSeconds: 600
+        AttemptDurationSeconds: !Ref JobDurationSeconds
       RetryStrategy:
-        Attempts: 1
+        Attempts: !Ref JobRetries
       ContainerProperties:
         Command: !If [HasCommand, !Split [ " " , !Ref Command ], !Ref 'AWS::NoValue']
         Image: !Ref Image

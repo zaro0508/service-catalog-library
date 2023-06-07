@@ -1,6 +1,12 @@
 repos:
+-   repo: https://github.com/awslabs/git-secrets
+    rev: b9e96b3212fa06aea65964ff0d5cda84ce935f38
+    hooks:
+    - id: git-secrets
+      entry: git-secrets
+      args: [--scan, --recursive]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v4.4.0
     hooks:
     # On Windows, git will convert all CRLF to LF,
     # but only after all hooks are done executing.
@@ -12,15 +18,20 @@ repos:
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/adrienverge/yamllint
-    rev: v1.27.1
+    rev: v1.32.0
     hooks:
     -   id: yamllint
 -   repo: https://github.com/aws-cloudformation/cfn-python-lint
-    rev: v0.61.4
+    rev: v0.77.6
     hooks:
     -   id: cfn-python-lint
         files: .*/.*\.(json|yml|yaml)$
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.3.0
+    rev: v1.5.1
     hooks:
     -   id: remove-tabs
+-   repo: https://github.com/sirosen/check-jsonschema
+    rev: 0.22.0
+    hooks:
+      - id: check-github-workflows
+      - id: check-github-actions

@@ -24,7 +24,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: "ami-0fcbd5266337cacab" # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v3.0.0
+      AMIID: "ami-0fcbd5266337cacab" # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v3.0.1
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'
@@ -122,7 +122,7 @@ Parameters:
       - x2gd.large
       - x2gd.xlarge
       - x2gd.2xlarge
-    Default: t3.micro
+    Default: t3.small
     Description: Amazon EC2 Instance Type
     Type: String
 
@@ -136,8 +136,8 @@ Parameters:
   VolumeSize:
     Description: The EC2 volume size (in GB)
     Type: Number
-    Default: 16
-    MinValue: 16
+    Default: 30
+    MinValue: 30
     MaxValue: 2000
 
 Resources:
@@ -319,7 +319,7 @@ Resources:
                 [cfn-auto-reloader-hook]
                 triggers=post.update
                 path=Resources.LinuxInstance.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy,SetupSynapseCredEnv --region ${AWS::Region}
+                action=/usr/local/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy,SetupSynapseCredEnv --region ${AWS::Region}
               mode: "000400"
               owner: root
               group: root
@@ -330,7 +330,7 @@ Resources:
 
                 [Service]
                 Type=simple
-                ExecStart=/opt/aws/bin/cfn-hup
+                ExecStart=/usr/local/bin/cfn-hup
                 Restart=always
 
                 [Install]
@@ -340,9 +340,9 @@ Resources:
               group: root
           commands:
             01_enable_cfn-hup:
-              command: "/bin/systemctl enable cfn-hup.service"
+              command: "/usr/bin/systemctl enable cfn-hup.service"
             02_start_cfn-hup:
-              command: "/bin/systemctl start cfn-hup.service"
+              command: "/usr/bin/systemctl start cfn-hup.service"
         set_env_vars:
           files:
             /opt/sage/bin/make_env_vars_file.sh:
@@ -415,8 +415,8 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy,SetupSynapseCredEnv --region ${AWS::Region}
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
+          /usr/local/bin/cfn-init -v --stack ${AWS::StackName} --resource LinuxInstance --configsets SetupCfn,SetEnv,SetupApacheProxy,SetupSynapseCredEnv --region ${AWS::Region}
+          /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource LinuxInstance --region ${AWS::Region}
       PropagateTagsToVolumeOnCreation: true
       Tags:
         - Key: Name

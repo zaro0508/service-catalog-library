@@ -29,7 +29,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Assume AWS Role
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-region: us-east-1
         role-to-assume: arn:aws:iam::745159704268:role/sagebase-github-oidc-cfn-template-deploy

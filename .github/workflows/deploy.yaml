@@ -25,9 +25,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    env:
-      # bucket in org-sagebase-admincentral
-      S3_BUCKET_URL="s3://bootstrap-awss3cloudformationbucket-19qromfd235z9/${{ github.event.repository.name }}/${{ github.ref_name }}"
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -39,12 +36,4 @@ jobs:
         role-session-name: GitHubActions-${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
         role-duration-seconds: 900
     - name: Copy files with the AWS CLI
-      run: |
-        # Clean existing files on S3 bucket
-        aws s3 rm --recursive ${{ env.S3_BUCKET_URL }}
-        # Upload dirs and files to S3 bucket
-        DIRS=$(ls -d */)
-        for dir in $DIRS
-        do
-          aws s3 cp --recursive ${dir} ${{ env.S3_BUCKET_URL }}/${dir}
-        done
+      run: "./deploy-templates.sh || travis_terminate 1"

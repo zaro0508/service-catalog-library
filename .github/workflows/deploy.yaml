@@ -27,7 +27,7 @@ jobs:
       contents: read
     env:
       # bucket in org-sagebase-admincentral
-      S3_BUCKET_URL="s3://bootstrap-awss3cloudformationbucket-19qromfd235z9/${{ github.event.repository.name }}/${{ github.ref_name }}"
+      S3_BUCKET_URL: "s3://bootstrap-awss3cloudformationbucket-19qromfd235z9/${{ github.event.repository.name }}/${{ github.ref_name }}"
     steps:
     - name: Checkout
       uses: actions/checkout@v3

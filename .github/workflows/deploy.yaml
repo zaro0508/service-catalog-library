@@ -39,4 +39,4 @@ jobs:
         role-session-name: GhActions-${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
         role-duration-seconds: 900
     - name: Copy files with the AWS CLI
-      run: "./deploy-templates.sh || travis_terminate 1"
+      run: "./deploy-templates.sh"

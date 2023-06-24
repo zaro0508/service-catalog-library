@@ -39,4 +39,6 @@ jobs:
         role-session-name: GhActions-${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
         role-duration-seconds: 900
     - name: Copy files with the AWS CLI
-      run: "./deploy-templates.sh"
+      run: |
+        aws s3 rm --recursive $S3_BUCKET_URL
+        aws s3 cp --recursive templates $S3_BUCKET_URL

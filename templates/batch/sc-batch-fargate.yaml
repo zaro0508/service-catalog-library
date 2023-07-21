@@ -41,7 +41,7 @@ Parameters:
   Memory:
     Description: >
       The amount (in MiB) of memory for the container. Mapping of memory to CpuShares for the
-      container is 1024:0.25, 2048:0.5, 4096:1, 10240:2, 18432:4  More info at
+      container is 1024:0.25, 2048:0.5, 4096:1, 8192:2, 16384:4  More info at
       https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-batch-jobdefinition-resourcerequirement.html
     Type: String
     Default: "1024"
@@ -49,8 +49,8 @@ Parameters:
       - "1024"
       - "2048"
       - "4096"
-      - "10240"
-      - "18432"
+      - "8192"
+      - "16384"
     ConstraintDescription: >
       Memory and CPU shares must be a matched set, the relationship can be found at
       https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-batch-jobdefinition-resourcerequirement.html
@@ -114,9 +114,9 @@ Mappings:
       CpuShares: 0.50
     "4096":
       CpuShares: 1
-    "10240":
+    "8192":
       CpuShares: 2
-    "18432":
+    "16384":
       CpuShares: 4
 Resources:
   ComputeEnvironment:

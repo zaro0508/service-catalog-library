@@ -24,7 +24,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: "ami-09a02d2456a2a8908" # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v3.0.2
+      AMIID: "ami-0c57de1df1690007e" # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v3.0.3
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'

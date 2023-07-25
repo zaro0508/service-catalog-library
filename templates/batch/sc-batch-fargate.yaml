@@ -132,7 +132,7 @@ Resources:
       ServiceRole: !Ref ServiceRole
       ComputeResources:
         Type: FARGATE
-        MaxvCpus: 1
+        MaxvCpus: 16
         Subnets:
           - !ImportValue us-east-1-scheduledjobsvpc-PrivateSubnet
           - !ImportValue us-east-1-scheduledjobsvpc-PrivateSubnet1

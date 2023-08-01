@@ -24,7 +24,7 @@ Metadata:
 Mappings:
   NotebookTypes:
     Rstudio:
-      AMIID: "ami-098145e0ba042dd12" # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v3.0.4
+      AMIID: "ami-06f79674b25376754" # https://github.com/Sage-Bionetworks-IT/packer-rstudio/tree/v3.0.5
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'
@@ -346,7 +346,7 @@ Resources:
         set_env_vars:
           files:
             /opt/sage/bin/make_env_vars_file.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v2.0.0/linux/opt/sage/bin/make_env_vars_file.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v2.0.1/linux/opt/sage/bin/make_env_vars_file.sh"
               mode: "00744"
               owner: "root"
               group: "root"
@@ -360,7 +360,7 @@ Resources:
         write_apache_conf:
           files:
             /opt/sage/bin/apache_conf_rewrite.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v2.0.0/linux/opt/sage/bin/apache_conf_rewrite.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v2.0.1/linux/opt/sage/bin/apache_conf_rewrite.sh"
               mode: "00744"
               owner: "root"
               group: "root"
@@ -370,12 +370,12 @@ Resources:
         write_synapse_env:
           files:
             /opt/sage/bin/apache_synapse_cred_env.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v2.0.0/linux/opt/sage/bin/apache_synapse_cred_env.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v2.0.1/linux/opt/sage/bin/apache_synapse_cred_env.sh"
               mode: "00744"
               owner: "root"
               group: "root"
             /opt/sage/bin/rstudio_synapse_cred_env.sh:
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v2.0.0/linux/opt/sage/bin/rstudio_synapse_cred_env.sh"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/service-catalog-utils/v2.0.1/linux/opt/sage/bin/rstudio_synapse_cred_env.sh"
               mode: "00744"
               owner: "root"
               group: "root"

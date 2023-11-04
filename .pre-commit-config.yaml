@@ -6,7 +6,7 @@ repos:
       entry: git-secrets
       args: [--scan, --recursive]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
     # On Windows, git will convert all CRLF to LF,
     # but only after all hooks are done executing.
@@ -22,16 +22,16 @@ repos:
     hooks:
     -   id: yamllint
 -   repo: https://github.com/aws-cloudformation/cfn-python-lint
-    rev: v0.77.6
+    rev: v0.83.1
     hooks:
     -   id: cfn-python-lint
         files: .*/.*\.(json|yml|yaml)$
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.1
+    rev: v1.5.4
     hooks:
     -   id: remove-tabs
 -   repo: https://github.com/sirosen/check-jsonschema
-    rev: 0.22.0
+    rev: 0.27.1
     hooks:
       - id: check-github-workflows
       - id: check-github-actions

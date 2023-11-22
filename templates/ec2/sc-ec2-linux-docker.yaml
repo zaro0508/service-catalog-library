@@ -23,7 +23,7 @@ Metadata:
 Mappings:
   AMIs:
     AmazonLinuxDocker:
-      AmiId: "ami-0b0c7a592286b1ad4"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/v2.0.1
+      AmiId: "ami-0b0c6a592286b1ad4"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/v2.0.1
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'
@@ -40,24 +40,21 @@ Parameters:
       - t3a.large
       - t3a.xlarge
       - t3a.2xlarge
-      - m7a.medium
-      - m7a.large
-      - m7a.xlarge
-      - m7a.2xlarge
-      - m7a.4xlarge
-      - m7a.8xlarge
-      - c7a.medium
-      - c7a.large
-      - c7a.xlarge
-      - c7a.2xlarge
-      - c7a.4xlarge
-      - c7a.8xlarge
-      - r7a.medium
-      - r7a.large
-      - r7a.xlarge
-      - r7a.2xlarge
-      - r7a.4xlarge
-      - r7a.8xlarge
+      - m6a.large
+      - m6a.xlarge
+      - m6a.2xlarge
+      - m6a.4xlarge
+      - m6a.8xlarge
+      - c6a.large
+      - c6a.xlarge
+      - c6a.2xlarge
+      - c6a.4xlarge
+      - c6a.8xlarge
+      - r6a.large
+      - r6a.xlarge
+      - r6a.2xlarge
+      - r6a.4xlarge
+      - r6a.8xlarge
       - g5.xlarge
       - g5.2xlarge
       - g5.4xlarge

@@ -23,7 +23,7 @@ Metadata:
 Mappings:
   AMIs:
     AmazonLinuxDocker:
-      AmiId: "ami-0090a06306e93b1e1"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/v1.0.1
+      AmiId: "ami-0bbdf90b2a07923e8"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/master
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'

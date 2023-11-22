@@ -23,7 +23,7 @@ Metadata:
 Mappings:
   AMIs:
     AmazonLinuxDocker:
-      AmiId: "ami-0b0c7a592286b1ad4"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/v2.0.1
+      AmiId: "ami-0bbdf90b2a07923e8"  # https://github.com/Sage-Bionetworks-IT/packer-amazonlinux-docker/tree/master
   AccountToImportParams:
     'Fn::Transform':
       Name: 'AWS::Include'
@@ -70,8 +70,8 @@ Parameters:
   VolumeSize:
     Description: The EC2 volume size (in GB)
     Type: Number
-    Default: 16
-    MinValue: 16
+    Default: 30
+    MinValue: 30
     MaxValue: 5000
 Resources:
   TgwHubSecurityGroup:

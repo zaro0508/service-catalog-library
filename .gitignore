@@ -13,3 +13,5 @@ Pipfile.lock
 # temp
 tmp/
 temp/
+
+.project

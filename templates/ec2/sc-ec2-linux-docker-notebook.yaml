@@ -309,7 +309,7 @@ Resources:
                 -e AWS_REGION=${AWS_REGION} \
                 -e SERVICE_CATALOG_PREFIX=${SERVICE_CATALOG_PREFIX} \
                 -e SSM_PARAMETER_SUFFIX=${SSM_PARAMETER_SUFFIX} \
-                ghcr.io/Sage-Bionetworks-IT/notebook-reverse-proxy-${NOTEBOOK_TYPE}:v1.0.0
+                ghcr.io/sage-bionetworks-it/notebook-reverse-proxy-${NOTEBOOK_TYPE}:v1.0.0
               env:
                 AWS_REGION: !Ref AWS::Region
                 NETWORK_NAME:

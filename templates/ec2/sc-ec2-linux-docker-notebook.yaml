@@ -37,7 +37,7 @@ Mappings:
     Rstudio:
       NoteBookTypeForDocker: rstudio
       ConfigSet: StartContainersRstudio
-      DockerImage: rocker/rstudio:4.3.2
+      DockerImage: ghcr.io/sage-bionetworks-it/rstudio-service-catalog:v1.0.0
       EC2WorkDir: /home/ssm-user/workdir
   GlobalVars:
     DockerNetworkName:
@@ -377,7 +377,6 @@ Resources:
                 docker run -d --name ${NOTEBOOK_CONTAINER_NAME} \
                 --restart unless-stopped \
                 --network ${NETWORK_NAME} \
-                -e DISABLE_AUTH=true \
                 -e SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME=${SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME} \
                 -e AWS_DEFAULT_REGION=${AWS_REGION} \
                 -v ${EC2_WORK_DIR}:${RSTUDIO_WORK_DIR} \

@@ -122,7 +122,7 @@ Resources:
               command: !Join
                 - ''
                 - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
-                  - 'Powershell.exe C:\scripts\install-chocolatey.ps1 > C:\scripts\install-chocolatey.log'
+                  - 'Powershell.exe C:\scripts\install-chocolatey.ps1 -ChocolateyVersion 1.4.0 > C:\scripts\install-chocolatey.log'
             03_install_jq:
               command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install jq --yes --no-progress'
             04_install_awscli:
@@ -147,7 +147,7 @@ Resources:
               source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.8/aws/install-ms-vc.ps1"
               mode: "0664"
             'c:\\scripts\\install-jc-agent.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.8/aws/install-jc-agent.ps1"
+              source: "https://raw.githubusercontent.com/TheJumpCloud/support/v2.10.0/scripts/windows/InstallWindowsAgent.ps1"
               mode: "0664"
           commands:
             01_install_ms_vc:
@@ -160,7 +160,7 @@ Resources:
                 - ''
                 - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
                   - 'Powershell.exe C:\scripts\install-jc-agent.ps1 '
-                  - ' -JcConnectKey '
+                  - ' -JumpCloudConnectKey '
                   - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcConnectKey"}}
                   - ' > C:\scripts\install-jc-agent.log'
     Properties:

@@ -147,7 +147,7 @@ Resources:
               source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.8/aws/install-ms-vc.ps1"
               mode: "0664"
             'c:\\scripts\\install-jc-agent.ps1':
-              source: "https://raw.githubusercontent.com/TheJumpCloud/support/v2.10.0/scripts/windows/InstallWindowsAgent.ps1"
+              source: "https://raw.githubusercontent.com/TheJumpCloud/support/master/scripts/windows/InstallWindowsAgent.ps1"
               mode: "0664"
           commands:
             01_install_ms_vc:

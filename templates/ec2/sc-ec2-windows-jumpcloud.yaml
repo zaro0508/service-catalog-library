@@ -132,7 +132,7 @@ Resources:
         set_env_vars:
           files:
             'c:\\scripts\\set_env_vars_file.ps1':
-              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.8/aws/set_env_vars_file.ps1"
+              source: "https://raw.githubusercontent.com/Sage-Bionetworks/infra-utils/v1.0.9/aws/set_env_vars_file.ps1"
               mode: "0664"
           commands:
             01_set_env_vars:

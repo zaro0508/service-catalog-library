@@ -55,7 +55,6 @@ Parameters:
 
   EC2InstanceType:
     AllowedValues:
-      - t3a.nano
       - t3a.micro
       - t3a.small
       - t3a.medium

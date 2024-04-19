@@ -122,7 +122,7 @@ Resources:
               command: !Join
                 - ''
                 - - 'Powershell.exe Set-ExecutionPolicy Bypass -Scope Process -Force;'
-                  - 'Powershell.exe C:\scripts\install-chocolatey.ps1 -ChocolateyVersion 1.4.0 > C:\scripts\install-chocolatey.log'
+                  - 'Powershell.exe C:\scripts\install-chocolatey.ps1 > C:\scripts\install-chocolatey.log'
             03_install_jq:
               command: 'Powershell.exe C:\ProgramData\chocolatey\bin\choco install jq --yes --no-progress'
             04_install_awscli:
@@ -164,7 +164,7 @@ Resources:
                   - Fn::Transform: {"Name": "SsmParam", "Parameters": {"Type": "SecureString", "Name": "/infra/JcConnectKey"}}
                   - ' > C:\scripts\install-jc-agent.log'
     Properties:
-      ImageId: 'ami-0dbdf36ae5f30d8d1'    # https://github.com/Sage-Bionetworks-IT/packer-base-winserver2019/releases/tag/v0.0.1
+      ImageId: 'ami-08079232459aa7414'    # https://github.com/Sage-Bionetworks-IT/packer-winserver-2022/releases/tag/v0.0.1
       InstanceType: !Ref 'WindowsInstanceType'
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet1]

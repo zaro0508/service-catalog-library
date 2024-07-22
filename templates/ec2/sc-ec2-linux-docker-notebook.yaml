@@ -401,7 +401,7 @@ Resources:
                 AWS_REGION:
                   'Fn::Sub': ${AWS::Region}
     Properties:
-      ImageId: "ami-0b710e028cd5ff838" # https://github.com/Sage-Bionetworks-IT/packer-base-ubuntu-jammy/tree/v1.0.0
+      ImageId: "ami-04e92928ecf1c2066" # https://github.com/Sage-Bionetworks-IT/packer-base-ubuntu-jammy/tree/v1.0.2
       InstanceType: !Ref 'EC2InstanceType'
       SubnetId: !ImportValue
           'Fn::FindInMap': [AccountToImportParams, !Ref "AWS::AccountId", PrivateSubnet]

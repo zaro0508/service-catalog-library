@@ -32,15 +32,15 @@ Mappings:
     Jupyter:
       NoteBookTypeForDocker: jupyter
       ConfigSet: StartContainersJupyter
-      DockerImage: quay.io/jupyter/base-notebook:python-3.11
-      EC2WorkDir: /home/ssm-user/work
+      DockerImage: quay.io/jupyter/base-notebook:python-3.12
+      WorkVolumeName: work-dir
       NotebookWorkDir: /home/jovyan/work
     Rstudio:
       NoteBookTypeForDocker: rstudio
       ConfigSet: StartContainersRstudio
-      DockerImage: ghcr.io/sage-bionetworks-it/rstudio-service-catalog:1.0
-      EC2WorkDir: /home/ssm-user/work
-      NotebookWorkDir: /home/rstudio/work
+      DockerImage: ghcr.io/sage-bionetworks-it/rstudio-service-catalog:1.1
+      WorkVolumeName: work-dir
+      NotebookWorkDir: /home/rstudio
   GlobalVars:
     DockerNetworkName:
       Value: proxy-net
@@ -262,14 +262,12 @@ Resources:
             - set_env_vars
             - start_docker_network
             - start_reverse_proxy
-            - make_work_dir
             - start_jupyter_notebook
             - start_watchtower
           StartContainersRstudio:
             - set_env_vars
             - start_docker_network
             - start_reverse_proxy
-            - make_work_dir
             - start_rstudio_notebook
             - start_watchtower
         set_env_vars:
@@ -325,15 +323,6 @@ Resources:
                   'Fn::FindInMap': [GlobalVars, SSMParameterSuffix, Value]
                 NOTEBOOK_TYPE:
                   'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, NoteBookTypeForDocker]
-        make_work_dir:
-          commands:
-            make_work_dir:
-              command: |
-                mkdir -p ${EC2_WORK_DIR}
-                sudo chmod 777 ${EC2_WORK_DIR}
-              env:
-                EC2_WORK_DIR:
-                  'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, EC2WorkDir]
         start_jupyter_notebook:
           commands:
             start_notebook:
@@ -348,17 +337,17 @@ Resources:
                 -e DOCKER_STACKS_JUPYTER_CMD=notebook \
                 -e SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME=${SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME} \
                 -e AWS_DEFAULT_REGION=${AWS_REGION} \
-                -v ${EC2_WORK_DIR}:${JUPYTER_WORK_DIR} \
+                -v ${WORK_VOLUME_NAME}:${JUPYTER_WORK_DIR} \
                 --network ${NETWORK_NAME} ${DOCKER_IMAGE} \
                 bash -c "start-notebook.py --IdentityProvider.token='' --NotebookApp.base_url=/${EC2_INSTANCE_ID} \
-                --notebook-dir=${JUPYTER_WORK_DIR}"
+                --ServerApp.root_dir=${JUPYTER_WORK_DIR}"
               env:
                 NETWORK_NAME:
                   'Fn::FindInMap': [GlobalVars, DockerNetworkName, Value]
                 NOTEBOOK_CONTAINER_NAME:
                   'Fn::FindInMap': [GlobalVars, NotebookContainerName, Value]
-                EC2_WORK_DIR:
-                  'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, EC2WorkDir]
+                WORK_VOLUME_NAME:
+                  'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, WorkVolumeName]
                 DOCKER_IMAGE:
                   'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, DockerImage]
                 JUPYTER_WORK_DIR:
@@ -383,7 +372,7 @@ Resources:
                 --network ${NETWORK_NAME} \
                 -e SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME=${SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME} \
                 -e AWS_DEFAULT_REGION=${AWS_REGION} \
-                -v ${EC2_WORK_DIR}:${RSTUDIO_WORK_DIR} \
+                -v ${WORK_VOLUME_NAME}:${RSTUDIO_WORK_DIR} \
                 ${DOCKER_IMAGE}
               env:
                 NETWORK_NAME:
@@ -392,8 +381,8 @@ Resources:
                   'Fn::FindInMap': [GlobalVars, NotebookContainerName, Value]
                 DOCKER_IMAGE:
                   'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, DockerImage]
-                EC2_WORK_DIR:
-                  'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, EC2WorkDir]
+                WORK_VOLUME_NAME:
+                  'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, WorkVolumeName]
                 RSTUDIO_WORK_DIR:
                   'Fn::FindInMap': [NotebookTypeToInitParams, !Ref NotebookType, NotebookWorkDir]
                 SERVICE_CATALOG_PREFIX:
